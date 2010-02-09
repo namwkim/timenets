@@ -1,0 +1,8 @@
+  <ul style="background-color: #eeeeec;color:#2e3436;">
+    <% @profiles.each do |profile| %>
+    <li onclick="submit_add_form('<%=profile.id%>')" style="border-bottom:1px dashed #fcaf3e; border-top:1px dashed #fcaf3e;">
+		<span class="show_this"><%=profile.name%></span>
+	</li>
+    <% end %>
+  </ul>
+

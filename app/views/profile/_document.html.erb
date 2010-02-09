@@ -1,0 +1,4 @@
+<tr width='100%' id='<%=dom_id(document)%>'><td style='padding:5px 5px 5px 5px;'><%=link_to_remote_lightbox( document.name, {:url=>{:controller=>"profile", :action=>"show_document", :id=>document.id}})%></td>
+<td style='padding:5px 5px 5px 5px;'><%=document.type.name%></td>
+<td style='padding:5px 5px 5px 5px;'><%=link_to_remote_lightbox( "Edit", {:url=>{:controller=>"profile", :action=>"edit_document", :id=>document.id}})%>
+ <%=link_to_remote("Remove", :url=>{:controller=>"profile", :action=>"delete_document", :id=>document.id}, :confirm=>"do you really want to delete this document?", :complete=>"$('#{("document_"+document.id.to_s)}').remove()")%></td></tr>

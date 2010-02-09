@@ -1,0 +1,7 @@
+<tr id="<%="profile_"+profile.id.to_s%>"><td>
+	<span style="padding-right:20px;">	<%=link_to(profile.name, :action=>"show_profile", :id=>profile.id)%></span>
+	<% if role=="Spouse"%>
+		<span style="padding-right:20px;border-right:1px dotted #eeeeec"><%= rel.start_date%> - <%= rel.end_date%></span>
+	<% end %>
+    <span style="padding-left:20px;"><%=link_to_remote("Remove Link", :url=>{:action=>"delete_relationship", :id=>rel.id}, :confirm=>"do you really want to delete this relationship(profile will not be deleted)?", :complete=>"$('profile_#{profile.id}').remove();$('#{add_link_id}').setStyle('display:inline');")%></span>
+</td></tr>

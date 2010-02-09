@@ -1,0 +1,19 @@
+<% form_for @project, :url=>{:action=>"create_project", :id=>@project.id}, :html=>{:target=>"upload_frame", :id=>"proj_new_form"} do |f|%>
+<fieldset style="margin:10px 10px 10px 10px;">
+	<legend>New Project</legend>
+	<table>
+		<tr>
+			<td><%= f.label :name%></td>
+			<td><%= f.text_field :name%></td>
+		</tr>
+		<tr>
+			<td><%= f.label :description%></td>
+			<td><%= f.text_area :description %></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to_close_lightbox "Create", {:onclick=>"$('proj_new_form').request()"} %> <%=link_to_close_lightbox "Cancel"%></td>
+		</tr>
+		
+	</table>
+</fieldset>
+<% end %>

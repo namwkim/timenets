@@ -1,0 +1,3 @@
+page.replace "project_"+project.id.to_s, :partial=>"project", :locals=>{:project=>project}
+page.visual_effect :highlight, "project_#{project.id}", {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}
+

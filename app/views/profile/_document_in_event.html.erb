@@ -1,0 +1,8 @@
+<tr width='100%' id='<%=dom_id(document)%>'>
+	<td width="20%"><%=document.name%></td>
+	<td width="20%"><%=document.type.name%></td>
+	<td width="40%">
+		<span style="padding-right:20px;"><%=link_to_remote_lightbox( "Edit", {:url=>{:controller=>"profile", :action=>"edit_document_in_event", :id=>document.id}})%></span>
+	 	<%=link_to_remote("Remove Link", :url=>{:controller=>"profile", :action=>"delete_document_in_event", :id=>document.id}, :with=>"'event_id='+#{event.id}", :confirm=>"do you really want to delete this link?", :complete=>"$('#{("document_"+document.id.to_s)}').remove()")%>
+	</td>
+</tr>

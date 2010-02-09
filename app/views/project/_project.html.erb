@@ -1,0 +1,8 @@
+<tr width='100%' id='<%="project_"+project.id.to_s%>'>
+	<td><%= link_to project.name, :action=>"show_project", :id=>project.id%></td>
+	<td><%= project.description%></td>
+	<td>
+		<%= link_to_remote_lightbox "Edit", :url=>{:action=>"edit_project", :id=>project.id}%> 
+		<%= link_to_remote "Remove", :url=>{:action=>"delete_project", :id=>project.id}, :confirm=>"Do you really want to delete this project?", :complete=>"$('project_#{project.id}').remove();"%>
+	</td>
+</tr>

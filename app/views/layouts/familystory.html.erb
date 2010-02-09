@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Genealogy</title>
+	
+	<%= javascript_include_tag :defaults %>
+	<%= stylesheet_link_tag 'familystory' %>
+	<%= stylesheet_link_tag 'lightbox' %>
+	<%= javascript_include_tag 'lightbox' %>
+	<%= stylesheet_link_tag 'lytebox' %> 
+	<%= javascript_include_tag "lytebox" %>
+</head>
+
+<body>
+<div class="header_wrapper">
+<div class="header"> 
+    <span class="submenu">
+        <span class="submenuitem"><%= link_to @operator.profile.name, {:controller=>"profile", :action=>"index"}%></span>
+        <span class="submenuitem"><%= link_to ("Logout", {:controller=>"home", :action=>"logout"})%></span>
+    </span>
+	<span class="title">FamilyStory</span>
+	<span class="menu">
+		<span class="menuitem"><%= link_to "Home", {:controller=> "home", :action=>"index"}%></span>
+        <span class="menuitem"><%= link_to "Profile", {:controller=> "profile", :action=>"index"}%></span>
+    	<!--<span class="menuitem"><%= link_to "Chart", {:controller=> "chart", :action=>"index"}%></span>-->
+		<span class="menuitem"><%= link_to "Projects", {:controller=>"project", :action=>"index"}%></span>
+        <!--<span class="menuitem"><%= link_to "Collaborators", {:controller=>"collaborator", :action=>"index"}%></span>
+        <span class="menuitem"><%= link_to "Inbox", {:controller=>"home", :action=>"inbox"}%></span>-->
+    </span>
+</div>
+</div>
+
+<div id="content" class="content"><%= yield :layout %></div>
+
+</body>
+</html>

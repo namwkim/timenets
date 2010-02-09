@@ -1,0 +1,2 @@
+page.replace dom_id(document), :partial=>"document", :locals=>{:document=>document}
+page.visual_effect :highlight, "document_#{document.id}", {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}

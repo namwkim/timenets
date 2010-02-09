@@ -1,0 +1,214 @@
+@charset "UTF-8";
+/********** HTML style overriding ***************/
+body {
+	font-family: Verdana, Geneva, sans-serif;
+	background-color: #2e3436;
+	color: #eeeeec;
+	margin: 0px;
+	padding: 0px;
+	font-size: 14px;
+}
+
+a{
+	color:#e9b96e;
+	text-decoration:none;
+}
+a:hover{
+	
+	color:#73d216;
+}
+fieldset {
+	border:2px solid #888a85;
+}
+legend{
+	color:#eeeeec;
+	font-weight:bold;
+	text-shadow: 2px 2px 2px #000;
+}
+fieldset fieldset{
+	margin:5px 5px 5px 5px;
+	border:1px dashed #888a85;
+}
+fieldset fieldset legend{
+	font-weight:normal;
+}
+
+/************** front page ****************/
+
+.ftop {
+	background-color:#555753;
+	height:60px;
+	margin-top:30px;
+}
+
+.fheader{
+	margin:auto;
+	width:900px;
+	padding-top:10px;
+}
+.ftitle{
+	font-weight: bold;
+	color:#fcaf3e;
+	font-size: 36px;
+}
+.login{
+	float:right;
+}
+.fmain{
+	margin:auto;
+	width:900px;
+	height:350px;
+	padding:20px 0px 20px 0px;
+}
+.intro{
+	width:550px;
+	margin-top:50px;
+	font-size:20px;
+}
+.signup{
+	margin-top:80px;
+	float:right;
+	width:350px;
+	border-top:1px solid #eeeeec;
+	border-bottom:1px solid #eeeeec;
+	padding: 5px 5px 5px 5px;
+}
+.fbottom{
+	background-color:#555753;
+	height:60px;
+	margin-bottom:30px;
+}
+
+/********** Common Page Style  ****************/
+
+
+.header,.content {
+	margin:auto;
+	width:900px;
+}
+
+.header_wrapper{
+	background-color:#555753;
+	padding: 5px 0px 5px 0px;
+}
+.header{
+	margin-top:10px;
+}
+.title{
+	font-weight: bold;
+	color:#fcaf3e;
+	margin-right:15px;
+	font-size:16px;
+}
+.menu {
+	font-weight:bold;
+}
+.menu a{
+	color:#eeeeec;
+	text-decoration:none;
+}
+.menu a:hover{
+	
+	color:#73d216;
+}
+.menuitem{
+	margin-right:10px;
+}
+.submenu{
+	margin-top:3px;
+	float:right;
+}
+.submenuitem{
+	margin-right:5px;
+}
+.content {
+	padding-left:10px;
+	margin-top:20px;
+	padding:0px;
+}
+.inputtext{
+	font-family: Verdana, Geneva, sans-serif;
+	border: 1px solid #555753;
+	font-size: 12px;
+}
+.flash{
+	color:#ef2929;
+}
+
+/************* chart.html *******************/
+.vis{
+	width:600px;
+	margin-top:10px;
+}
+.act{
+	width:300px;
+	float:right;
+	margin-top:10px;
+}
+.disabled{
+	color:#555753;
+}
+.help td{
+	padding:10px 10px 10px 10px;
+}
+
+/****************** profile ********************/
+.profile{
+
+}
+.profile_photo_frame{
+	vertical-align:top;
+	margin-right:20px;
+	float:left;
+
+}
+.profile_photo_frame td{
+	border-bottom:1px dotted #d3d7cf;
+}
+.profile_photo{
+	margin:5px 5px 5px 5px;
+}
+.profile_info{
+	vertical-align:top;
+	text-align:left;
+	float:left;
+}
+
+/***************** event ********************/
+.events{
+	width:100%;
+	
+}
+.event{
+	width:100%;
+}
+.events table{
+	width:100%;
+}
+.dcmt_form_container{
+	margin:10px 10px 10px 10px
+}
+.event{
+	width:100%;
+}
+/***************** project ********************/
+.projects{
+	width="100%"
+}
+.projects table{
+	width:100%;
+}
+
+
+.dotted_line{
+	border-bottom:1px dotted #d3d7cf;
+}
+
+/***************** project ********************/
+.collaborators{
+	width="100%";
+}
+.collaborators table{
+	width:100%;
+}
+.

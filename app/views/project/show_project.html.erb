@@ -1,0 +1,106 @@
+<% javascript_tag do%>
+function flip_dob_field(chk_box){
+	if (chk_box.checked){
+		$('dod_label').setStyle("display:inline");
+		$('dod_text').setStyle("display:inline");	
+	}else{
+		$('dod_label').setStyle("display:none");	
+		$('dod_text').setStyle("display:none");	
+		//also clear the form elements
+		$('profile_date_of_death_1i').selectedIndex = 0;
+		$('profile_date_of_death_2i').selectedIndex = 0;
+		$('profile_date_of_death_3i').selectedIndex = 0;
+	}
+}
+function submit(){
+	$('profile_form').submit();
+}
+<% end %>
+<fieldset class="projects">
+	<legend>Project</legend>
+	<table>
+		<tr>
+			<td>Name:</td>
+			<td><%= @project.name%></td>
+		</tr>
+		<tr>
+			<td>Description:</td>
+			<td><%= @project.description%></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<fieldset>
+					<legend>Collaborators</legend>
+					<table>
+						<tr>
+							<td width="25%">Name</td>
+							<td width="30%">Email</td>
+							<td><%=link_to_remote_lightbox "Invite Collaborators", {:url=>{:controller=>"collaborator", :action=>"invite"}}%></td>
+						</tr>
+						<% @project.users.each do |user|%>
+							<tr>
+								<td><%= link_to user.profile.name, :controller=>"profile", :action=>"show_profile", :id=>user.profile.id%></td>
+								<td><%= user.email%></td>
+								<td><%= link_to_remote_lightbox "Send Message", {:url=>{:controller=>"inbox", :action=>"new_message", :id=>user.id}}%></td>
+							</tr>
+						<% end %>
+					</table>
+				</fieldset>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<fieldset>
+					<legend>Profiles</legend>
+					<table id="profiles">
+						<tr>
+							<td>Name</td>
+							<td>Sex</td>
+							<td>Date of Birth</td>
+							<td><%=link_to_remote_lightbox "New Profile", {:url=>{:controller=>"profile", :action=>"new_profile"}, :with=>"'project_id='+#{@project.id}"}%></td>
+						</tr>					
+						<% @project.profiles.each do |profile|%>
+							<%= render :partial=>"profile/profile", :locals=>{:profile=>profile}%>
+						<% end %>
+					</table>
+				</fieldset>				
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<fieldset>
+					<legend>Events</legend>
+					<table>
+						<tr>
+							<td width="20%">Date</td>
+							<td width="35%">Name</td>
+							<td width="25%">Location</td>
+							<td width="20%"><%= link_to( "New Event",:controller=>"profile", :action=>"new_event",:project_id=>@project.id)%></td>
+						</tr>					
+						<% @project.events.each do |event|%>
+							<%= render :partial=>"profile/event", :locals=>{:event=>event}%>
+						<% end %>
+					</table>
+				</fieldset>				
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<fieldset>
+					<legend>Documents</legend>
+					<table id="documents">
+						<tr>
+							<td width="20%">Title</td>
+							<td width="60%">Description</td>
+							<td width="20%"><%=link_to_remote_lightbox( "New Document", {:url=>{:controller=>"profile", :action=>"new_document"}, :with=>"'project_id='+#{@project.id}"}) %></td>
+						</tr>										
+						<% @project.documents.each do |document|%>
+							<%= render :partial=>"profile/document", :locals=>{:document=>document}%>
+						<% end %>
+					</table>
+				</fieldset>				
+			</td>
+		</tr>
+	</table>
+</fieldset>
+<iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

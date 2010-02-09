@@ -1,0 +1,2 @@
+page.insert_html :bottom, "profiles", :partial=>"profile", :locals=>{:profile=>profile}
+page.visual_effect :highlight, "profile_#{profile.id}", {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}

@@ -1,0 +1,2 @@
+page.insert_html :bottom, "project_list", :partial=>"project", :locals=>{:project=>project}
+page.visual_effect :highlight, "project_#{project.id}", {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}

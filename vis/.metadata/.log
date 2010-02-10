@@ -1,0 +1,9 @@
+!SESSION 2010-02-10 01:40:26.361 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.6.0_17
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=x86, WS=carbon, NL=en_US
+Command-line arguments:  -os macosx -ws carbon -arch x86 -data /Users/namwkim/Projects/TimeNets/cs294h social software/code/familystory/vis
+
+!ENTRY org.eclipse.core.net 1 0 2010-02-10 01:40:33.552
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences

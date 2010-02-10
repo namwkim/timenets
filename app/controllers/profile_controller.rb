@@ -2,6 +2,7 @@ class ProfileController < ApplicationController
   require 'lightbox_helper'
   before_filter :change_data_type, :only=>[:create_document, :create_profile, :create_profile_in_event, :create_document_in_event,
     :update_document, :update_profile, :update_profile_in_event, :update_document_in_event]
+  before_filter :authorize
   def index
     @profile = @operator.profile
   end
@@ -14,18 +15,11 @@ class ProfileController < ApplicationController
       format.js { render :layout=>false }
     end
   end
-  def new_profile_in_event
-    @profile = Profile.new
-    @action = "create_profile_in_event"
-    @project_id = params[:project_id]
-    @event_id   = params[:event_id]
-    render :action=>"new_profile", :layout=>false
-  end
   def create_profile      
     @profile = build_profile params
     @profile.project = Project.find_by_id(params[:project_id])
     if @profile.save      
-      log "created", "Profile", @profile.id, @profile.project.id
+      log "created", @profile, @profile.project
       respond_to do |format|
         format.html {redirect_to(:action=>"index")}
         format.js { 
@@ -38,22 +32,7 @@ class ProfileController < ApplicationController
         render :action=>"new_profile"
     end
   end
-  def create_profile_in_event
-    @profile = build_profile params
-    @profile.project = Project.find_by_id(params[:project_id])
-    if @profile.save      
-      if params[:event_id].nil? 
-        session[:profiles] << @profile.id
-      else
-        @event = Event.find_by_id(params[:event_id])
-      end      
-      responds_to_parent do 
-        render :partial=>"add_profile_in_event", :locals=>{:profile=>@profile, :event=>@event}  
-      end
-    else
-      render :action=>"new_profile_in_event"
-    end
-  end
+
   def edit_profile
     @profile  = Profile.find_by_id(params[:id])
     @action   = "update_profile"
@@ -62,14 +41,11 @@ class ProfileController < ApplicationController
       format.js{ render :layout=>false}
     end
   end
-  def edit_profile_in_event
-    @profile = Profile.find_by_id(params[:id])
-    @action  = "update_profile_in_event"
-    render :action=>"edit_profile", :layout=>false
-  end
+  
   def update_profile
     @profile = Profile.find_by_id(params[:id])
     if update_profile_attributes @profile, params
+      log "edited", @profile, @profile.project
       respond_to do |format|
         format.html {redirect_to(:action=>"index")}
         format.js { 
@@ -82,24 +58,17 @@ class ProfileController < ApplicationController
       render :action=>"edit_profile"
     end
   end
-  def update_profile_in_event
-    @profile = Profile.find_by_id(params[:id])
-    if update_profile_attributes @profile, params
-      responds_to_parent do
-        render :partial=>"update_profile_in_event", :locals=>{:profile=>@profile}
-      end      
-    else
-      render :action=>"edit_profile_in_event"
-    end
-  end
+    
   def show_profile
     @profile = Profile.find_by_id(params[:id])
     render :action=>"index"
   end
+  
   def delete_profile
     @profile = Profile.find_by_id(params[:id])
     Profile.delete_file(@profile.photo_url)
     Profile.destroy(@profile)
+    log "deleted", @profile, @profile.project
     render :nothing=>true
   end
   ############################## Relationship ##############################
@@ -197,6 +166,7 @@ class ProfileController < ApplicationController
     save_attachments_in_event @event
     @event.project = Project.find_by_id(params[:project_id])
     if @event.save
+      log "created", @event, @event.project
       flash[:notice] = 'Event was successfully added.'
       redirect_to(:controller=>"project", :action =>"show_project", :id=>@event.project.id) 
     else      
@@ -213,6 +183,7 @@ class ProfileController < ApplicationController
     @event = Event.find_by_id(params[:id])
     save_attachments_in_event @event
     if @event.update_attributes(params[:event])
+      log "edited", @event, @event.project
       flash[:notice] = 'Event was successfully updated.'
       redirect_to(:controller=>"project", :action =>"show_project", :id=>@event.project.id) 
     else
@@ -233,11 +204,54 @@ class ProfileController < ApplicationController
     @event = Event.find_by_id(params[:id])
     @project = @event.project
   end  
+  def new_profile_in_event
+    @profile = Profile.new
+    @action = "create_profile_in_event"
+    @project_id = params[:project_id]
+    @event_id   = params[:event_id] #could be null if called from new_event
+    render :action=>"new_profile", :layout=>false
+  end
+  def create_profile_in_event
+    @profile = build_profile params
+    @profile.project = Project.find_by_id(params[:project_id])
+    if @profile.save      
+      if params[:event_id].nil?  #new event
+        session[:profiles] << @profile.id
+      else #edit event or show event
+        @event = Event.find_by_id(params[:event_id])
+        @event.profiles << @profile
+      end      
+      log "created", @profile, @profile.project
+      responds_to_parent do 
+        render :partial=>"add_profile_in_event", :locals=>{:profile=>@profile, :event=>@event}  
+      end
+    else
+      render :action=>"new_profile_in_event"
+    end
+  end
+  def edit_profile_in_event
+    @profile = Profile.find_by_id(params[:id])
+    @action  = "update_profile_in_event"
+    @event_id = params[:event_id]
+    render :action=>"edit_profile", :layout=>false
+  end
+  def update_profile_in_event
+    @profile = Profile.find_by_id(params[:id])
+    if update_profile_attributes @profile, params
+      @event = Event.find_by_id(params[:event_id]) if params[:event_id]!=nil
+      log "edited", @profile, @profile.project
+      responds_to_parent do
+        render :partial=>"update_profile_in_event", :locals=>{:profile=>@profile, :event=>@event}
+      end      
+    else
+      render :action=>"edit_profile_in_event"
+    end
+  end
   def delete_profile_in_event
     @profile = Profile.find_by_id(params[:id])
-    if params[:evt_id]!=nil
-      @event  = Event.find_by_id(params[:id])      
-      @event.profiles.delete(@profile.id)
+    if params[:event_id]!=nil
+      @event  = Event.find_by_id(params[:event_id])      
+      @event.profiles.delete(@profile)
     else
       session[:profiles].delete(@profile.id)
     end
@@ -253,13 +267,6 @@ class ProfileController < ApplicationController
     end    
     render :partial=>"add_profile_in_event", :locals=>{:profile=>@profile, :event=>@event}
   end
-  ############################## Document ########################################
-  def new_document
-    @document = Document.new
-    @action   = "create_document"
-    @project_id = params[:project_id]
-    render :action=>"new_document", :layout => false
-  end
   def new_document_in_event
     @document = Document.new
     @action   = "create_document_in_event"
@@ -267,32 +274,18 @@ class ProfileController < ApplicationController
     @event_id   = params[:event_id]
     render :action=>"new_document", :layout => false    
   end
-  def create_document
-    @document = build_document params
-    @document.project = Project.find_by_id(params[:project_id])
-    if @document.save
-      #flash[:notice] = 'Document was successfully added.'      
-      respond_to do |format|
-        format.html {redirect_to(:action=>"index")}
-        format.js   { 
-          responds_to_parent do
-            render :partial => "add_document", :locals=>{:document=>@document}
-          end
-        }
-      end
-    else      
-      render :action =>"new_document"
-    end
-  end
   def create_document_in_event
     @document = build_document params
     @document.project = Project.find_by_id(params[:project_id])
     if @document.save
       if params[:event_id].nil? 
         session[:documents] << @document.id
+        @event = nil
       else
         @event = Event.find_by_id(params[:event_id])
+        @event.documents << @document
       end
+      log "created", @document, @document.project
       respond_to_parent do 
         render :partial=>"add_document_in_event", :locals=>{:document=>@document, :event=>@event}
       end
@@ -300,31 +293,17 @@ class ProfileController < ApplicationController
       render :action=>"new_document_in_event"
     end 
   end  
-  def edit_document
-    @document = Document.find_by_id(params[:id])
-    @action   = "update_document"
-    render :layout=>false
-  end
-  def edit_document_in_event
+    def edit_document_in_event
     @document = Document.find_by_id(params[:id])
     @action   = "update_document_in_event"
+    @event_id = params[:event_id]
     render :action=>"edit_document", :layout=>false
-  end
-  def update_document
-    @document = Document.find_by_id(params[:id])
-    if update_document_attributes @document, params
-      render :partial => "update_document_in_event", :locals=>{:document=>@document}
-    else
-      render :action=>"edit_document_in_event"
-    end
   end
   def update_document_in_event
      @document = Document.find_by_id(params[:id])
     if update_document_attributes @document, params
-      if params[:event_id]!=nil
-        @event = Event.find_by_id(params[:event_id]) 
-        @event.documents << @document
-      end
+      @event = Event.find_by_id(params[:event_id]) if params[:event_id]!=nil
+      log "edited", @document, @document.project
       responds_to_parent do 
         render :partial => "update_document_in_event", :locals=>{:document=>@document, :event=>@event}
       end 
@@ -332,32 +311,11 @@ class ProfileController < ApplicationController
       render :action=>"edit_document_in_event"
     end
   end
-  def delete_document
-    @document = Document.find_by_id(params[:id])
-    #delete file if exists
-    Document.delete_file(@document.file_url)
-    Document.destroy(@document)
-    render :nothing=>true
-  end
-  def show_document
-    @document = Document.find_by_id(params[:id])
-    render :layout=>false
-  end
-  def auto_complete_for_document_title
-    query = params[:doc_name]
-    query = "%#{query}%"
-    @documents = Document.find(
-      :all,
-      :conditions => ['project_id=? and LOWER(title) LIKE ?', params[:project_id], query],
-      :limit => 10
-    )
-    render :partial => 'document_completions'
-  end  
   def delete_document_in_event
+    @document = Document.find_by_id(params[:id])
     if params[:event_id]!=nil
-      @event  = Event.find_by_id(params[:event_id])
-      @document = Document.find_by_id(params[:id])
-      @event.documents.delete(@document.id)
+      @event  = Event.find_by_id(params[:event_id])       
+      @event.documents.delete(@document)
     else
       session[:documents].delete(@document.id)
     end
@@ -371,13 +329,79 @@ class ProfileController < ApplicationController
     else
       session[:documents] << @document.id
     end
-    render :partial=>"add_document_in_event", :locals=>{:document=>@document}
+    render :partial=>"add_document_in_event", :locals=>{:document=>@document, :event=>@event}
   end
+  ############################## Document ########################################
+  def new_document
+    @document = Document.new
+    @action   = "create_document"
+    @project_id = params[:project_id]
+    render :action=>"new_document", :layout => false
+  end
+
+  def create_document
+    @document = build_document params
+    @document.project = Project.find_by_id(params[:project_id])
+    if @document.save
+      #flash[:notice] = 'Document was successfully added.'
+      log "created", @document, @document.project      
+      respond_to do |format|
+        format.html {redirect_to(:action=>"index")}
+        format.js   { 
+          responds_to_parent do
+            render :partial => "add_document", :locals=>{:document=>@document}
+          end
+        }
+      end
+    else      
+      render :action =>"new_document"
+    end
+  end
+  def edit_document
+    @document = Document.find_by_id(params[:id])
+    @action   = "update_document"
+    render :layout=>false
+  end
+
+  def update_document
+    @document = Document.find_by_id(params[:id])
+    if update_document_attributes @document, params
+      log "edited", @document, @document.project
+      render :partial => "update_document_in_event", :locals=>{:document=>@document}
+    else
+      render :action=>"edit_document_in_event"
+    end
+  end
+  def delete_document
+    @document = Document.find_by_id(params[:id])
+    #delete file if exists
+    Document.delete_file(@document.file_url)
+    Document.destroy(@document)    
+    render :nothing=>true
+  end
+  def show_document
+    @document = Document.find_by_id(params[:id])
+    render :layout=>false
+  end
+  def auto_complete_for_document_name
+    query = params[:doc_name]
+    query = "%#{query}%"
+    @documents = Document.find(
+      :all,
+      :conditions => ['project_id=? and LOWER(name) LIKE ?', params[:project_id], query],
+      :limit => 10
+    )
+    render :partial => 'document_completions'
+  end  
+
 private
   def change_data_type
     if params[:html_format]==nil or params[:html_format]!="true"
       request.format = :js
     end    
+  end
+  def authorize
+    
   end
   def build_profile params
     if (params[:profile][:photo_url] != nil)
@@ -417,17 +441,9 @@ private
     session[:documents] = nil
     session[:profiles]  = nil
   end
-  def log action_verb, record_type, record_id, project_id
-    project = Project.find_by_id(project_id)
-    case record_type
-      when "Profile"
-        record = Profile.find_by_id(record_id)
-      when "Event"
-        record = Event.find_by_id(record_id)
-      when "Document"
-        record = Document.find_by_id(record_id)
-    end
-    html_text = @operator.profile.name+" "+action_verb+" "+record.name+" in "+project.name
+  def log action_verb, record, project
+    time = Time.now.strftime("%B %d at %H:%M%p")
+    html_text = @operator.profile.name+" "+action_verb+" "+record.name+" in "+project.name + ", "+time
     @operator.activities.create(:html_text=>html_text)
     @operator.save
   end  

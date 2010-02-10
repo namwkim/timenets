@@ -40,14 +40,13 @@
 		<% end %>
 	</table>
 </fieldset>
-<fieldset class="events">
+<fieldset>
 	<legend>Events</legend>
-	<table>
+	<table width="100%">
 		<tr>
 			<td width="20%">Date</td>
 			<td width="40%">Name</td>
 			<td width="20%">Location</td>
-			<td width="20%"></td>
 		</tr>
 		<% @profile.events.each do |event|%>
 			<tr id="<%="event_"+event.id.to_s%>">

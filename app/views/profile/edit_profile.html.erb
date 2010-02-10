@@ -1,6 +1,7 @@
 <% form_for(@profile, :url => {:controller=>"profile", :action =>@action, :id => @profile.id }, :html=>{:multipart => true, :id=>"prof_update_form", :target=>(@html_format? nil : "upload_frame")}) do |f|%>
 <%= f.error_messages %>
-<%= hidden_field_tag "html_format", @html_format%>
+<%= hidden_field_tag 'event_id', @event_id if @event_id!=nil%>
+<%= hidden_field_tag "html_format", @html_format if @html_format!=nil%>
 <fieldset class="profile">
 	<legend>Edit Profile</legend>
 	<table>

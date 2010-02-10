@@ -1,3 +1,10 @@
-<% @operator.activities.each do |activity| %>
-	<%= activity.html_text%><br/>
-<% end %>
+<fieldset>
+	<legend>My Activities</legend>
+	<% @operator.activities.reverse_each do |activity| %>
+		<%= activity.html_text%><br><br>
+	<% end %>
+</fieldset>
+<br/>
+<fieldset>
+	<legend>Collaborators Activities</legend>
+</fieldset>

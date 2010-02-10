@@ -1,7 +1,7 @@
 <% form_for(@profile, :url => {:controller=>"profile", :action =>@action, :id => @profile.id }, :html=>{:multipart => true, :id=>"prof_new_form", :target=>"upload_frame"}) do |f|%>
 <%= f.error_messages %>
 <%= hidden_field_tag "project_id", @project_id%>
-<%= hidden_field_tag "event_id", @event_id%>
+<%= hidden_field_tag "event_id", @event_id if @event_id!=nil%>
 <fieldset class="profile">
 	<legend>New Profile</legend>
 	<table>

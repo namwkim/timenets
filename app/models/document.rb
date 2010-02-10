@@ -3,7 +3,6 @@ class Document < ActiveRecord::Base
   has_and_belongs_to_many :events
   belongs_to :project
   
-  
   def self.upload_file uploader, file
     name = File.basename(file.original_filename).gsub(/[^\w\.\-]/,'_')
     time_string = Time.now.strftime "%y%m%d%H%M%S"

@@ -32,7 +32,7 @@
 					<legend>People</legend>						
 					<table id="profiles" width="100%" style='padding:5px 5px 5px 5px;'>				
 						<% @event.profiles.each do |profile|%>
-							<%= render :partial=>"profile/profile", :locals=>{:profile=>profile}%>
+							<%= render :partial=>"profile/profile_in_event", :locals=>{:profile=>profile, :event=>@event}%>
 						<% end %>					
 					</table>
 				</fieldset>
@@ -45,7 +45,7 @@
 					<legend>Documents</legend>
 					<table id="documents" width="100%" style='padding:5px 5px 5px 5px;'>
 						<% @event.documents.each do |document|%>
-								<%= render :partial=>"profile/document_in_event", :locals=>{:document=>document}%>
+								<%= render :partial=>"profile/document_in_event", :locals=>{:document=>document, :event=>@event}%>
 						<% end %>	
 				</table>
 				</fieldset>

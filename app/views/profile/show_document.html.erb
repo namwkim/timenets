@@ -3,7 +3,7 @@
 	<table>
 		<tr>
 			<td>Title</td>
-			<td><%= @document.title%></td>
+			<td><%= @document.name%></td>
 		</tr>
 		<tr>
 			<td>Type</td>
@@ -11,7 +11,7 @@
 		</tr>
 		<tr>
 			<td>File</td>
-			<td><% if @document.type.name == "Photo"%><%=link_to(image_tag(@document.file_url, :size=>"100x100"), @document.file_url, :rel=>"lytebox", :title=>"Document Image")%><% end %></td>
+			<td><% if @document.type.name == "Photo" and @document.file_url!=nil%><%=link_to(image_tag(@document.file_url, :size=>"100x100"), @document.file_url, :rel=>"lytebox", :title=>"Document Image")%><% end %></td>
 		</tr>
 		<tr>
 			<td>Description</td>

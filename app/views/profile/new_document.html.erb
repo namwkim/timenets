@@ -1,6 +1,7 @@
 <% form_for @document, :url=>{:controller=>"profile", :action=>@action}, :html=>{:multipart => true, :id=>"dcmt_new_form", :target=>'upload_frame'} do |f|%>
-<%= hidden_field_tag "document_id", @project_id%>
-<%= hidden_field_tag "event_id", @event_id%>
+<%= f.error_messages %>
+<%= hidden_field_tag "project_id", @project_id%>
+<%= hidden_field_tag "event_id", @event_id if @event_id!=nil%>
 <fieldset style="margin:10px 10px 10px 10px;">
 	<legend>Add a New Document</legend>
 	<table>

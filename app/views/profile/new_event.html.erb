@@ -99,7 +99,7 @@ function submit_add_doc_form(doc_id){
 					<tr><td colspan="4">
 							<%=link_to_remote_lightbox( "Upload a New Document", {:url=>{:controller=>"profile", :action=>"new_document_in_event"}, :with=>"'project_id='+#{@project.id}"}) %>
 							or Search for an Existing Document:
-							<%= auto_complete_text_field :document, :title, {:size=>15, :value=>""}, {:url=>{:controller=>"profile", :action=>"auto_complete_for_document_title"}, :select=>"show_this", :with=>"'doc_name='+element.value+'&project_id='+#{@project.id}"}%>						
+							<%= auto_complete_text_field :document, :name, {:size=>15, :value=>""}, {:url=>{:controller=>"profile", :action=>"auto_complete_for_document_name"}, :select=>"show_this", :with=>"'doc_name='+element.value+'&project_id='+#{@project.id}"}%>						
 					</td></tr>
 					<% @event.documents.each do |document|%>
 							<%= render :partial=>"profile/document_in_event", :locals=>{:document=>document}%>

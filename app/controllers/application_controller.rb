@@ -2,8 +2,7 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  before_filter :authenticate
-  before_filter :authorize, :except => [:login, :intro, :signup]
+  before_filter :authenticate, :except => [:login, :intro, :signup]
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   layout :determine_layout
@@ -16,15 +15,13 @@ class ApplicationController < ActionController::Base
     'familystory'
   end
 protected
-  def authorize
-    if @operator == nil
-      redirect_to :controller=>'home', :action=>'intro'
-    end
-  end
-  
+ 
   def authenticate
     session[:original_uri] = request.request_uri
     @operator = User.find_by_id(session[:operator_id])
+    if @operator == nil
+      redirect_to :controller=>'home', :action=>'intro'
+    end
   end
 
 end

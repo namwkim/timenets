@@ -1,2 +1,0 @@
-class ChartController < ApplicationController
-end

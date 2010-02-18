@@ -1,9 +1,0 @@
-<tr id="<%="profile_"+profile.id.to_s%>">
-	<td><%= link_to profile.name, :controller=>"profile", :action=>"show_profile", :id=>profile.id%></td>
-	<td><%=profile.sex%></td>
-	<td><%=profile.date_of_birth%></td>
-	<td> 
-		<span style="padding-right:40px;"><%= link_to_remote_lightbox "Edit", {:url=>{:controller=>"profile", :action=>"edit_profile", :id=>profile.id}} %></span>
-	 	<%=link_to_remote("Remove", :url=>{:action=>"delete_profile", :id=>profile.id}, :confirm=>"do you really want to delete this profile?", :complete=>"$('profile_#{profile.id}').remove();")%>								
-	 </td>
-</tr>

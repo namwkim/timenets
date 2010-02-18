@@ -1,0 +1,7 @@
+<tr id="<%=dom_id(person)%>"><td>
+	<span style="padding-right:20px;">	<%=link_to(person.name, :action=>"show_person", :id=>person.id)%></span>
+	<% if role=="Spouse"%>
+		<span style="padding-right:20px;border-right:1px dotted #eeeeec"><%= options[:marriage].start_date%> - <%= options[:marriage].end_date%></span>
+	<% end %>
+    <span style="padding-left:20px;"><%=link_to_remote("Remove Link", :url=>{:action=>"delete_relationship", :id=>person.id}, :with=>"'role=#{role}&ref_id='+#{ref_id}", :confirm=>"do you really want to delete this relationship(person will not be deleted)?", :complete=>"$('#{dom_id(person)}').remove();$('#{options[:add_link_id]}').show();")%></span>
+</td></tr>

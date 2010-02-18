@@ -2,9 +2,10 @@ class CreateActivities < ActiveRecord::Migration
   def self.up
     create_table :activities do |t|
       t.integer :user_id
-      t.text  :html_text
+      t.integer :project_id
+      t.string  :html
       t.timestamps
-    end
+    end        
   end
 
   def self.down

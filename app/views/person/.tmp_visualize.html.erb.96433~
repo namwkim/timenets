@@ -1,0 +1,23 @@
+<%= javascript_include_tag "bridge/FABridge" %>
+<% javascript_tag do%>
+
+var flex;
+document.observe("dom:loaded", function() {
+	FABridge.addInitializationCallback( "flex", initCallback );   
+});
+
+var initCallback = function() {  
+   flex = FABridge.flex.root();  
+   flex.setRoot(<%=@profile.id%>);
+}  
+
+<% end %>
+<!--<a onclick="flex.show_msg('<%=@profile.name%>');">Flex-Ajax bridge test</a>-->
+<div class="flexvis" style="z-index: ">
+	<object type="application/x-shockwave-flash" data="/vis/genvis.swf" width="750" height="450">
+  		<param name="vis" value="flex/genvis.swf" />
+  		<param name="wmode" value="transparent">
+		<param name="allowFullScreen" value="true" />
+	</object>			
+</div>
+

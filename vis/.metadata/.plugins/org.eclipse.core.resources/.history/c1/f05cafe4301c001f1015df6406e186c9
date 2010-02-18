@@ -1,0 +1,39 @@
+/* CSS file */
+Canvas {
+	font-family:Arial,Helvetica, sans-serif;
+	background-color: #2e3436;
+	color: #eeeeec;
+	font-size: 12px;	
+}
+.emp{
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color:#fcaf3e;
+	font-size:16px;
+}
+Button {
+	font-size: 12px;
+	fontWeight:normal;
+	borderColor:#eeeeec;
+	themeColor:#eeeeec;
+	fillAlphas:0.8, 0.6, 1.0, 0.8;
+	fillColors:#eeeeec, #d3d7cf;
+	textRollOverColor:#2e3436;
+	cornerRadius:2;
+	color:#2e3436;
+	font-family:Arial,Helvetica, sans-serif;
+    paddingBottom:0;
+    paddingLeft:0;
+    paddingRight:0;
+    paddingTop:0;
+
+	upSkin: Embed(source="kingnarestyle.swf", symbol="Button_upSkin");
+	overSkin: Embed(source="kingnarestyle.swf", symbol="Button_overSkin");
+	downSkin: Embed(source="kingnarestyle.swf", symbol="Button_downSkin");
+	disabledSkin: Embed(source="kingnarestyle.swf", symbol="Button_disabledSkin");
+	
+	selectedUpSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedUpSkin');
+	selectedOverSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedOverSkin');
+	selectedDownSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedDownSkin');
+	selectedDisabledSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedDisabledSkin');
+}

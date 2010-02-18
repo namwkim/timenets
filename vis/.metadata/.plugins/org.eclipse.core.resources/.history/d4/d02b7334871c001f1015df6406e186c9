@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Script>
+	<![CDATA[
+		import org.akinu.events.StateChangeEvent;
+			import org.akinu.model.ModelLocator;		
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			
+			private function addRelationship(role:String):void{
+				var stateChangeEvent:StateChangeEvent = new StateChangeEvent(ModelLocator.ADD_RELATIONSHIP, role);
+				stateChangeEvent.dispatch();
+			}
+	]]>
+	</mx:Script>
+	<mx:HBox>
+		<mx:Label text="Name:"/> <mx:Label text="{model.selectedPerson.name}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Sex:"/> <mx:Label text="{model.selectedPerson.sex}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Date of Birth:"/> <mx:Label text="{model.selectedPerson.dateOfBirth.toDateString()}"/>	
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Date of Death:"/> <mx:Label text="{model.selectedPerson.dateOfDeath.toDateString()}"/>	
+	</mx:HBox>	
+	<mx:Button label="Add Father" width="100" click="addRelationship('Father')"/>
+	<mx:Button label="Add Mother" width="100" click="addRelationship('Mother')"/>
+	<mx:Button label="Add Spouse" width="100" click="addRelationship('Spouse')"/>
+	<mx:Button label="Add Child" width="100" click="addRelationship('Child')"/>		
+</mx:VBox>

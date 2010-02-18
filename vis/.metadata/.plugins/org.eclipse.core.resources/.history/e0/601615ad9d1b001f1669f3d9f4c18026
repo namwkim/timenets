@@ -1,0 +1,21 @@
+package org.akinu.responders
+{
+	import mx.rpc.IResponder;
+	import mx.rpc.events.ResultEvent;
+
+	public class RootChangeResponder implements IResponder
+	{
+		public function RootChangeResponder()
+		{
+		}
+
+		public function result(e:Object):void {
+			var event:ResultEvent = e as ResultEvent;
+		}
+		
+		public function fault(info:Object):void	{
+			trace("RootChangeResponder-Fault");
+		}
+		
+	}
+}

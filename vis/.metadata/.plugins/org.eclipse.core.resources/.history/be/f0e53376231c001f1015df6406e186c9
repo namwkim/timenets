@@ -1,0 +1,19 @@
+/* CSS file */
+Canvas {
+	font-family:Arial,Helvetica, sans-serif;
+	background-color: #2e3436;
+	color: #eeeeec;
+	font-size: 12px;	
+}
+.emp{
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color:#fcaf3e;
+	font-size:16px;
+}
+Button {
+	color:#fcaf3e;
+	font-family:Arial,Helvetica, sans-serif;
+	background-color: #eeeeec;
+	
+}

@@ -110,12 +110,12 @@ package genvis.vis.operator.layout
 
 			var person:Person = recentFocus.data as Person;
 			if (!_fitHorzBound){
-				if (!person.isDead){
+				if (!person.deceased){
 					var minYear:Number = _curDate.fullYear-_xrange;
 					_xscale.min = new Date(minYear, 1, 1);
 					_xscale.max = _curDate;
 				}else{	
-					var median:Number = person.date_of_birth.fullYear + (person.date_of_death.fullYear - person.date_of_birth.fullYear)/2;
+					var median:Number = person.dateOfBirth.fullYear + (person.dateOfDeath.fullYear - person.dateOfBirth.fullYear)/2;
 					_xscale.min = new Date(median-(_xrange/2), 1, 1);
 					_xscale.max = new Date((median+(_xrange/2))>_curDate.fullYear?_curDate.fullYear:(median+(_xrange/2)) , 1 ,1);				
 				}
@@ -130,13 +130,13 @@ package genvis.vis.operator.layout
 //						isAlive = true;
 //					}					
 //				});
-//				people.sortOn("date_of_birth", Array.NUMERIC);
-//				_xscale.min = people[0].date_of_birth;
+//				people.sortOn("dateOfBirth", Array.NUMERIC);
+//				_xscale.min = people[0].dateOfBirth;
 //				if (isAlive) {
 //					_xscale.max = _curDate;
 //				}else{
-//					people.sortOn("date_of_death", Array.NUMERIC);
-//					_xscale.max = people[people.length-1].date_of_death;
+//					people.sortOn("dateOfDeath", Array.NUMERIC);
+//					_xscale.max = people[people.length-1].dateOfDeath;
 //					
 //				}
 				//temp for study data
@@ -153,8 +153,8 @@ package genvis.vis.operator.layout
 //				people.push(p);
 //			}, _xrange);	
 //					
-//			people.sortOn("date_of_birth", Array.NUMERIC);
-//			var minYear:Number = Math.floor(people[0].date_of_birth.fullYear/10)*10;
+//			people.sortOn("dateOfBirth", Array.NUMERIC);
+//			var minYear:Number = Math.floor(people[0].dateOfBirth.fullYear/10)*10;
 //			_xscale.min = new Date(minYear, 1, 1);
 //			
 //			var isAlive:Boolean = false;
@@ -168,8 +168,8 @@ package genvis.vis.operator.layout
 //			if (isAlive){
 //				 _xscale.max = new Date();				 
 //			}else{
-//				people.sortOn("date_of_death", Array.NUMERIC);
-//				maxYear = Math.ceil(people[people.length-1].date_of_death.fullYear/10)*10;
+//				people.sortOn("dateOfDeath", Array.NUMERIC);
+//				maxYear = Math.ceil(people[people.length-1].dateOfDeath.fullYear/10)*10;
 //				_xscale.max =  new Date(maxYear, 11, 31);;
 //			}				
 		}
@@ -598,11 +598,11 @@ package genvis.vis.operator.layout
 //				if (!isNaN(d.data.yorder)) _displayList.push(d.data);
 //				//if (d.data.isVisited) _displayList.push(d.data);
 //			});
-//		    _displayList.sortOn("date_of_birth", Array.NUMERIC);
+//		    _displayList.sortOn("dateOfBirth", Array.NUMERIC);
 //		    
 //
 //		    // Group years by decade.  Range of years depend on data being displayed.  Scale will change as necessary.    
-//		    var minYear:Number = Math.floor(_displayList[0].date_of_birth.fullYear/10)*10;
+//		    var minYear:Number = Math.floor(_displayList[0].dateOfBirth.fullYear/10)*10;
 //		    this.xScale.min = new Date(minYear, 1, 1);
 //		   	
 //			var isAlive:Boolean = false;
@@ -611,7 +611,7 @@ package genvis.vis.operator.layout
 //			for each (var person:Person in _displayList){
 //				if (min>person.yorder) min = person.yorder;
 //		    	if (max<person.yorder) max = person.yorder;	
-//				if (person.date_of_death ==null){
+//				if (person.dateOfDeath ==null){
 //					isAlive = true;
 //				}				
 //			}
@@ -620,8 +620,8 @@ package genvis.vis.operator.layout
 //				 this.xScale.max = new Date();
 //				 maxYear = this.xScale.max.fullYear;
 //			}else{
-//				_displayList.sortOn("date_of_death", Array.NUMERIC);
-//				maxYear = Math.ceil(_displayList[_displayList.length-1].date_of_death.fullYear/10)*10;
+//				_displayList.sortOn("dateOfDeath", Array.NUMERIC);
+//				maxYear = Math.ceil(_displayList[_displayList.length-1].dateOfDeath.fullYear/10)*10;
 //				 this.xScale.max = new Date(maxYear, 11, 31);
 //			}	
 //		   			   

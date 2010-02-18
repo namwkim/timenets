@@ -1,0 +1,20 @@
+package org.akinu.commands
+{
+	import com.adobe.cairngorm.commands.ICommand;
+	import com.adobe.cairngorm.control.CairngormEvent;
+	
+	import org.akinu.events.InitializeEvent;
+	import org.akinu.model.ModelLocator;
+
+	public class InitializeCommand implements ICommand {
+		private var model:ModelLocator = ModelLocator.getInstance();
+		public function InitializeCommand()	{
+		}
+
+		public function execute(event:CairngormEvent):void {
+			var initEvent:InitializeEvent  = event as InitializeEvent;
+			model.vis = initEvent.vis;
+		}
+		
+	}
+}

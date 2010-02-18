@@ -1,0 +1,20 @@
+package org.akinu.responders
+{
+	import mx.rpc.IResponder;
+	import mx.rpc.events.ResultEvent;
+
+	public class AddRelationshipResponder implements IResponder{
+		public function AddRelationshipResponder()	{
+		}
+
+		public function result(e:Object):void	{
+			var event:ResultEvent = e as ResultEvent;
+			trace(event.trace);
+		}
+		
+		public function fault(info:Object):void	{
+			trace("AddRelationshipResponder - Fault");
+		}
+		
+	}
+}

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ViewStack xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Label text="This is where default actions are located!"/>
+	<mx:Label text="Action1-Create a Event"/>
+</mx:ViewStack>

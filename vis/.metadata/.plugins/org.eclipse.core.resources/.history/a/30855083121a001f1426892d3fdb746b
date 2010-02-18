@@ -1,0 +1,10 @@
+package org.akinu.business
+{
+	public class PersonDelegate
+	{
+		public function PersonDelegate()
+		{
+		}
+
+	}
+}

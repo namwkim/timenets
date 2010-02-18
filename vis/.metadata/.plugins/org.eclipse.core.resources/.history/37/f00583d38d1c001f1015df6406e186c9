@@ -1,0 +1,16 @@
+package org.akinu.responders
+{
+	import mx.rpc.IResponder;
+
+	public class AddRelationshipResponder implements IResponder{
+		public function AddRelationshipResponder()	{
+		}
+
+		public function result(data:Object):void	{
+		}
+		
+		public function fault(info:Object):void	{
+		}
+		
+	}
+}

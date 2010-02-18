@@ -1,0 +1,13 @@
+package org.akinu.events
+{
+	import com.adobe.cairngorm.control.CairngormEvent;
+
+	public class StateChangeEvent extends CairngormEvent
+	{
+		public function StateChangeEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+		{
+			super(type, bubbles, cancelable);
+		}
+		
+	}
+}

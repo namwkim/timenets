@@ -1,0 +1,3 @@
+#Thu Feb 18 05:54:13 PST 2010
+prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<watchExpressions>\n<expression enabled\="true" text\="person.name"/>\n<expression enabled\="true" text\="_vis"/>\n</watchExpressions>\n
+eclipse.preferences.version=1

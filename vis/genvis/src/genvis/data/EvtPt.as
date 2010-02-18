@@ -2,7 +2,8 @@ package genvis.data
 {
 	import flash.geom.Point;
 	
-	
+	//change this to Render Point to remove name conflict with Event class???? or not
+	// or move this to vis.data
 	public class EvtPt
 	{
 		private var _pt:Point;

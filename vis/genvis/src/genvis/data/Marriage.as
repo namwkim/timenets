@@ -1,19 +1,25 @@
 package genvis.data
 {
 	import flare.vis.data.Data;
-	
+	[RemoteClass(alias="Marriage")]
+	[Bindable]
 	public class Marriage
 	{
+		private var _id:String;
 		private var _startDate:Date;
 		private var _endDate:Date;
 		private var _person1:Person;
 		private var _person2:Person;
+		private var _divorced:Boolean =true;
 		
 		private var _estimated:int;
 		
 		public static const NONE:int		= 0;
 		public static const STARTDATE:int	= 1;
 		public static const ENDDATE:int		= 2;
+		
+		public function set id(id:String):void { _id = id; }
+		public function get id():String { return _id; }
 		
 		public function set startDate(sDate:Date):void { 
 			_startDate = sDate; 
@@ -29,17 +35,24 @@ package genvis.data
 		public function set person2(p:Person):void { _person2 = p; }
 		public function get person2():Person { return _person2; }
 		
+		//TODO: is there a better way to handle this discrepancy with the backend?
+		public function set person(p:Person):void { _person1 = p; }
+		public function get person():Person { return _person1; }
+		public function set spouse(p:Person):void { _person2 = p; }
+		public function get spouse():Person { return _person2; }
+		
 		public function set estimated(flag:int):void{ _estimated |= flag; }
 		public function get estimated():int	{ return _estimated; }
 		
-		public function get isDivorced():Boolean {
+		public function set divorced(d:Boolean):void { _divorced = d; }
+		public function get divorced():Boolean {
 			if (_endDate == null) return false;
-			if ((_endDate.fullYear == (_person1.isDead? _person1.date_of_death.fullYear: (new Date()).fullYear)
-				|| _endDate.fullYear == (_person2.isDead? _person2.date_of_death.fullYear: (new Date()).fullYear))
+			if ((_endDate.fullYear == (_person1.deceased? _person1.dateOfDeath.fullYear: (new Date()).fullYear)
+				|| _endDate.fullYear == (_person2.deceased? _person2.dateOfDeath.fullYear: (new Date()).fullYear))
 				&& (_person1.lastMarriage == this && _person2.lastMarriage == this))	{
 				return false;
 			}		
-			return true;
+			return _divorced;
 		}
 		public function isEstimated(flag:int):Boolean{
 			return _estimated & flag? true : false;

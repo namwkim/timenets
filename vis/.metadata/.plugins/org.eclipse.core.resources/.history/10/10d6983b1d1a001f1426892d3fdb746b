@@ -1,0 +1,13 @@
+package org.akinu.control
+{
+	import com.adobe.cairngorm.control.FrontController;
+
+	public class AkinuController extends FrontController
+	{
+		public function AkinuController()
+		{
+			super();
+		}
+		
+	}
+}

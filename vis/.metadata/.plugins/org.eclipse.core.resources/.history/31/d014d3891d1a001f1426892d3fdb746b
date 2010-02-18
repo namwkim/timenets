@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+				import org.akinu.model.ModelLocator;		
+				private var modelLocator:ModelLocator = ModelLocator.getInstance();
+		]]>
+	</mx:Script>
+	<mx:Label text="This is where default actions are located!"/>
+	<mx:Button id="createEvent" label="Create a Event"/>
+</mx:Canvas>

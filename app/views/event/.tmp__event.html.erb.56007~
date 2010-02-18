@@ -1,0 +1,15 @@
+<tr id="<%="event_"+event.id.to_s%>">
+	<td>
+		<% if event.isRange %>
+			<%= event.from%> - <%=event.to%>
+		<% else %>
+			<%= event.from%>
+		<% end %>
+	</td>
+	<td><%= link_to event.name, :controller=>"profile", :action=>"show_event", :id=>event.id %></td>
+	<td><%= event.location%></td>
+	<td>
+		<%= link_to "Edit", :controller=>"profile", :action=>"edit_event", :id=>event.id, :project_id=>@project.id%>
+		<%= link_to_remote "Remove", :url=>{:controller=>"profile", :action=>"delete_event", :id=>event.id}, :confirm=>"do you really want to delete this event?", :complete=>"$('event_#{event.id}').remove()"%>
+	</td>
+</tr>

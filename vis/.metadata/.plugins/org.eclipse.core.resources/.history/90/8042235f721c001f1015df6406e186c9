@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.FormItem;
+			import mx.collections.ArrayCollection;
+				import org.akinu.model.ModelLocator;		
+				[Bindable]
+				private var model:ModelLocator = ModelLocator.getInstance();
+				//private var month:ArrayCollection = [{:"Month","Jan","Feb","Mar","Apr","May","Jun","July","Aug","Sep","Oct","Nov","Dec"]; 
+				[Bindable]
+				private var thisYear:int = new Date().fullYear;
+				[Bindable]
+				private var sexArray:Array = [{label:"Select Sex:",data:""},{label:"Male",data:"Male"},{label:"Female",data:"Female"}];
+				[Bindable]
+				private var monthArray:Array = [{label:"Month",data:""},{label:"Jan",data:"1"},{label:"Feb",data:"2"}, {label:"Mar",data:"3"}, 
+					{label:"Apr",data:"4"}, {label:"May",data:"5"}, {label:"June",data:"6"}, {label:"July",data:"7"}, {label:"Aug",data:"8"},
+					{label:"Sep",data:"9"}, {label:"Oct",data:"10"}, {label:"Nov",data:"11"}, {label:"Dec",data:"12"} ];
+				[Bindable]
+				private var dayArray:Array = [{label:"Day", data:""}, {label:"1", data:"1"}, {label:"2", data:"2"}, {label:"3", data:"3"}, {label:"4", data:"4"},
+				{label:"5", data:"5"}, {label:"6", data:"6"}, {label:"7", data:"7"}, {label:"8", data:"8"}, {label:"9", data:"9"}, {label:"10", data:"10"}, 
+				{label:"11", data:"11"}, {label:"12", data:"12"}, {label:"13", data:"13"}, {label:"14", data:"14"}, {label:"15", data:"15"}, {label:"16", data:"16"},
+				{label:"17", data:"17"}, {label:"18", data:"18"}, {label:"19", data:"19"}, {label:"20", data:"20"}, {label:"21", data:"21"}, {label:"22", data:"22"},
+				{label:"23", data:"23"}, {label:"24", data:"24"}, {label:"25", data:"25"}, {label:"26", data:"26"}, {label:"27", data:"27"}, {label:"28", data:"28"}, 
+				{label:"29", data:"29"}, {label:"30", data:"30"}, {label:"31", data:"31"}];
+
+				private function submitForm():void{
+					trace(sex.value);
+					
+				}
+		]]>
+		</mx:Script>
+    <mx:NumberValidator source="{dobYear}" property="text"
+        minValue="-9999" maxValue="{thisYear}" domain="int" 
+        trigger="{submit}" triggerEvent="click"/>
+
+	<mx:Form id="relForm" defaultButton="{submit}">
+		<mx:FormHeading label="New Relationship"/>
+		<mx:FormItem label="First Name">
+			<mx:TextInput id="firstName"/>		
+		</mx:FormItem>
+		<mx:FormItem label="Last Name">
+			<mx:TextInput id="lastName"/>		
+		</mx:FormItem>
+	    <mx:FormItem label="Sex">
+		    <mx:ComboBox id="sex" dataProvider="{sexArray}"/>
+    </mx:FormItem>
+    <mx:FormItem direction="vertical" label="Birth Date">
+    	<mx:HBox>
+	     	<mx:ComboBox dataProvider="{monthArray}" id="dobMonth"/>
+	    	<mx:ComboBox dataProvider="{dayArray}" id="dobDay"/>
+	    	<mx:TextInput id="dobYear" width="40" text=" Year" click="dobYear.text=''"/>	
+    	</mx:HBox>
+    	<mx:CheckBox label="Deceased?" id="deceased"/>   	   	
+    </mx:FormItem>
+    <mx:FormItem direction="vertical" label="Death Date" visible="{deceased.selected}">
+    	<mx:HBox>
+	     	<mx:ComboBox dataProvider="{monthArray}" id="dodMonth"/>
+	    	<mx:ComboBox dataProvider="{dayArray}" id="dodDay"/>
+	    	<mx:TextInput id="dodYear" width="40" text=" Year" click="dodYear.text=''"/>	
+    	</mx:HBox>	   	
+    </mx:FormItem>
+    <mx:FormItem>
+        <mx:Button id="submit" label="Add" click="submitForm();"/>
+    </mx:FormItem>
+
+</mx:Form>
+</mx:Canvas>

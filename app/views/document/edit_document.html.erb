@@ -1,0 +1,29 @@
+<% form_for @document, :url=>{:controller=>"document", :action=>@action, :id=>@document.id}, :html=>{:multipart => true, :id=>"dcmt_update_form", :target=>"upload_frame"} do |f|%>
+<%= f.error_messages %>
+<%= hidden_field_tag 'event_id', @event_id if @event_id!=nil%>
+<fieldset style="margin:10px 10px 10px 10px;">
+	<legend>Edit Document</legend>
+	<table>
+		<tr>
+			<td><%= f.label :name%></td>
+			<td><%= f.text_field :name%></td>
+		</tr>
+		<tr>
+			<td><%= f.label :type_id, "Type"%></td>
+			<td><%= f.select :type_id, DocType.find(:all).collect{|dc| [dc.name, dc.id]}%></td>
+		</tr>
+		<tr>
+			<td><%= f.label :file_url, "File"%></td>
+			<td><%= f.file_field :file_url%><br/><% if @document.file_url!=nil%><%=File.basename(@document.file_url)%> currently attached<% end %></td>
+		</tr>
+		<tr>
+			<td><%= f.label :description%></td>
+			<td><%= f.text_area :description, :cols=>40, :rows=>5%></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to_close_lightbox "Update", {:onclick=>"$('dcmt_update_form').submit()"} %> <%=link_to_close_lightbox "Cancel"%></td>
+		</tr>
+		
+	</table>
+</fieldset>
+<% end %>

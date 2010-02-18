@@ -40,8 +40,8 @@ package genvis.data.converters
 				person.id				= personXML.id.toString();
 				person.name				= personXML.name.toString();
 				person.gender			= personXML.gender.toString()!=""? personXML.gender.toString() : null;					
-				person.date_of_birth 	= xml2Date(personXML.date_of_birth);
-				person.date_of_death	= xml2Date(personXML.date_of_death);		
+				person.dateOfBirth 	= xml2Date(personXML.date_of_birth);
+				person.dateOfDeath	= xml2Date(personXML.date_of_death);		
 				map[person.id]   = person; 
 				personTable.push(person);		
 			}

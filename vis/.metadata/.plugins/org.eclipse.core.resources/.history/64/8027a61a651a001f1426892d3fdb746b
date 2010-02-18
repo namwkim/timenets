@@ -1,0 +1,18 @@
+package org.akinu.control
+{
+	import com.adobe.cairngorm.control.FrontController;
+	import org.akinu.events.*;
+	import org.akinu.commands.*;
+
+	public class AkinuController extends FrontController
+	{
+		
+		public function AkinuController(){
+			this.initialize();
+		}
+		public function initialize():void{
+			
+		}
+		
+	}
+}

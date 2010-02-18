@@ -1,0 +1,2 @@
+page.insert_html :bottom, "documents", :partial=>"document", :locals=>{:document=>document}
+page.visual_effect :highlight, dom_id(document), {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}

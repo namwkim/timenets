@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Genealogy</title>
+	
+	<%= javascript_include_tag :defaults %>
+	<%= stylesheet_link_tag 'akinu' %>
+	<%= stylesheet_link_tag 'lightbox' %>
+	<%= javascript_include_tag 'lightbox' %>
+	<%= stylesheet_link_tag 'lytebox' %> 
+	<%= javascript_include_tag "lytebox" %>
+</head>
+
+<body>
+<div class="header_wrapper">
+<div class="header"> 
+    <span class="submenu">
+		<span class="submenuitem"><%= link_to "Home", {:controller=>"project", :action=>"index"}%></span>
+        <span class="submenuitem"><%= link_to "Profile", {:controller=>"person", :action=>"index"}%></span>
+        <span class="submenuitem"><%= link_to ("Logout", {:controller=>"home", :action=>"logout"})%></span>
+    </span>
+	<span class="title"><%= link_to "Akinu", {:controller=> "home", :action=>"index"}%></span>
+<!--<span class="menu">
+		<span class="menuitem"><%= link_to "Home", {:controller=> "home", :action=>"index"}%></span>
+        <span class="menuitem"><%= link_to "Profile", {:controller=> "profile", :action=>"index"}%></span>
+    	<span class="menuitem"><%= link_to "Chart", {:controller=> "chart", :action=>"index"}%></span>
+		<span class="menuitem"><%= link_to "Projects", {:controller=>"project", :action=>"index"}%></span>
+        <span class="menuitem"><%= link_to "Collaborators", {:controller=>"collaborator", :action=>"index"}%></span>
+        <span class="menuitem"><%= link_to "Inbox", {:controller=>"home", :action=>"inbox"}%></span>
+    </span>-->
+</div>
+</div>
+
+<div id="content" class="content"><%= yield :layout %></div>
+<div class="pageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div>
+</body>
+</html>

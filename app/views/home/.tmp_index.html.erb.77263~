@@ -1,0 +1,89 @@
+<% javascript_tag do%>
+var selected_menu_id;
+var shown_elem_id;
+document.observe("dom:loaded", function() {
+	selected_menu_id 	= "people_menu";
+	shown_elem_id 		= "people";
+	$('events').hide();
+	$('documents').hide();
+});
+
+function select_menu(menu, elem_id){
+	//hide previously selected menu
+	$(selected_menu_id).removeClassName("project_menuitem_selected");
+	$(selected_menu_id).addClassName("project_menuitem");
+	$(shown_elem_id).hide();
+	
+	//show currently selected menu
+	selected_menu_id = menu.id;
+	shown_elem_id	 = elem_id;
+	$(selected_menu_id).removeClassName("project_menuitem");
+	$(selected_menu_id).addClassName("project_menuitem_selected");
+	$(shown_elem_id).show();
+	
+	
+}
+<% end %>
+<div class="project_title">
+	<span class="visualize"><%=link_to "VISUALIZE", :controller=>"person", :action=>"visualize", :id=>@root.id %></span>
+	<span><%= link_to @project.name, :controller=>"project", :action=>"show_project", :id=>@project.id%></span>	
+</div>
+<div class="project_desc"><%= @project.description%></div>
+<div class="globalContainer">
+	<div class="project_left_col">
+		<div class="activity_box">
+			<div class="project_subtitle">Recent Activities</div>
+			<% @project.activities.each do |activity|%>
+				<div class="activity_text"><%= activity.html%></div>
+				<div class="activity_time"><%= activity.created_at.strftime("%B %d at %H:%M%p")%></div>
+			<% end %>
+		</div>
+		<div class="collaborator_box">
+			<div class="project_subtitle">Collaborators</div>
+			<div class="collaborator">
+			<% @project.users.each do |user|%>
+				<% if user.id != @operator.id%>
+					<% if user.person.photo_url %>
+						<%= link_to(image_tag(user.person.photo_url, :class=>"thumbnail_photo float_left", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>user.person.id) %>
+					<% else %>
+						<%= link_to(image_tag("/images/person.png", :class=>"thumbnail_photo float_left", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>user.person.id) %>
+					<% end%>
+					<div class="collaborator_info">
+						<%= link_to user.person.name, :controller=>"person", :action=>"show_person", :id=>user.person.id%><br/>
+						<%= link_to_remote_lightbox "Send a Message", {:url=>{:controller=>"message", :action=>"new_message", :id=>user.id}}%>
+					</div>
+				<% end %>
+			<% end %>		
+			</div>	
+		</div>
+	</div>
+	<div class="project_right_col">
+		<div class="project_menu">
+			<a id="people_menu" class="project_menuitem_selected" onclick="select_menu(this, 'people')" href="#">People</a>
+			<a id="events_menu" class="project_menuitem" onclick="select_menu(this, 'events')" href="#">Events</a>
+			<a id="documents_menu" class="project_menuitem" onclick="select_menu(this, 'documents')" href="#">Documents</a> 	
+		</div>
+		<div id="people" class="project_people">
+			<div class="submenu_box"><%=link_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person"}, :with=>"'project_id='+#{@project.id}"}%></div>					
+			<div class="search_box">Search Box</div>
+			<% @project.people.each do |person|%>
+				<%= render :partial=>"person/person", :locals=>{:person=>person}%>
+			<% end %>
+		</div>	
+		<div id="events" class="project_events">
+			<div class="submenu_box"><%= link_to( "Create a New Event",:controller=>"event", :action=>"new_event",:project_id=>@project.id)%></div>
+			<div class="search_box">Search Box</div>				
+				<% @project.events.each do |event|%>
+					<%= render :partial=>"event/event", :locals=>{:event=>event}%>
+				<% end %>		
+		</div>
+		<div id="documents" class="project_documents">
+			<div class="submenu_box"><%=link_to_remote_lightbox( "Create a New Document", {:url=>{:controller=>"document", :action=>"new_document"}, :with=>"'project_id='+#{@project.id}"}) %></div>										
+			<div class="search_box">Search Box</div>
+			<% @project.documents.each do |document|%>
+				<%= render :partial=>"document/document", :locals=>{:document=>document}%>
+			<% end %>
+		</div>
+	</div>
+</div>
+<iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

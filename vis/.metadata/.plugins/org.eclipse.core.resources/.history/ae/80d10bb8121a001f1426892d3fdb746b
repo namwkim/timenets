@@ -1,0 +1,13 @@
+package org.akinu.business
+{
+	import mx.rpc.IResponder;
+	
+	public class PersonDelegate
+	{
+		private var responder:IResponder;
+		public function PersonDelegate()
+		{
+		}
+
+	}
+}

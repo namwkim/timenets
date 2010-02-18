@@ -1,0 +1,6 @@
+<div id='<%=dom_id(document)%>'>
+	<span class="document_property"><%=link_to_remote_lightbox( document.name, {:url=>{:controller=>"document", :action=>"show_document", :id=>document.id}})%></span>
+	<span class="document_property"><%=document.type.name%></span>
+	<span class="document_property"><%=link_to_remote_lightbox( "Edit", {:url=>{:controller=>"document", :action=>"edit_document_in_event", :id=>document.id}, :with=>(event!=nil ? "'event_id='+#{event.id}" : nil)})%></span>
+	<span class="document_property"><%=link_to_remote("Remove Link", :url=>{:controller=>"document", :action=>"delete_document_in_event", :id=>document.id}, :with=>(event!=nil ? "'event_id='+#{event.id}" : nil), :confirm=>"do you really want to delete this link?", :complete=>"$('#{dom_id(document)}').remove()")%></span>
+</div>

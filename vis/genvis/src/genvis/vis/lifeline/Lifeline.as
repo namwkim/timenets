@@ -114,7 +114,7 @@ package genvis.vis.lifeline
 		public function horizontalPositioning(block:BlockSprite):void{
 			//TODO: onlde do for displayed nodes
 			for each (var node:NodeSprite in block.nodes){
-				node.x = axes.xAxis.X(node.data.date_of_birth)-block.x;
+				node.x = axes.xAxis.X(node.data.dateOfBirth)-block.x;
 			}
 			
 		}

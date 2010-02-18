@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<list key="installedFeatures">
+		<item value="com.adobe.flexbuilder.feature.core.osx:3.0.214193"/>
+		<item value="com.adobe.flexbuilder.feature.standalone.osx:3.0.214193"/>
+		<item value="com.interaktonline.jseclipse:1.5.5"/>
+		<item value="org.eclipse.cvs:1.0.1.R33x_r20070802-7C79_9_KKG-mDM9e3H5D"/>
+		<item value="org.eclipse.platform:3.3.1.R33x_r20070911-_19UEkpF-B7Uh2hKy75y"/>
+		<item value="org.eclipse.rcp:3.3.1.R33x_r20070802-8y8eE8sEV3Fz0z0GlHJrXvTAUS"/>
+	</list>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item value="192" key="DIALOG_Y_ORIGIN"/>
+		<item value="312" key="DIALOG_X_ORIGIN"/>
+	</section>
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
+	<section name="ResourceNavigator">
+		<item value="" key="ResourceWorkingSetFilter.STORE_WORKING_SET"/>
+		<item value="1" key="ResourceViewer.STORE_SORT_TYPE"/>
+	</section>
+	<section name="org.eclipse.ui.views.problem">
+	</section>
+	<section name="CleanDialogSettings">
+		<item value="516" key="DIALOG_WIDTH"/>
+		<item value="128" key="DIALOG_Y_ORIGIN"/>
+		<item value="254" key="DIALOG_X_ORIGIN"/>
+		<item value="372" key="DIALOG_HEIGHT"/>
+		<item value="false" key="TOGGLE_SELECTED"/>
+	</section>
+</section>

@@ -6,7 +6,6 @@ package genvis
 	import flare.util.palette.ColorPalette;
 	import flare.vis.data.DataSprite;
 	
-	import flash.display.Sprite;
 	import flash.display.StageDisplayState;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
@@ -23,7 +22,6 @@ package genvis
 	import genvis.vis.controls.ClickControl;
 	import genvis.vis.controls.DragControl;
 	import genvis.vis.controls.HoverControl;
-	import genvis.vis.controls.PanZoomControl;
 	import genvis.vis.controls.TooltipControl;
 	import genvis.vis.data.BlockSprite;
 	import genvis.vis.data.Data;
@@ -51,11 +49,13 @@ package genvis
 	import mx.events.SliderEvent;
 	import mx.styles.CSSStyleDeclaration;
 	
-	import org.alivepdf.display.Display;
-	import org.alivepdf.layout.Orientation;
-	import org.alivepdf.pdf.PDF;
-	import org.alivepdf.saving.Download;
-	import org.alivepdf.saving.Method;
+	import org.akinu.events.PersonSelectedEvent;
+	
+//	import org.alivepdf.display.Display;
+//	import org.alivepdf.layout.Orientation;
+//	import org.alivepdf.pdf.PDF;
+//	import org.alivepdf.saving.Download;
+//	import org.alivepdf.saving.Method;
 
 	public class GenVis extends Canvas
 	{
@@ -70,6 +70,7 @@ package genvis
 		private var _lifelineLayout:LifelineLayout = null;
 		private var _root:Person;	
 		private var _focusNodes:Array 			= new Array();
+		private var _selectedNode:NodeSprite		= null;
  		private var _range:TextArea				= null;
  		private var _t:Transitioner				= null; 		
 		//child components
@@ -83,7 +84,7 @@ package genvis
 		public static const AUTOMATIC:int	= 0;
 		public static const MANUAL:int	 	= 1;
 	
-		private static const MINWIDTH:Number 	= 600;
+		private static const MINWIDTH:Number 	= 400;
 		private static const MINHEIGHT:Number 	= 400;
 		
 		private static const ENCODER:String		= "colorEncoder";
@@ -119,131 +120,8 @@ package genvis
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 			
 		}
-		private function onResize(evt:ResizeEvent):void{			
-			resize(width, height);
-		}
-		private function init(evt:Event):void{
-			this.removeEventListener(Event.ADDED_TO_STAGE, init);
-			//this.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
-			this.addEventListener(ResizeEvent.RESIZE, onResize);
-			this.name = "GenVis";
-			
-			//layout components			
-			_visarea 	= new UIComponent();
-			_uiCtrls	= new Canvas();	
-			_vis 		= new Visualization();
-//			_visScroll  = new ScrollBar();
-			_t			= null;//new Transitioner(1);
-			_visarea.addChild(_vis);		
-			this.addChild(_visarea);
-			this.addChild(_uiCtrls);
-			//_vis.addChild(_visScroll);				
-			resize(width, height);	
-//			_visScroll.direction = ScrollBarDirection.HORIZONTAL;
-//			_visScroll.lineScrollSize = 1;
-//			_visScroll.pageScrollSize = 1;
-//			_visScroll.pageSize = 10;
-			//addFlexCtrls();
-			addFlareCtrls();	
-			_uiCtrls.enabled = false;		    
-		}
-		private function resize(newWidth:Number, newHeight:Number):void
-		{
-			if (newWidth  < MINWIDTH) newWidth 	= MINWIDTH;
-			if (newHeight < MINHEIGHT) newHeight = MINHEIGHT;
-			_visarea.width 	= newWidth-250;
-			_visarea.height = newHeight;
-			_uiCtrls.x		= _visarea.width;	
-			_uiCtrls.width 	= 250;
-			_uiCtrls.height = newHeight;
-			_vis.x = 20;
-			_vis.y = 20;
-			_vis.bounds = new Rectangle(0, 0, _visarea.width-40, _visarea.height-40);
-//			_visScroll.x = 0;
-//            _visScroll.y = _vis.bounds.height;
-//            _visScroll.height	= _vis.bounds.width;
-			if (_vis.data){
-				_vis.update(_t, OPS);
-				DirtySprite.renderDirty();
-			}
-		}
-		/**
-		 * TODO: transition when updating
-		 **/
-		private function updateVis(data:Data):void{
-			//replace old data
-			_vis.data = data;	
-			//set properties
-			_renderer = new LifelineRenderer(_lifelineType, _layoutMode);
-			
-			buildOperators();				
-			_vis.data.edges.setProperties({"renderer":_renderer, lineColor:Colors.setAlpha(_edgeColor, uint(255*_edgeAlpha)%256), 
-					lineWidth:_edgeWidth});
-			_vis.data.nodes.setProperties({"renderer":_renderer, lineWidth:_lifelineLayout.lifeline.lineWidth,
-					fillAlpha: _nFillAlpha});
-			_vis.data.blocks.setProperties({"renderer":_renderer, lineWidth:_bLineWidth, 
-					lineColor: Colors.setAlpha(_bLineColor, uint(255*_bLineAlpha)%256), 
-					fillColor: Colors.setAlpha(_bFillColor, uint(255*_bFillAlpha)%256)});
-			//postprocessing after operators added
-			// Format the y-axis.
-		    var axes:CartesianAxes = _vis.axes as CartesianAxes;
-		    //axes.xAxis.labelOffsetY = 0;
-		    axes.xAxis.showLines = false;
-		    axes.xAxis.showLabels =false;
-		    axes.showXLine = false;
-		    axes.xAxis.labelTextMode = TextSprite.DEVICE;
-		    
-//		
-//			_spanSlider.minimum = axes.xAxis.axisScale.min.fullYear;
-//			_spanSlider.maximum = axes.xAxis.axisScale.max.fullYear;
-//			_spanSlider.values  = [_spanSlider.minimum, _spanSlider.maximum];			    
+		public function addRelationship(person:Person, role:String, ref_id:String):void{
 
-			_vis.update(null, OPS);
-			
-		}
-		private function buildOperators():void{
-			//build operators	
-			_vis.operators.clear();						
-			//add encoders
-			var palette:ColorPalette = new ColorPalette([Colors.setAlpha(_nColors[0], uint(255*_nLineAlpha)%256),
-				 Colors.setAlpha(_nColors[1], uint(255*_nLineAlpha)%256), 
-				 Colors.setAlpha(_nColors[2], uint(255*_nLineAlpha)%256)]); 
-			_colorEncoder = new ColorEncoder( "data.gender", Data.NODES, "lineColor", ScaleType.CATEGORIES, palette);					
-			_vis.setOperator("colorEncoder", _colorEncoder);		        
- 			
-
- 			//add axis layout
-// 			switch (_layoutType){
-// 				case LifelineLayout.HOURGLASSCHART:
-// 				_lifelineLayout = new HourglassChart(_root, "data.date_of_birth", "data.yorder", _lifelineType);
-// 				break;
-// 				case LifelineLayout.DESCENDANTCHART:
-// 				_lifelineLayout = new DescendantChart(_root, "data.date_of_birth", "data.yorder", _lifelineType);
-// 				break;
-// 				case LifelineLayout.PEDIGREECHART:
-// 				_lifelineLayout = new PedigreeChart(_root, "data.date_of_birth", "data.yorder", _lifelineType);
-// 				break; 				
-// 			} 			
-			_fisheyeFilter = new FisheyeFilter(_focusNodes, 1);
-			_vis.setOperator("fisheyeFilter",_fisheyeFilter);
-			_lifelineLayout = new LifelineLayout(_root.sprite, _doiEnabled, _lifelineType, _labelStyle, _xrange);
-			_vis.setOperator("layout", _lifelineLayout);	
-// 			_vis.operators.add(new VisibilityFilter(filter));
- 			
-//			//labeling
-		    var labeler:Labeler = new Labeler("data.name", Data.NODES, _lifelineLayout, new TextFormat("Arial", Lifeline.FONTSIZE),
-		    function(d:DataSprite):Boolean{
-		    	return (d.visible == true);
-		    });	
-		    _vis.setOperator("labler", labeler);
-		}
-		private function filter(d:DataSprite):Boolean{
-			if (isNaN(d.data.yorder)) return false;
-			var birthYear:Number = d.data.date_of_birth.fullYear;
-			var deathYear:Number = d.data.date_of_death != null? d.data.date_of_death.fullYear : 2009
-			if (birthYear < _spanSlider.values[0]) return false;
-			if (deathYear > _spanSlider.values[1]) return false;
-			return true;
 		}
 		/**
 		 * genealogy: xml-representation of genealogy databases
@@ -270,6 +148,157 @@ package genvis
 			//#5. enable vis controls
 			_uiCtrls.enabled = true;
 		}
+		public function visualize(root:Person):void{
+			_root = root;
+			//#2. estimate missing data
+			DataEstimator.estimate(_root, null);	
+			//#3. construct display list
+			var data:Data = new Data(_root);		
+
+			//#3. set initial focus
+			_root.sprite.status = NodeSprite.FOCUSED;
+			//_focusNodes.push(_root.sprite);
+			
+			//#4. construct visualization			
+			updateVis(data);
+			
+			//#5. enable vis controls
+			_uiCtrls.enabled = false;
+			
+			DirtySprite.renderDirty();
+		}
+		private function onResize(evt:ResizeEvent):void{			
+			resize(width, height);
+		}
+		private function init(evt:Event):void{
+			this.removeEventListener(Event.ADDED_TO_STAGE, init);
+			//this.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+			this.addEventListener(ResizeEvent.RESIZE, onResize);
+			this.name = "GenVis";
+			
+			//layout components			
+			_visarea 	= new UIComponent();
+			_uiCtrls	= new Canvas();	
+			_vis 		= new Visualization();
+//			_visScroll  = new ScrollBar();
+			_t			= null;//new Transitioner(1);
+			_visarea.addChild(_vis);		
+			this.addChild(_visarea);
+//			this.addChild(_vis);
+//			this.addChild(_uiCtrls);
+//			_vis.addChild(_visScroll);				
+			resize(width, height);	
+//			_visScroll.direction = ScrollBarDirection.HORIZONTAL;
+//			_visScroll.lineScrollSize = 1;
+//			_visScroll.pageScrollSize = 1;
+//			_visScroll.pageSize = 10;
+//			addFlexCtrls();
+			addFlareCtrls();	
+			_uiCtrls.enabled = false;		    
+		}
+		private function resize(newWidth:Number, newHeight:Number):void
+		{
+			trace(newWidth);
+			trace(newHeight);
+			if (newWidth  < MINWIDTH) newWidth 	= MINWIDTH;
+			if (newHeight < MINHEIGHT) newHeight = MINHEIGHT;
+			_visarea.width 	= newWidth; //-250;
+			_visarea.height = newHeight;
+//			_uiCtrls.x		= _visarea.width;	
+//			_uiCtrls.width 	= 250;
+//			_uiCtrls.height = newHeight;
+			_vis.x = 20;
+			_vis.y = 20;
+			_vis.bounds = new Rectangle(0, 0, _visarea.width-40, _visarea.height-40);
+//			_visScroll.x = 0;
+//            _visScroll.y = _vis.bounds.height;
+//            _visScroll.height	= _vis.bounds.width;
+			if (_vis.data){
+				_vis.update(_t, OPS);
+				DirtySprite.renderDirty();
+			}
+		}
+		
+		/**
+		 * TODO: transition when updating
+		 **/
+		private function updateVis(data:Data):void{
+			//replace old data
+			_vis.data = data;	
+			//set properties
+			_renderer = new LifelineRenderer(_lifelineType, _layoutMode);
+			
+			buildOperators();				
+			_vis.data.edges.setProperties({"renderer":_renderer, lineColor:Colors.setAlpha(_edgeColor, uint(255*_edgeAlpha)%256), 
+					lineWidth:_edgeWidth});
+			_vis.data.nodes.setProperties({"renderer":_renderer, lineWidth:_lifelineLayout.lifeline.lineWidth,
+					fillAlpha: _nFillAlpha});
+			_vis.data.blocks.setProperties({"renderer":_renderer, lineWidth:_bLineWidth, 
+					lineColor: Colors.setAlpha(_bLineColor, uint(255*_bLineAlpha)%256), 
+					fillColor: Colors.setAlpha(_bFillColor, uint(255*_bFillAlpha)%256)});
+			//postprocessing after operators added
+			// Format the y-axis.
+		    var axes:CartesianAxes = _vis.axes as CartesianAxes;
+		    //axes.xAxis.labelOffsetY = 0;
+		    axes.xAxis.showLines = true;
+		    axes.xAxis.showLabels =true;
+		    axes.xAxis.labelOffsetY = 0;
+		    axes.showXLine = true;
+		    axes.xAxis.labelTextMode = TextSprite.DEVICE;
+		    
+//		
+//			_spanSlider.minimum = axes.xAxis.axisScale.min.fullYear;
+//			_spanSlider.maximum = axes.xAxis.axisScale.max.fullYear;
+//			_spanSlider.values  = [_spanSlider.minimum, _spanSlider.maximum];			    
+
+			_vis.update(null, OPS);
+			
+		}
+		private function buildOperators():void{
+			//build operators	
+			_vis.operators.clear();						
+			//add encoders
+			var palette:ColorPalette = new ColorPalette([Colors.setAlpha(_nColors[0], uint(255*_nLineAlpha)%256),
+				 Colors.setAlpha(_nColors[1], uint(255*_nLineAlpha)%256), 
+				 Colors.setAlpha(_nColors[2], uint(255*_nLineAlpha)%256)]); 
+			_colorEncoder = new ColorEncoder( "data.gender", Data.NODES, "lineColor", ScaleType.CATEGORIES, palette);					
+			_vis.setOperator("colorEncoder", _colorEncoder);		        
+ 			
+
+ 			//add axis layout
+// 			switch (_layoutType){
+// 				case LifelineLayout.HOURGLASSCHART:
+// 				_lifelineLayout = new HourglassChart(_root, "data.dateOfBirth", "data.yorder", _lifelineType);
+// 				break;
+// 				case LifelineLayout.DESCENDANTCHART:
+// 				_lifelineLayout = new DescendantChart(_root, "data.dateOfBirth", "data.yorder", _lifelineType);
+// 				break;
+// 				case LifelineLayout.PEDIGREECHART:
+// 				_lifelineLayout = new PedigreeChart(_root, "data.dateOfBirth", "data.yorder", _lifelineType);
+// 				break; 				
+// 			} 			
+			_fisheyeFilter = new FisheyeFilter(_focusNodes, 1);
+			_vis.setOperator("fisheyeFilter",_fisheyeFilter);
+			_lifelineLayout = new LifelineLayout(_root.sprite, _doiEnabled, _lifelineType, _labelStyle, _xrange);
+			_vis.setOperator("layout", _lifelineLayout);	
+// 			_vis.operators.add(new VisibilityFilter(filter));
+ 			
+//			//labeling
+		    var labeler:Labeler = new Labeler("data.name", Data.NODES, _lifelineLayout, new TextFormat("Arial", Lifeline.FONTSIZE),
+		    function(d:DataSprite):Boolean{
+		    	return (d.visible == true);
+		    });	
+		    _vis.setOperator("labler", labeler);
+		}
+		private function filter(d:DataSprite):Boolean{
+			if (isNaN(d.data.yorder)) return false;
+			var birthYear:Number = d.data.dateOfBirth.fullYear;
+			var deathYear:Number = d.data.dateOfDeath != null? d.data.dateOfDeath.fullYear : 2009
+			if (birthYear < _spanSlider.values[0]) return false;
+			if (deathYear > _spanSlider.values[1]) return false;
+			return true;
+		}
+
 		private function addFlexCtrls():void{
 			_uiCtrls.setStyle("border", 0x000000);
 			//css styles			
@@ -405,13 +434,13 @@ package genvis
 			_uiCtrls.addChild(btnDsp);
 
 			//operations on node
-			y += 30;
-			var btnSp:Button	= new Button();	
-			btnSp.label	= "Export to PDF";
-			btnSp.y		= y;
-			btnSp.addEventListener(FlexEvent.BUTTON_DOWN, onExportToPDF);
-			btnSp.enabled		= true;
-			_uiCtrls.addChild(btnSp);
+//			y += 30;
+//			var btnSp:Button	= new Button();	
+//			btnSp.label	= "Export to PDF";
+//			btnSp.y		= y;
+//			btnSp.addEventListener(FlexEvent.BUTTON_DOWN, onExportToPDF);
+//			btnSp.enabled		= true;
+//			_uiCtrls.addChild(btnSp);
 						
 			//slider filter	
 			y += 30;						
@@ -466,17 +495,17 @@ package genvis
 			btnRange.enabled		= true;
 			_uiCtrls.addChild(btnRange);
 		}
-		private function onExportToPDF(evt:FlexEvent):void{
-			var spr:Sprite = new Sprite();
-			spr.graphics.beginFill(0xff0000,1);
-			spr.graphics.drawCircle(0,0,100);
-			spr.graphics.endFill();					
-			var pdf:PDF = new PDF(Orientation.PORTRAIT);
-			pdf.setDisplayMode(Display.FULL_WIDTH);
-			pdf.addPage();
-			pdf.addImage(spr);
-			pdf.save(Method.REMOTE, "./php/exportVis.php", Download.ATTACHMENT, "genvis.pdf");
-		}
+//		private function onExportToPDF(evt:FlexEvent):void{
+//			var spr:Sprite = new Sprite();
+//			spr.graphics.beginFill(0xff0000,1);
+//			spr.graphics.drawCircle(0,0,100);
+//			spr.graphics.endFill();					
+//			var pdf:PDF = new PDF(Orientation.PORTRAIT);
+//			pdf.setDisplayMode(Display.FULL_WIDTH);
+//			pdf.addPage();
+//			pdf.addImage(spr);
+//			pdf.save(Method.REMOTE, "./php/exportVis.php", Download.ATTACHMENT, "genvis.pdf");
+//		}
 		private function onDOIChange(evt:ListEvent):void{
 			_doiEnabled = evt.currentTarget.selectedItem.data;
 			_lifelineLayout.doiEnabled = _doiEnabled;		
@@ -539,8 +568,8 @@ package genvis
 		
 		private function addFlareCtrls():void{
 			//add controls
-			_dragCtrl = new DragControl();
-			_vis.controls.add(_dragCtrl);
+//			_dragCtrl = new DragControl();
+//			_vis.controls.add(_dragCtrl);
 			_hoverCtrl = new HoverControl(DataSprite,
 				HoverControl.MOVE_AND_RETURN,
 				function(e:SelectionEvent):void {					
@@ -597,14 +626,14 @@ package genvis
         			function( evt:TooltipEvent ):void
         			{        				
 						var person:Person = evt.node.data as Person;
-						var birthYear:Number = person.date_of_birth.fullYear
-						var deathYear:Number = person.date_of_death != null? person.date_of_death.fullYear : (new Date()).fullYear;
+						var birthYear:Number = person.dateOfBirth.fullYear
+						var deathYear:Number = person.dateOfDeath != null? person.dateOfDeath.fullYear : (new Date()).fullYear;
 						var toolTip:String = "<b>"+person.name+"<br>"+person.gender+"<br>"+birthYear+"-"+deathYear;
 						for (var i:int=0; i<person.marriages.length; i++){
 							var marriage:Marriage = person.marriages[i];
 							toolTip	+= "<br>marriage#"+(i+1)+
 								": "+ marriage.startDate.fullYear+"-"+
-								(marriage.isDivorced? marriage.endDate.fullYear : "");
+								(marriage.divorced? marriage.endDate.fullYear : "");
 						}
 						toolTip += "</b>";
 						//father and mother
@@ -616,39 +645,47 @@ package genvis
 			_vis.controls.add(new ClickControl(NodeSprite, 1,
 				// set search query to the occupation name
 				function(e:SelectionEvent):void {
-					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
-						|| _doiEnabled==false) return;
-					if (e.node.type != NodeSprite.ROOT){
-						if (e.node.status == NodeSprite.FOCUSED){
-							//if (_focusNodes.length == 1) return; //make sure there exists at least one nodesprite.
-						 	e.node.status = NodeSprite.NON_FOCUSED;	
-							_focusNodes.splice(_focusNodes.indexOf(e.node), 1);
-						}else{//not previously focused
-							e.node.status = NodeSprite.FOCUSED;
-							_focusNodes.push(e.node);
-						}	
-					}				
-					_lifelineLayout.buildScale(e.node);
-					_vis.update(null, [ENCODER, FILTER]);
-					_vis.update(1, [LAYOUT, LABLER]).play();
+					if (_selectedNode) _selectedNode.selected = false;
+					_selectedNode = e.node;
+					_selectedNode.selected = true;
+					
+					//Dispatch Selection Event
+					var personSelected:PersonSelectedEvent = new PersonSelectedEvent(_selectedNode.data as Person);
+					personSelected.dispatch();
+					
+//					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
+//						|| _doiEnabled==false) return;
+//					if (e.node.type != NodeSprite.ROOT){
+//						if (e.node.status == NodeSprite.FOCUSED){
+//							//if (_focusNodes.length == 1) return; //make sure there exists at least one nodesprite.
+//						 	e.node.status = NodeSprite.NON_FOCUSED;	
+//							_focusNodes.splice(_focusNodes.indexOf(e.node), 1);
+//						}else{//not previously focused
+//							e.node.status = NodeSprite.FOCUSED;
+//							_focusNodes.push(e.node);
+//						}	
+//					}				
+//					_lifelineLayout.buildScale(e.node);
+//					_vis.update(null, [ENCODER, FILTER]);
+//					_vis.update(1, [LAYOUT, LABLER]).play();
 					
 					//_vis.axes.update();
 					//_vis.render();//force render
 					//DirtySprite.renderDirty();
 				}
 			));
-			_vis.controls.add(new ClickControl(BlockSprite, 1,
-				// set search query to the occupation name
-				function(e:SelectionEvent):void {
-					if (_layoutMode != MANUAL) return;
-					var b:BlockSprite = e.block;
-					if (_selectedBlock)	_selectedBlock.selected = false;
-					_selectedBlock = b;
-					_selectedBlock.selected = true;
-					
-				}
-			));
-			_vis.controls.add( new PanZoomControl());
+//			_vis.controls.add(new ClickControl(BlockSprite, 1,
+//				// set search query to the occupation name
+//				function(e:SelectionEvent):void {
+//					if (_layoutMode != MANUAL) return;
+//					var b:BlockSprite = e.block;
+//					if (_selectedBlock)	_selectedBlock.selected = false;
+//					_selectedBlock = b;
+//					_selectedBlock.selected = true;
+//					
+//				}
+//			));
+//			_vis.controls.add( new PanZoomControl());
 			
 		}
 	}

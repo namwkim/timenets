@@ -116,8 +116,8 @@ package genvis.vis.data
 			node.block = this;
 			this.addChild(node);
 			//update min
-			var d:Date = node.data.isDead? node.data.date_of_death : new Date();
-			_min = _min == null? node.data.date_of_birth:(node.data.date_of_birth < _min? node.data.date_of_birth:_min);
+			var d:Date = node.data.deceased? node.data.dateOfDeath : new Date();
+			_min = _min == null? node.data.dateOfBirth:(node.data.dateOfBirth < _min? node.data.dateOfBirth:_min);
 			_max = _max == null? d : (d > _max? d:_max);
 		}
 		

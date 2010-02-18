@@ -39,7 +39,7 @@ package genvis.vis.operator.encoder
 		 *  palette will be determined based on the scale type.
 		 */
 		public function ColorEncoder(source:String=null,
-			group:String=Data.NODES, target:String="lineColor",
+			group:String="nodes", target:String="lineColor",
 			scaleType:String=null, palette:ColorPalette=null)
 		{
 			super(source, target, group);

@@ -17,7 +17,7 @@ package genvis.vis.lifeline
 			var person:Person    = node.data as Person;
 			var points:Array = new Array();	
 			//add born point
-			var evt:EvtPt = new EvtPt(0, 0, EvtPt.BORN, person.date_of_birth)
+			var evt:EvtPt = new EvtPt(0, 0, EvtPt.BORN, person.dateOfBirth)
 			points.push(evt);
 			var dist:Number = (GAMMA+_lineWidth/2);
 			
@@ -38,7 +38,7 @@ package genvis.vis.lifeline
 					evt = new EvtPt(marX, marY, EvtPt.MARRIAGE, marriage.startDate, spouse);
 					points.push(evt);
 					//divorce point
-					if (marriage.isDivorced){
+					if (marriage.divorced){
 						var divX:Number = node.toLocalX(axes.xAxis.X(marriage.endDate));
 						var divY:Number = dir==UP? -dist:dist;
 //						var retX:Number = node.toLocalX(axes.xAxis.X(Dates.addYears(marInfo.endDate, ALPHA)));		
@@ -62,7 +62,7 @@ package genvis.vis.lifeline
 			}
 			//add death point	
 			var isDivorced:Boolean = numMar==0? true:false;//person.isDivorced;
-			var deathDate:Date = person.isDead? person.date_of_death: node.block.gbLayout.curDate;
+			var deathDate:Date = person.deceased? person.dateOfDeath: node.block.gbLayout.curDate;
 			var deathX:Number = node.toLocalX(axes.xAxis.X(deathDate));
 			var deathY:Number = isDivorced? 0 : (person.spouses.length == 0? 0: (dir==UP? -dist:dist));
 			evt = new EvtPt(deathX, deathY, EvtPt.DEAD, deathDate);
@@ -125,13 +125,13 @@ package genvis.vis.lifeline
 			var refPerson:Person = refNode.data as Person;
 			var points:Array = new Array();	
 			//add born point
-			var evt:EvtPt = new EvtPt(0, 0, EvtPt.BORN, person.date_of_birth)
+			var evt:EvtPt = new EvtPt(0, 0, EvtPt.BORN, person.dateOfBirth)
 			points.push(evt);
 			var mergeY:Number = refNode.y-node.y+((node.y-refNode.y)<0?-(GAMMA+BETA+1.5*_lineWidth):(GAMMA+BETA+1.5*_lineWidth));		
 			
-			var marriages:Array = person.marriageInfoWith(refPerson);
+			var marriages:Array = refPerson.marriageInfoWith(person);
 			var isDivorced:Boolean = person.isDivorced;
-			var deathDate:Date = person.isDead? person.date_of_death: node.block.gbLayout.curDate;
+			var deathDate:Date = person.deceased? person.dateOfDeath: node.block.gbLayout.curDate;
 			var deathX:Number = node.toLocalX(axes.xAxis.X(deathDate));
 			var deathY:Number = isDivorced? 0 : (person.spouses.length == 0? 0:mergeY);
 			//add marriage and divorce points
@@ -248,7 +248,7 @@ package genvis.vis.lifeline
 //								nextX = (secNextX-curX)/2 + curX;
 //							}
 //						}else{
-//							nextX = _xAxis.X(person.isDead? person.date_of_death:_curDate)-node.x;
+//							nextX = _xAxis.X(person.isDead? person.dateOfDeath:_curDate)-node.x;
 //						}
 //						curY = 0;
 //						if (node.props["div"]!=null){
@@ -303,7 +303,7 @@ package genvis.vis.lifeline
 ////							var nextMarInfo:MarriageInfo = person.marriageInfo[person.marriageInfo.indexOf(marInfo)+1];
 ////							nextX = _xAxis.X(nextMarInfo.startDate) - node.x;
 ////						}else{
-////							nextX = _xAxis.X(person.isDead? person.date_of_death:_curDate)-node.x;
+////							nextX = _xAxis.X(person.isDead? person.dateOfDeath:_curDate)-node.x;
 ////						}
 ////						dx	 = ((nextX - divX)/3)/3;
 ////						points.push(new Point(divX, prevY)); //dummy point
@@ -320,7 +320,7 @@ package genvis.vis.lifeline
 //			}
 //			//marriage to death
 //			// death point
-//			deathX = _xAxis.X(person.isDead? person.date_of_death:_curDate)-node.x;
+//			deathX = _xAxis.X(person.isDead? person.dateOfDeath:_curDate)-node.x;
 //			var isDivorced:Boolean = refSpouse==null? person.isDivorced : person.marriageInfoWith(refSpouse).isDivorced;
 //			if (isDivorced){
 //				points.push(new Point(deathX, 0));

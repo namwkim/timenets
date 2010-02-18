@@ -1,0 +1,14 @@
+package org.akinu.events
+{
+	import com.adobe.cairngorm.control.CairngormEvent;
+
+	public class StateChangeEvent extends CairngormEvent
+	{
+		public static const STATE_CHAGE = "StateChage";
+		public function StateChangeEvent()
+		{
+			super(type, bubbles, cancelable);
+		}
+		
+	}
+}

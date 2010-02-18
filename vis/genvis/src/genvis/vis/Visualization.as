@@ -87,7 +87,7 @@ package genvis.vis
 		private var _vscrollbar:ScrollBar;
 		//internal use
 		private var _maskEnabled:Boolean 	= false;
-		private var _scrollEnabled:Boolean 	= false;
+		private var _scrollEnabled:Boolean 	= true;
 		private var _fitVertBound:Boolean	= true;
 		/** An object storing extra properties for the visualziation. */
 		public var props:Object = {};
@@ -200,8 +200,8 @@ package genvis.vis
 				setHitArea, false, int.MIN_VALUE+1);
 			
 			if (_scrollEnabled){
-				addChild(_hscrollbar = new ScrollBar());
-				addChild(_vscrollbar = new ScrollBar());	
+				this.addChild(_hscrollbar = new ScrollBar());
+				this.addChild(_vscrollbar = new ScrollBar());	
 				_hscrollbar.enabled = true;
 				_hscrollbar.direction = ScrollBarDirection.HORIZONTAL;
 				_hscrollbar.addEventListener(ScrollEvent.SCROLL, hscrollHandler);			
@@ -241,6 +241,8 @@ package genvis.vis
 			_hscrollbar.setScrollProperties(range, 0, range);
 			_hscrollbar.setScrollPosition(0);
 			_layers.x = (bounds.x - min);
+			if (range<=0) _hscrollbar.visible = false;
+			else _hscrollbar.visible = true;
 			
 			//vertical scrollbar
 			min = bounds.y;
@@ -255,7 +257,9 @@ package genvis.vis
 			//trace("SCROLL-"+min+","+max+","+range);
 			_vscrollbar.setScrollProperties(range, 0, range);
 			_vscrollbar.setScrollPosition(0);
-			_layers.y = (bounds.y - min);			
+			_layers.y = (bounds.y - min);	
+			if (range<=0) _vscrollbar.visible = false;
+			else _vscrollbar.visible = true;		
 		}
 		public function hscrollHandler(se:ScrollEvent):void{
 			_layers.x -= se.delta;
@@ -316,7 +320,7 @@ package genvis.vis
 				_axes.update(trans);			
 			}
 			fireEvent(VisualizationEvent.UPDATE, trans, operators);
-			//renderBounds();
+			renderBounds();
 			if (_scrollEnabled) updateScrollbar();
 			return trans;
 		}

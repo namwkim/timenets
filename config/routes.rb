@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.rubyamf_gateway 'rubyamf_gateway', :controller => 'rubyamf', :action => 'gateway'
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

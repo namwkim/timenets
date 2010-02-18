@@ -1,0 +1,144 @@
+<% javascript_tag do%>
+function flip_dob_field(chk_box){
+	if (chk_box.checked){
+		$('dod_label').setStyle("display:inline");
+		$('dod_text').setStyle("display:inline");	
+	}else{
+		$('dod_label').setStyle("display:none");	
+		$('dod_text').setStyle("display:none");	
+		//also clear the form elements
+		$('person_date_of_death_1i').selectedIndex = 0;
+		$('person_date_of_death_2i').selectedIndex = 0;
+		$('person_date_of_death_3i').selectedIndex = 0;
+	}
+}
+function flip_div_field (chk_box){
+	if (chk_box.checked){
+		$('end_date_label').setStyle("display:inline");	
+		$('end_date_form').setStyle("display:inline");	
+	}else{
+		$('end_date_label').setStyle("display:none");	
+		$('end_date_form').setStyle("display:none");	
+		//also clear the form elements
+		$('relationship_end_date_1i').selectedIndex = 0;
+		$('relationship_end_date_2i').selectedIndex = 0;
+		$('relationship_end_date_3i').selectedIndex = 0;
+	}
+}
+function submit_add_form(person_id){
+	$('person_id').value=person_id;
+	$('add_form').request();
+}
+<% end %>
+
+<fieldset>
+	<legend>Edit Relationships</legend>
+	<table width="100%">
+		<tr>
+			<td>
+				<fieldset>
+					<legend>Parents</legend>
+					<table>
+						<tr>
+							<td >Father:</td>
+							<td>
+								<table id="father">								
+									<tr id="add_father" style="<%= 'display:none' if @person.father!=nil%>"><td>										
+										Add Father by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Father'"}) %>
+										or Searching for an Existing Person: 										
+										<%= auto_complete_text_field :person, :name, {:index=>0, :size=>15, :value=>"", :onclick=>"$('role').value = 'Father'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>									
+									</td></tr>
+									<% if @person.father!=nil%>
+										<%= render :partial=>"relationship", :locals=>{:person=>@person.father, :role=>"Father", :ref_id=>@person.id, :options=>{ :add_link_id=>"add_father"}}%>
+									<% end %>								
+								</table>								
+							</td>
+						</tr>
+						<tr>
+							<td >Mother:</td>
+							<td>
+								<table id="mother">
+									<tr id="add_mother" style="<%= 'display:none' if @person.mother!=nil%>"><td>										
+										Add Mother by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Mother'"}) %>
+										or Searching for an Existing Person: 										
+										<%= auto_complete_text_field :person, :name, {:index=>1, :size=>15, :value=>"", :onclick=>"$('role').value = 'Mother'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>
+									</td></tr>
+									<% if @person.mother!=nil%>
+										<%= render :partial=>"relationship", :locals=>{:person=>@person.mother, :role=>"Mother", :ref_id=>@person.id, :options=>{:add_link_id=>"add_mother"}}%>
+									<% end %>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fieldset>
+					<legend>Spouse</legend>
+					<table id="spouses">
+					<tr><td>						
+						Add Spouse by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Spouse'"}) %>
+						or Searching for an Existing Person: 
+					</td></tr>	
+					<tr><td>
+					<% form_tag({:action=>"create_relationship"}, {:id=>"add_form"})do -%>
+						<%=hidden_field_tag "person_id", nil%>
+						<%=hidden_field_tag "ref_id", @person.id%>
+						<%=hidden_field_tag "role", nil%>
+					<table style="padding:5px; border:1px dotted #888a85">
+						<% fields_for :marriage do |mf|%>
+							<%= hidden_field_tag "marriage[spouse_id]", @person.id%>
+						<tr>
+							<td><%= mf.label "start_date", "Marriage Date"%></td>
+							<td><%= mf.date_select :start_date, :start_year => Time.new.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+							<td>Divorced? <%= mf.check_box(:divorced, { :onchange=>"flip_div_field(this)"}, true, false)%></td>
+						</tr>
+						<tr>
+							<td><%= mf.label "end_date", "Divorce Date", {:style=>"display:none;", :id=>"end_date_label"}%></td>
+							<td><span id="end_date_form" style="display:none"><%= mf.date_select :end_date, {:start_year => 0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }}%></span></td>
+							<td></td>
+						</tr>
+						<% end %>
+						<tr>	
+							<td>Name:</td>								
+							<td><%= auto_complete_text_field :person, :name, {:index=>2, :size=>15, :value=>"", :onclick=>"$('role').value = 'Spouse'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%></td>
+							<td></td>
+						</tr>	
+					</table>
+					<% end %>
+					</td></tr>					
+					<% if @person.marriages %>
+						<% @person.marriages.each do |marriage|%>
+							<%= render :partial=>"relationship", :locals=>{:person=>marriage.spouse, :role=>"Spouse", :ref_id=>@person.id, :options=>{ :marriage=>marriage}}%>					
+						<% end %>
+					<% end %>
+					</table>
+				</fieldset>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<fieldset>
+					<legend>Children</legend>
+					<table id="children">
+						<tr id="add_child" ><td>
+							Add Child by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Child'"}) %>
+							or Searching for an Existing Person: 										
+							<%= auto_complete_text_field :person, :name, {:index=>3, :size=>15, :value=>"", :onclick=>"$('role').value = 'Child'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>
+						</td></tr>						
+						<% if @person.children %>
+							<% @person.children.each do |child|%>
+								<%= render :partial=>"relationship", :locals=>{:person=>child, :role=>"Child", :ref_id=>@person.id, :options=>{}}%>
+							<% end %>
+						<% end %>
+					</table>
+				</fieldset>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right" style="border-top:1px dotted #d3d7cf;"> <%=link_to "Back", :back %></td>
+		</tr>
+	</table>
+</fieldset>

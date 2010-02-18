@@ -1,0 +1,115 @@
+<% javascript_tag do%>
+function flip_range(chk_box){
+
+	if (chk_box.checked){
+		$('from_label').innerHTML = "From";
+		$('to_label').setStyle("display:inline");
+		$('to_form').setStyle("display:inline");	
+	}else{
+		$('from_label').innerHTML = "Date";
+		$('to_label').setStyle("display:none");	
+		$('to_form').setStyle("display:none");	
+		//also clear the form elements
+		$('event_to_1i').selectedIndex = 0;
+		$('event_to_2i').selectedIndex = 0;
+		$('event_to_3i').selectedIndex = 0;
+	}
+}
+function submit_add_form(person_id){
+	$('person_id').value=person_id;
+	if ($('person_'+person_id)!=null){
+		alert('the selected person is alreadt added!');		
+	}else{
+		$('add_form').request();
+	}
+}
+function submit_add_doc_form(doc_id){
+	$('doc_id').value=doc_id;
+	if ($('document_'+doc_id)!=null){
+		alert('the selected document is alreadt added!');		
+	}else{
+		$('add_doc_form').request();
+	}
+}	
+<% end %>
+<% form_tag({:controller=>"person", :action=>"add_person_in_event"}, {:id=>"add_form"})do -%>
+	<%=hidden_field_tag "person_id", nil%>
+<% end %>
+<% form_tag({:controller=>"document", :action=>"add_document_in_event"}, {:id=>"add_doc_form"})do -%>
+	<%=hidden_field_tag "doc_id", nil%>
+<% end %>
+<% form_for(@event, :url=>{:controller=>"event", :action=>"create_event", :id=>@event.id}, :html=>{:id=>"event_new_form"}) do |f|%>
+<%= hidden_field_tag "project_id", @project.id%>
+<%= f.error_messages %>
+<fieldset class="event">
+	<legend>Add a New Event</legend>
+	<table>
+		<tr>
+			<td width="15%"><%= f.label :name%></td>
+			<td width="40%"><%= f.text_field :name%></td>
+			<td width="45%"></td>
+		</tr>
+		<tr>
+			<td><%= f.label :locaction%></td>
+			<td><%= f.text_field :location%></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><%= f.label :description%></td>
+			<td><%= f.text_area :description, :cols=>50, :rows=>5 %></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><%= f.label :from, "Date", :id=>"from_label"%></td>
+			<td><%= f.date_select :from, :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td>Range: <%= f.check_box(:isRange, { :onchange=>"flip_range(this)"},true, false)%></td>
+		</tr>
+			
+		<tr>		
+			<td>
+				<span id="to_label" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.label :to %></span>
+			</td>
+			<td>
+				<span id="to_form" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.date_select :to, { :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }}%></span></td>							
+			<td></td>
+		</tr>	
+		<tr>		
+			<td colspan="3">
+				<fieldset>
+					<legend>People</legend>						
+					<table id="people" width="100%" style='padding:5px 5px 5px 5px;'>
+						<tr><td colspan="4">					
+							<%=link_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person_in_event"}, :with=>"'project_id='+#{@project.id}"}%>
+							or Searching for an Existing Person: 
+							<%= auto_complete_text_field :person, :name, {:size=>15, :value=>""}, {:url=>{:controller=>"person", :action=>"auto_complete_for_person_name"}, :select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@project.id}"}%>						
+						</td></tr>					
+						<% @event.people.each do |person|%>
+							<%= render :partial=>"person/person", :locals=>{:person=>person}%>
+						<% end %>					
+					</table>
+				</fieldset>
+				
+			</td>
+		</tr>
+		<tr>			
+			<td colspan="3">
+				<fieldset>
+					<legend>Documents</legend>
+					<table id="documents" width="100%" style='padding:5px 5px 5px 5px;'>
+					<tr><td colspan="4">
+							<%=link_to_remote_lightbox( "Upload a New Document", {:url=>{:controller=>"document", :action=>"new_document_in_event"}, :with=>"'project_id='+#{@project.id}"}) %>
+							or Search for an Existing Document:
+							<%= auto_complete_text_field :document, :name, {:size=>15, :value=>""}, {:url=>{:controller=>"document", :action=>"auto_complete_for_document_name"}, :select=>"show_this", :with=>"'doc_name='+element.value+'&project_id='+#{@project.id}"}%>						
+					</td></tr>
+					<% @event.documents.each do |document|%>
+							<%= render :partial=>"person/document_in_event", :locals=>{:document=>document}%>
+					<% end %>	
+				</table>
+				</fieldset>
+			</td>	
+		</tr>
+		<tr><td colspan="3" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to "Create", "javascript:$('event_new_form').submit()"%> <%=link_to "Cancel", :back %></td></tr>
+	</table>
+</fieldset>
+<% end %>
+<iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

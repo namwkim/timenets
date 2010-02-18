@@ -1,0 +1,10 @@
+package genvis.data
+{
+	public class Event
+	{
+		public function Event()
+		{
+		}
+
+	}
+}

@@ -1,0 +1,116 @@
+<% javascript_tag do%>
+function flip_range(chk_box){
+
+	if (chk_box.checked){
+		$('from_label').innerHTML = "From";
+		$('to_label').setStyle("display:inline");
+		$('to_form').setStyle("display:inline");	
+	}else{
+		$('from_label').innerHTML = "Date";
+		$('to_label').setStyle("display:none");	
+		$('to_form').setStyle("display:none");	
+		//also clear the form elements
+		$('event_to_1i').selectedIndex = 0;
+		$('event_to_2i').selectedIndex = 0;
+		$('event_to_3i').selectedIndex = 0;
+	}
+}
+function submit_add_form(profile_id){
+	$('profile_id').value=profile_id;
+	if ($('profile_'+profile_id)!=null){
+		alert('the selected profile is alreadt added!');		
+	}else{
+		$('add_form').request();
+	}
+}
+function submit_add_doc_form(doc_id){
+	$('doc_id').value=doc_id;
+	if ($('document_'+doc_id)!=null){
+		alert('the selected document is alreadt added!');		
+	}else{
+		$('add_doc_form').request();
+	}
+}	
+<% end %>
+<% form_tag({:controller=>"profile", :action=>"add_profile_in_event"}, {:id=>"add_form"})do -%>
+	<%=hidden_field_tag "profile_id", nil%>
+	<%=hidden_field_tag "event_id", @event.id%>
+<% end %>
+<% form_tag({:controller=>"profile", :action=>"add_document_in_event"}, {:id=>"add_doc_form"})do -%>
+	<%=hidden_field_tag "doc_id", nil%>
+	<%=hidden_field_tag "event_id", @event.id%>
+<% end %>
+<% form_for(@event, :url=>{:action=>"update_event", :id=>@event.id}, :html=>{:id=>"event_update_form"}) do |f|%>
+<%= f.error_messages %>
+<fieldset class="event">
+	<legend>Edit Event</legend>
+	<table>
+		<tr>
+			<td width="15%"><%= f.label :name%></td>
+			<td width="40%"><%= f.text_field :name%></td>
+			<td width="45%"></td>
+		</tr>
+		<tr>
+			<td><%= f.label :locaction%></td>
+			<td><%= f.text_field :location%></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><%= f.label :description%></td>
+			<td><%= f.text_area :description, :cols=>50, :rows=>5 %></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><%= f.label :from, "Date", :id=>"from_label"%></td>
+			<td><%= f.date_select :from, :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td>Range: <%= f.check_box(:isRange, { :onchange=>"flip_range(this)"},true, false)%></td>
+		</tr>
+			
+		<tr>		
+			<td>
+				<span id="to_label" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.label :to %></span>
+			</td>
+			<td>
+				<span id="to_form" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.date_select :to, { :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }}%></span></td>							
+			<td></td>
+		</tr>	
+		<tr>		
+			<td colspan="3">
+				<fieldset>
+					<legend>People</legend>						
+					<table id="profiles" width="100%" style='padding:5px 5px 5px 5px;'>
+						<tr><td colspan="4">					
+							<%=link_to_remote_lightbox "Create a New Profile", {:url=>{:controller=>"profile", :action=>"new_profile_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}%>
+							or Searching for an Existing Profile: 
+							<%= auto_complete_text_field :profile, :name, {:size=>15, :value=>""}, {:url=>{:controller=>"profile", :action=>"auto_complete_for_profile_name"}, :select=>"show_this", :with=>"'profile_name='+element.value+'&project_id='+#{@project.id}"}%>						
+						</td></tr>					
+						<% @event.profiles.each do |profile|%>
+							<%= render :partial=>"profile/profile_in_event", :locals=>{:profile=>profile, :event=>@event}%>
+						<% end %>					
+					</table>
+				</fieldset>
+				
+			</td>
+		</tr>
+		<tr>			
+			<td colspan="3">
+				<fieldset>
+					<legend>Documents</legend>
+					<table id="documents" width="100%" style='padding:5px 5px 5px 5px;'>
+					<tr><td colspan="4">
+							<%=link_to_remote_lightbox( "Upload a New Document", {:url=>{:controller=>"profile", :action=>"new_document_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}) %>
+							or Search for an Existing Document:
+							<%= auto_complete_text_field :document, :title, {:size=>15, :value=>""}, {:url=>{:controller=>"profile", :action=>"auto_complete_for_document_title"}, :select=>"show_this", :with=>"'doc_name='+element.value+'&project_id='+#{@project.id}"}%>						
+					</td></tr>
+					<% @event.documents.each do |document|%>
+							<%= render :partial=>"profile/document_in_event", :locals=>{:document=>document, :event=>@event}%>
+					<% end %>		
+				</table>
+				</fieldset>
+			</td>	
+		</tr>
+		<tr><td colspan="3" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to "Update", "javascript:$('event_update_form').submit()"%> <%=link_to "Cancel", :back %></td></tr>
+	</table>
+</fieldset>
+<% end %>
+<iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

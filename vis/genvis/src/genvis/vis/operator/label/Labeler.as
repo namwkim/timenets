@@ -147,7 +147,7 @@ package genvis.vis.operator.label
 		 *  separate label layer) or CHILD (for adding labels as children of
 		 *  data objects)
 		 */
-		public function Labeler(source:*=null, group:String=Data.NODES, layout:LifelineLayout=null,
+		public function Labeler(source:*=null, group:String="nodes", layout:LifelineLayout=null,
 			format:TextFormat=null, filter:*=null, policy:String=CHILD)
 		{
 			if (source is String) {
@@ -254,7 +254,7 @@ package genvis.vis.operator.label
 					var marriages:Array	 = person.marriageInfoWith(person.firstSpouse);
 					width = n.toLocalX(xAxis.X(marriages[0].startDate));
 				}else{
-					width = n.toLocalX((person.isDead? xAxis.X(person.date_of_death) : xAxis.X(new Date)));
+					width = n.toLocalX((person.deceased? xAxis.X(person.dateOfDeath) : xAxis.X(new Date)));
 				}
 				//chop the text until it fits within this bound
 				var subLen:Number= text.length-1;

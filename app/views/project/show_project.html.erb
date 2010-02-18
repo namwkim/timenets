@@ -1,4 +1,28 @@
 <% javascript_tag do%>
+var selected_menu_id;
+var shown_elem_id;
+document.observe("dom:loaded", function() {
+	selected_menu_id 	= "people_menu";
+	shown_elem_id 		= "people";
+	$('events').hide();
+	$('documents').hide();
+});
+
+function select_menu(menu, elem_id){
+	//hide previously selected menu
+	$(selected_menu_id).removeClassName("project_menuitem_selected");
+	$(selected_menu_id).addClassName("project_menuitem");
+	$(shown_elem_id).hide();
+	
+	//show currently selected menu
+	selected_menu_id = menu.id;
+	shown_elem_id	 = elem_id;
+	$(selected_menu_id).removeClassName("project_menuitem");
+	$(selected_menu_id).addClassName("project_menuitem_selected");
+	$(shown_elem_id).show();
+	
+	
+}
 function flip_dob_field(chk_box){
 	if (chk_box.checked){
 		$('dod_label').setStyle("display:inline");
@@ -7,100 +31,81 @@ function flip_dob_field(chk_box){
 		$('dod_label').setStyle("display:none");	
 		$('dod_text').setStyle("display:none");	
 		//also clear the form elements
-		$('profile_date_of_death_1i').selectedIndex = 0;
-		$('profile_date_of_death_2i').selectedIndex = 0;
-		$('profile_date_of_death_3i').selectedIndex = 0;
+		$('person_date_of_death_1i').selectedIndex = 0;
+		$('person_date_of_death_2i').selectedIndex = 0;
+		$('person_date_of_death_3i').selectedIndex = 0;
 	}
 }
-function submit(){
-	$('profile_form').submit();
-}
+
 <% end %>
-<fieldset class="projects">
-	<legend>Project</legend>
-	<table>
-		<tr>
-			<td>Name:</td>
-			<td><%= @project.name%></td>
-		</tr>
-		<tr>
-			<td>Description:</td>
-			<td><%= @project.description%></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<fieldset>
-					<legend>Collaborators</legend>
-					<table>
-						<tr>
-							<td width="25%">Name</td>
-							<td width="30%">Email</td>
-							<td><%=link_to_remote_lightbox "Invite Collaborators", {:url=>{:controller=>"collaborator", :action=>"invite"}}%></td>
-						</tr>
-						<% @project.users.each do |user|%>
-							<tr>
-								<td><%= link_to user.profile.name, :controller=>"profile", :action=>"show_profile", :id=>user.profile.id%></td>
-								<td><%= user.email%></td>
-								<td><%= link_to_remote_lightbox "Send Message", {:url=>{:controller=>"inbox", :action=>"new_message", :id=>user.id}}%></td>
-							</tr>
-						<% end %>
-					</table>
-				</fieldset>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<fieldset>
-					<legend>Profiles</legend>
-					<table id="profiles">
-						<tr>
-							<td>Name</td>
-							<td>Sex</td>
-							<td>Date of Birth</td>
-							<td><%=link_to_remote_lightbox "New Profile", {:url=>{:controller=>"profile", :action=>"new_profile"}, :with=>"'project_id='+#{@project.id}"}%></td>
-						</tr>					
-						<% @project.profiles.each do |profile|%>
-							<%= render :partial=>"profile/profile", :locals=>{:profile=>profile}%>
-						<% end %>
-					</table>
-				</fieldset>				
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<fieldset>
-					<legend>Events</legend>
-					<table>
-						<tr>
-							<td width="20%">Date</td>
-							<td width="35%">Name</td>
-							<td width="25%">Location</td>
-							<td width="20%"><%= link_to( "New Event",:controller=>"profile", :action=>"new_event",:project_id=>@project.id)%></td>
-						</tr>					
-						<% @project.events.each do |event|%>
-							<%= render :partial=>"profile/event", :locals=>{:event=>event}%>
-						<% end %>
-					</table>
-				</fieldset>				
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<fieldset>
-					<legend>Documents</legend>
-					<table id="documents">
-						<tr>
-							<td width="20%">Title</td>
-							<td width="60%">Description</td>
-							<td width="20%"><%=link_to_remote_lightbox( "New Document", {:url=>{:controller=>"profile", :action=>"new_document"}, :with=>"'project_id='+#{@project.id}"}) %></td>
-						</tr>										
-						<% @project.documents.each do |document|%>
-							<%= render :partial=>"profile/document", :locals=>{:document=>document}%>
-						<% end %>
-					</table>
-				</fieldset>				
-			</td>
-		</tr>
-	</table>
-</fieldset>
+<div class="project_title">
+	<span class="visualize"><%=link_to "VISUALIZE", :controller=>"person", :action=>"visualize", :id=>@root.id %></span>
+	<span><%= link_to @project.name, :controller=>"project", :action=>"show_project", :id=>@project.id%></span>	
+</div>
+<div class="project_desc"><%= @project.description%></div>
+<div class="globalContainer">
+	<div class="project_left_col">
+		<div class="activity_box">
+			<div class="project_subtitle">Recent Activities</div>
+			<% if @project.activities.length <= 5%>
+				<% @project.activities.reverse_each do |activity|%>
+					<div class="activity_text"><%= activity.html%></div>
+					<div class="activity_time"><%= activity.created_at.strftime("%B %d at %H:%M%p")%></div>
+				<% end %>
+			<% else %>
+				<% @project.activities.length.downto(@project.activities.length-5) do |i| %>
+					<% activity = @project.activities[i-1]%>
+					<div class="activity_text"><%= activity.html%></div>
+					<div class="activity_time"><%= activity.created_at.strftime("%B %d at %H:%M%p")%></div>					
+				<% end %>
+			<% end %>
+		</div>
+		<div class="collaborator_box">
+			<div class="project_subtitle">Collaborators</div>
+			<div class="collaborator">
+			<% @project.users.each do |user|%>
+				<% if user.id != @operator.id%>
+					<% if user.person.photo_url %>
+						<%= link_to(image_tag(user.person.photo_url, :class=>"thumbnail_photo float_left", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>user.person.id) %>
+					<% else %>
+						<%= link_to(image_tag("/images/person.png", :class=>"thumbnail_photo float_left", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>user.person.id) %>
+					<% end%>
+					<div class="collaborator_info">
+						<%= link_to user.person.name, :controller=>"person", :action=>"show_person", :id=>user.person.id%><br/>
+						<%= link_to_remote_lightbox "Send a Message", {:url=>{:controller=>"message", :action=>"new_message", :id=>user.id}}%>
+					</div>
+				<% end %>
+			<% end %>		
+			</div>	
+		</div>
+	</div>
+	<div class="project_right_col">
+		<div class="project_menu">
+			<a id="people_menu" class="project_menuitem_selected" onclick="select_menu(this, 'people')" href="#">People</a>
+			<a id="events_menu" class="project_menuitem" onclick="select_menu(this, 'events')" href="#">Events</a>
+			<a id="documents_menu" class="project_menuitem" onclick="select_menu(this, 'documents')" href="#">Documents</a> 	
+		</div>
+		<div id="people" class="project_people">
+			<div class="submenu_box"><%=link_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person"}, :with=>"'project_id='+#{@project.id}"}%></div>					
+			<div class="search_box">Search Box</div>
+			<% @project.people.each do |person|%>
+				<%= render :partial=>"person/person", :locals=>{:person=>person}%>
+			<% end %>
+		</div>	
+		<div id="events" class="project_events">
+			<div class="submenu_box"><%= link_to( "Create a New Event",:controller=>"event", :action=>"new_event",:project_id=>@project.id)%></div>
+			<div class="search_box">Search Box</div>				
+				<% @project.events.each do |event|%>
+					<%= render :partial=>"event/event", :locals=>{:event=>event}%>
+				<% end %>		
+		</div>
+		<div id="documents" class="project_documents">
+			<div class="submenu_box"><%=link_to_remote_lightbox( "Create a New Document", {:url=>{:controller=>"document", :action=>"new_document"}, :with=>"'project_id='+#{@project.id}"}) %></div>										
+			<div class="search_box">Search Box</div>
+			<% @project.documents.each do |document|%>
+				<%= render :partial=>"document/document", :locals=>{:document=>document}%>
+			<% end %>
+		</div>
+	</div>
+</div>
 <iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

@@ -1,0 +1,13 @@
+<div id="<%=dom_id(event)%>">
+	<span class="event_property">
+		<% if event.isRange %>
+			<%= event.from%> - <%=event.to%>
+		<% else %>
+			<%= event.from%>
+		<% end %>
+	</span>
+	<span class="event_property"><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></span>
+	<span class="event_property"><%= event.location%></span>
+	<span class="event_property"><%= link_to "Edit", :controller=>"event", :action=>"edit_event", :id=>event.id, :project_id=>@project.id%></span>
+	<span class="event_property"><%= link_to_remote "Remove", :url=>{:controller=>"event", :action=>"delete_event", :id=>event.id}, :confirm=>"do you really want to delete this event?", :complete=>"$('#{dom_id(event)}').remove()"%></span>
+</div>

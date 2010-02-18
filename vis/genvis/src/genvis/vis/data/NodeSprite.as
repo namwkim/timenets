@@ -46,7 +46,8 @@ package genvis.vis.data
 		private var _lines:Array 		= null;// line segments approximating lifeline
 		private var _label:TextSprite	= null;
 		private var _type:int;
-		private var _status:int; 		
+		private var _status:int; 
+		private var _selected:Boolean	= false;		
 		
 		private var _doi:Number;		
 		//private var _willVisible:Boolean;
@@ -75,11 +76,13 @@ package genvis.vis.data
 		public function get pseudoParents():Array	{ return _pseudoParents;	}
 		public function get parentNode():NodeSprite { return _parentNode; }
 		public function get expanded():Boolean		{ return _expanded;   }
-		public function get visited():Boolean		{ return _visited;   }
+		public function get visited():Boolean		{ return _visited;    }
+		public function get selected():Boolean		{ return _selected;	  }
 		
 		public function set parentNode(p:NodeSprite):void 	{ _parentNode	= p;  }
 		public function set expanded(e:Boolean):void		{ _expanded 	= e;  }
 		public function set visited(v:Boolean):void			{ _visited 		= v;  }
+		public function set selected(s:Boolean):void		{ _selected		= s;  }
 		
 		public function get label():TextSprite { return _label; }
 		public function get bbox():Box 		{ return _bbox; 	}

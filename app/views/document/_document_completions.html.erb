@@ -1,0 +1,8 @@
+  <ul style="background-color: #eeeeec;color:#2e3436;">
+    <% @documents.each do |document| %>
+    <li onclick="submit_add_doc_form('<%=document.id%>')" style="border-bottom:1px dashed #fcaf3e; border-top:1px dashed #fcaf3e;">
+		<span class="show_this"><%=document.name%></span>
+	</li>
+    <% end %>
+  </ul>
+

@@ -1,8 +1,8 @@
 class User < ActiveRecord::Base
   require 'digest/sha1'
   #one to one
-  belongs_to :profile
-  
+  belongs_to :person
+  belongs_to :main_project, :class_name=>"Project", :foreign_key=>"project_id"#will be displayed in the main page
   #one to many
   has_many :messages, :dependent=>:destroy
   has_many :activities, :dependent=>:destroy
@@ -10,10 +10,10 @@ class User < ActiveRecord::Base
   
   #many to many through
   has_many :managed_projects, :dependent=>:destroy
-  has_many :projects, :through => :managed_projects
+  has_many :projects, :through => :managed_projects, :uniq => true
   
   #self-referential many to many
-  has_and_belongs_to_many :collaborators, :class_name => "User", :join_table => "collaborators", :foreign_key => "user_id", :association_foreign_key => "collaborator_id"
+  #has_and_belongs_to_many :collaborators, :class_name => "User", :join_table => "collaborators", :foreign_key => "user_id", :association_foreign_key => "collaborator_id"
   
   #validation
   validates_presence_of   :email
@@ -23,10 +23,10 @@ class User < ActiveRecord::Base
   
   attr_accessor :password_confirmation
   
+
   def password
     @password
   end
-  
   def password=(pwd)
     @password = pwd
     return if pwd.blank?

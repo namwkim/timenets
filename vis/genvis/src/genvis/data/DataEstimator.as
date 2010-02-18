@@ -12,19 +12,19 @@ package genvis.data
 		public static const MALE:String 	= "Male";
 		public static const FEMALE:String 	= "Female";
 		public static const NONE:String		= "None";
-		public static const DATE_OF_BIRTH:String = "date_of_birth";
-		public static const DATE_OF_DEATH:String = "date_of_death";
+		public static const DATE_OF_BIRTH:String = "dateOfBirth";
+		public static const DATE_OF_DEATH:String = "dateOfDeath";
 		
 		protected static function firstPass(person:Person):void{			
 			estimateGender(person);
-			if (estimateDate(person, "date_of_birth")==false){//TODO: if cannot estimate
-				//this means there is no person having "date_of_birth" information
+			if (estimateDate(person, "dateOfBirth")==false){//TODO: if cannot estimate
+				//this means there is no person having "dateOfBirth" information
 				//TODO: return message saying that data cannot be displayed	
 				Alert.show("Cannot Estimate " + person.name + "'s Date of Birth!", 'Data Estimator', mx.controls.Alert.OK);			
 			}	
-			var dob:Date = person.date_of_birth;
+			var dob:Date = person.dateOfBirth;
 			if ((dob.fullYear + _threshold) < _curDate.fullYear){
-				if (estimateDate(person, "date_of_death")==false){
+				if (estimateDate(person, "dateOfDeath")==false){
 					Alert.show("Cannot Estimate " + person.name + "'s Date of Death.", 'Data Estimator', mx.controls.Alert.OK);						
 				}	
 			}
@@ -46,8 +46,8 @@ package genvis.data
 			if (person.parents.length ==1){//infer which spouse is a parent of this person
 				//find where the person's birth date reside in which marriage date
 				for each (marriage in person.parents[0].marriages){
-					var endDate:Date = marriage.endDate==null? (marriage.spouseOf(person.parents[0]).isDead==false? _curDate: marriage.spouseOf(person.parents[0]).date_of_death):marriage.endDate;
-					if (marriage.startDate <= person.date_of_birth &&  endDate>= person.date_of_birth){
+					var endDate:Date = marriage.endDate==null? (marriage.spouseOf(person.parents[0]).deceased==false? _curDate: marriage.spouseOf(person.parents[0]).dateOfDeath):marriage.endDate;
+					if (marriage.startDate <= person.dateOfBirth &&  endDate>= person.dateOfBirth){
 						marriage.spouseOf(person.parents[0]).addChild(person);
 						person.addParent(marriage.spouseOf(person.parents[0]));
 						break;
@@ -82,10 +82,10 @@ package genvis.data
 					marriage.endDate	= marriage.startDate;
 					marriage.startDate	= temp;
 				}
-				if (marriage.endDate!=null && person.date_of_death!=null && marriage.endDate>person.date_of_death){
+				if (marriage.endDate!=null && person.dateOfDeath!=null && marriage.endDate>person.dateOfDeath){
 					temp					= marriage.endDate;
-					marriage.endDate		= person.date_of_death;
-					person.date_of_death	= temp;
+					marriage.endDate		= person.dateOfDeath;
+					person.dateOfDeath	= temp;
 				}
 			}
 			
@@ -119,14 +119,14 @@ package genvis.data
 				var spouse:Person = mar.spouseOf(person);
 				if (mar.endDate == null){
 					if (mar.spouseOf(person) != person.lastSpouse){
-						if (prevMar.startDate > spouse.date_of_death)
-							mar.endDate = spouse.date_of_death;
+						if (prevMar.startDate > spouse.dateOfDeath)
+							mar.endDate = spouse.dateOfDeath;
 						else//it should be between birthdate of last child and the start date
 							mar.endDate = prevMar.startDate;
 						mar.estimated = Marriage.ENDDATE;
 					}
 				}else{
-//					if (mar.spouseOf(person) == person.lastSpouse && mar.endDate.fullYear == (person.isDead? person.date_of_death.fullYear: (new Date()).fullYear)){
+//					if (mar.spouseOf(person) == person.lastSpouse && mar.endDate.fullYear == (person.isDead? person.dateOfDeath.fullYear: (new Date()).fullYear)){
 //						mar.endDate = null;
 //					}
 				}
@@ -140,12 +140,12 @@ package genvis.data
 			var children:Array = person.childrenWith(spouse);
 			if (children.length !=0){
 				var child:Person = children[children.length-1];//
-				marriage.startDate = new Date(child.date_of_birth);
+				marriage.startDate = new Date(child.dateOfBirth);
 			}
-			if (person.date_of_birth < spouse.date_of_birth){//if spouse is young
-				marriage.startDate = new Date(spouse.date_of_birth.fullYear + _offset, spouse.date_of_birth.month, spouse.date_of_birth.date);
+			if (person.dateOfBirth < spouse.dateOfBirth){//if spouse is young
+				marriage.startDate = new Date(spouse.dateOfBirth.fullYear + _offset, spouse.dateOfBirth.month, spouse.dateOfBirth.date);
 			}else{//if person is young
-				marriage.startDate = new Date(person.date_of_birth.fullYear + _offset, person.date_of_birth.month, person.date_of_birth.date);				
+				marriage.startDate = new Date(person.dateOfBirth.fullYear + _offset, person.dateOfBirth.month, person.dateOfBirth.date);				
 			}			
 			marriage.estimated = Marriage.STARTDATE;
 			return ((marriage.startDate==null? false:true));
@@ -161,11 +161,11 @@ package genvis.data
 			if (person.parents.length == 2){	
 				var ms:Array	= person.parents[0].marriageInfoWith(person.parents[1]);	
 				for each (var mar:Marriage in ms){
-					var marDate:Date 	= type=="date_of_birth"? mar.startDate : mar.endDate;												
+					var marDate:Date 	= type=="dateOfBirth"? mar.startDate : mar.endDate;												
 					if (marDate != null){
-						person.setAttribute(type, new Date(marDate.fullYear + type=="date_of_birth"? 0 : _offset,
+						person.setAttribute(type, new Date(marDate.fullYear + type=="dateOfBirth"? 0 : _offset,
 									marDate.month, marDate.date));
-						person.estimated = type=="date_of_birth"? Person.DOB : Person.DOD;
+						person.estimated = type=="dateOfBirth"? Person.DOB : Person.DOD;
 						return (true);
 					}
 				}
@@ -177,7 +177,7 @@ package genvis.data
 				if (cDate != null){
 					//TODO: change to recursive call					
 					person.setAttribute(type, new Date(cDate.fullYear - _offset, cDate.month, cDate.date));
-					person.estimated = type=="date_of_birth"? Person.DOB : Person.DOD;
+					person.estimated = type=="dateOfBirth"? Person.DOB : Person.DOD;
 					return (true);
 				}
 			}	
@@ -185,7 +185,7 @@ package genvis.data
 			for each(var spouse:Person in person.spouses){
 				if (spouse.getAttribute(type) != null){
 					person.setAttribute(type, new Date(spouse.getAttribute(type)));
-					person.estimated = type=="date_of_birth"? Person.DOB : Person.DOD;
+					person.estimated = type=="dateOfBirth"? Person.DOB : Person.DOD;
 					return (true);
 				}
 			}
@@ -194,7 +194,7 @@ package genvis.data
 			for each(var sibling:Object in siblings){
 				if (sibling.getAttribute(type)!=null){
 					person.setAttribute(type, new Date(sibling.getAttribute(type)));
-					person.estimated = type=="date_of_birth"? Person.DOB : Person.DOD;
+					person.estimated = type=="dateOfBirth"? Person.DOB : Person.DOD;
 					return (true);
 				}
 			}
@@ -203,7 +203,7 @@ package genvis.data
 				var pDate:Date = parent.getAttribute(type) as Date;
 				if (pDate != null){
 					person.setAttribute(type, new Date(pDate.fullYear + _offset, pDate.month, pDate.date));
-					person.estimated = type=="date_of_birth"? Person.DOB : Person.DOD;
+					person.estimated = type=="dateOfBirth"? Person.DOB : Person.DOD;
 					return (true);
 				}
 			}
@@ -254,7 +254,7 @@ package genvis.data
 					//construct parent-child relationship
 					spouse.addChild(person);
 					person.addParent(spouse);
-					_data.push(spouse);	
+					if (_data) _data.push(spouse);	
 				}
 				//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
 				//(this is done after estimation)

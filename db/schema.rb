@@ -13,14 +13,10 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
 
   create_table "activities", :force => true do |t|
     t.integer  "user_id"
-    t.text     "html_text"
+    t.integer  "project_id"
+    t.string   "html"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "collaborators", :id => false, :force => true do |t|
-    t.integer "user_id"
-    t.integer "collaborator_id"
   end
 
   create_table "doc_types", :force => true do |t|
@@ -55,8 +51,8 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.datetime "updated_at"
   end
 
-  create_table "events_profiles", :id => false, :force => true do |t|
-    t.integer "profile_id"
+  create_table "events_people", :id => false, :force => true do |t|
+    t.integer "person_id"
     t.integer "event_id"
   end
 
@@ -64,6 +60,14 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.integer "user_id"
     t.integer "project_id"
     t.string  "privilege",  :default => "Editor"
+  end
+
+  create_table "marriages", :force => true do |t|
+    t.integer "person_id"
+    t.integer "spouse_id"
+    t.boolean "divorced"
+    t.date    "start_date"
+    t.date    "end_date"
   end
 
   create_table "messages", :force => true do |t|
@@ -74,8 +78,10 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.datetime "updated_at"
   end
 
-  create_table "profiles", :force => true do |t|
+  create_table "people", :force => true do |t|
     t.integer  "project_id"
+    t.integer  "father_id"
+    t.integer  "mother_id"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "sex"
@@ -94,23 +100,6 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.datetime "updated_at"
   end
 
-  create_table "relationship_types", :force => true do |t|
-    t.string "name"
-    t.string "description"
-  end
-
-  create_table "relationships", :force => true do |t|
-    t.integer  "profile_id"
-    t.integer  "family_member_id"
-    t.integer  "type_id"
-    t.integer  "profile_role_id"
-    t.integer  "family_member_role_id"
-    t.date     "start_date"
-    t.date     "end_date"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "revisions", :force => true do |t|
     t.integer  "user_id"
     t.integer  "project_id"
@@ -120,13 +109,9 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.datetime "updated_at"
   end
 
-  create_table "roles", :force => true do |t|
-    t.string "name"
-    t.string "description"
-  end
-
   create_table "users", :force => true do |t|
-    t.integer  "profile_id"
+    t.integer  "person_id"
+    t.integer  "project_id"
     t.string   "email"
     t.string   "hashed_password"
     t.string   "salt"

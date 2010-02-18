@@ -4,11 +4,12 @@ class HomeController < ApplicationController
       redirect_to(:action => "index")
     else
       @user = flash[:user] if flash[:user] 
-      @profile = flash[:profile] if flash[:profile] 
+      @person = flash[:person] if flash[:person] 
       render :layout => false
     end
   end
   def index
+    redirect_to(:controller=>"project", :action=>"show_project", :id=>@operator.main_project)
   end
   def login
     if request.post?
@@ -34,18 +35,19 @@ class HomeController < ApplicationController
   def signup
     if request.post?
       @user    = User.new(params[:user])
-      @profile = Profile.new(params[:profile]) 
-      @user.profile = @profile
-      if @user.save and @profile.save
+      @person = person.new(params[:person]) 
+      @user.person = @person
+      if @user.save and @person.save
         session[:operator_id] = @user.id        
         #create an initial project associated with the new user
-        @project = Project.create(:name=>@profile.first_name+"'s genealogy project", :description=>"Describe your genealogy project here!")
-        ManagedProject.create(:user_id=>@user.id, :project_id=>@project.id, :privilege=>"Editor")
-        @project.profiles << @profile
+        @project = Project.create(:name=>@person.first_name+"'s genealogy project", :description=>"Describe your genealogy project here!")
+        @person.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor")
+        @project.persons << @person
+        @person.main_project = @project
         redirect_to(:action => "index")
       else
         flash[:user] = @user
-        flash[:profie] = @profile
+        flash[:profie] = @person
         redirect_to(:action => "intro")
       end
     else

@@ -1,0 +1,10 @@
+package org.akinu.events
+{
+	public class RootChangeEvent
+	{
+		public function RootChangeEvent()
+		{
+		}
+
+	}
+}

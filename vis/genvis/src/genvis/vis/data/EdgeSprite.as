@@ -53,7 +53,7 @@ package genvis.vis.data
 		public function get start():Point{
 			var p:Person = _child.data as Person;
 			//var marInfo:MarriageInfo = p.father.marriageInfoWith(p.mother);
-			var bx:Number = _child.block.gbLayout.xAxis.X(p.date_of_birth);
+			var bx:Number = _child.block.gbLayout.xAxis.X(p.dateOfBirth);
 			var fy:Number = p.father.sprite.Y(bx);
 			var my:Number = p.mother.sprite.Y(bx); 
 			var by:Number = (isNaN(fy)? my: (isNaN(my)? fy: (fy+my)/2));
@@ -61,7 +61,7 @@ package genvis.vis.data
 		}
 		public function get end():Point{
 			var p:Person = _child.data as Person;
-			var x:Number = _child.block.gbLayout.xAxis.X(p.date_of_birth);
+			var x:Number = _child.block.gbLayout.xAxis.X(p.dateOfBirth);
 			var y:Number = _child.toGlobalY(0);
 			return new Point(x, y);
 		}

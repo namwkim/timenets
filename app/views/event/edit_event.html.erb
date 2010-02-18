@@ -15,9 +15,9 @@ function flip_range(chk_box){
 		$('event_to_3i').selectedIndex = 0;
 	}
 }
-function submit_add_form(profile_id){
-	$('profile_id').value=profile_id;
-	if ($('profile_'+profile_id)!=null){
+function submit_add_form(person_id){
+	$('person_id').value=person_id;
+	if ($('person_'+person_id)!=null){
 		alert('the selected person is alreadt added!');		
 	}else{
 		$('add_form').request();
@@ -32,8 +32,8 @@ function submit_add_doc_form(doc_id){
 	}
 }	
 <% end %>
-<% form_tag({:controller=>"person", :action=>"add_profile_in_event"}, {:id=>"add_form"})do -%>
-	<%=hidden_field_tag "profile_id", nil%>
+<% form_tag({:controller=>"person", :action=>"add_person_in_event"}, {:id=>"add_form"})do -%>
+	<%=hidden_field_tag "person_id", nil%>
 	<%=hidden_field_tag "event_id", @event.id%>
 <% end %>
 <% form_tag({:controller=>"document", :action=>"add_document_in_event"}, {:id=>"add_doc_form"})do -%>
@@ -80,7 +80,7 @@ function submit_add_doc_form(doc_id){
 					<legend>People</legend>						
 					<div id="people">
 						<div class="submenu_box">				
-							<%=link_to_remote_lightbox "Create a New Profile", {:url=>{:controller=>"person", :action=>"new_profile_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}%>
+							<%=link_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}%>
 							or Searching for an Existing Profile: 
 							<%= auto_complete_text_field :person, :name, {:size=>15, :value=>""}, {:url=>{:controller=>"person", :action=>"auto_complete_for_person_name"}, :select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@project.id}"}%>						
 						</div>	

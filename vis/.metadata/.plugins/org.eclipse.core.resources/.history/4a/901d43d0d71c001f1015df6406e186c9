@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="org.akinu.view.*" x="20" y="20" width="100%" height="100%">
+
+	<mx:Script>
+	<![CDATA[
+			import org.akinu.model.ModelLocator;
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			private function changeHandler():void{
+				if (model.workflowState == ModelLocator.ADD_RELATIONSHIP)
+					addRelationship.init();
+			}			
+	]]>
+	</mx:Script>
+	<mx:ViewStack id="personContext"  selectedIndex="{model.workflowState}" width="100%" height="100%" change="changeHandler()">
+		<view:PersonActionList id="personActionList"/>
+		<view:AddRelationship id="addRelationship"/>
+	</mx:ViewStack>
+
+
+</mx:Canvas>

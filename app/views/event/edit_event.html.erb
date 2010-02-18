@@ -98,7 +98,7 @@ function submit_add_doc_form(doc_id){
 					<legend>Documents</legend>
 					<div id="documents">
 					<div class="submenu_box">
-							<%=link_to_remote_lightbox( "Upload a New Document", {:url=>{:controller=>"document/document_in_event", :action=>"new_document_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}) %>
+							<%=link_to_remote_lightbox( "Upload a New Document", {:url=>{:controller=>"document", :action=>"new_document_in_event"}, :with=>"'project_id='+#{@project.id}+'&event_id='+#{@event.id}"}) %>
 							or Search for an Existing Document:
 							<%= auto_complete_text_field :document, :title, {:size=>15, :value=>""}, {:url=>{:controller=>"document", :action=>"auto_complete_for_document_name"}, :select=>"show_this", :with=>"'doc_name='+element.value+'&project_id='+#{@project.id}"}%>						
 					</div>

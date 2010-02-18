@@ -51,7 +51,7 @@
 			<td width="40%">Name</td>
 			<td width="20%">Location</td>
 		</tr>
-		<% @person.events.each do |event|%>
+		<% (@person.events.sort!{ |a,b| a.from <=> b.from}).each do |event|%>
 			<tr id="<%="event_"+event.id.to_s%>">
 				<td>
 					<% if event.isRange %>

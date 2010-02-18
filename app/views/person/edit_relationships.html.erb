@@ -42,27 +42,27 @@ function submit_add_form(person_id){
 						<tr>
 							<td >Father:</td>
 							<td>
-								<table id="father">								
-									<tr id="add_father" style="<%= 'display:none' if @person.father!=nil%>"><td>										
+								<div id="father">								
+									<div id="add_father" style="<%= 'display:none' if @person.father!=nil%>">										
 										Add Father by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Father'"}) %>
 										or Searching for an Existing Person: 										
 										<%= auto_complete_text_field :person, :name, {:index=>0, :size=>15, :value=>"", :onclick=>"$('role').value = 'Father'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>									
-									</td></tr>
+									</div>
 									<% if @person.father!=nil%>
 										<%= render :partial=>"relationship", :locals=>{:person=>@person.father, :role=>"Father", :ref_id=>@person.id, :options=>{ :add_link_id=>"add_father"}}%>
 									<% end %>								
-								</table>								
+								</div>								
 							</td>
 						</tr>
 						<tr>
 							<td >Mother:</td>
 							<td>
-								<table id="mother">
-									<tr id="add_mother" style="<%= 'display:none' if @person.mother!=nil%>"><td>										
+								<div id="mother">
+									<div id="add_mother" style="<%= 'display:none' if @person.mother!=nil%>">										
 										Add Mother by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Mother'"}) %>
 										or Searching for an Existing Person: 										
 										<%= auto_complete_text_field :person, :name, {:index=>1, :size=>15, :value=>"", :onclick=>"$('role').value = 'Mother'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>
-									</td></tr>
+									</div>
 									<% if @person.mother!=nil%>
 										<%= render :partial=>"relationship", :locals=>{:person=>@person.mother, :role=>"Mother", :ref_id=>@person.id, :options=>{:add_link_id=>"add_mother"}}%>
 									<% end %>
@@ -77,12 +77,12 @@ function submit_add_form(person_id){
 			<td>
 				<fieldset>
 					<legend>Spouse</legend>
-					<table id="spouses">
-					<tr><td>						
+					<div id="spouses">
+					<div class="submenu_box">						
 						Add Spouse by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Spouse'"}) %>
 						or Searching for an Existing Person: 
-					</td></tr>	
-					<tr><td>
+					</div>	
+					<div>
 					<% form_tag({:action=>"create_relationship"}, {:id=>"add_form"})do -%>
 						<%=hidden_field_tag "person_id", nil%>
 						<%=hidden_field_tag "ref_id", @person.id%>
@@ -108,13 +108,13 @@ function submit_add_form(person_id){
 						</tr>	
 					</table>
 					<% end %>
-					</td></tr>					
+					</div>					
 					<% if @person.marriages %>
 						<% @person.marriages.each do |marriage|%>
 							<%= render :partial=>"relationship", :locals=>{:person=>marriage.spouse, :role=>"Spouse", :ref_id=>@person.id, :options=>{ :marriage=>marriage}}%>					
 						<% end %>
 					<% end %>
-					</table>
+					</div>
 				</fieldset>
 			</td>
 		</tr>
@@ -122,18 +122,18 @@ function submit_add_form(person_id){
 			<td>
 				<fieldset>
 					<legend>Children</legend>
-					<table id="children">
-						<tr id="add_child" ><td>
+					<div id="children">
+						<div id="add_child" >
 							Add Child by <%=link_to_remote_lightbox( "Creating a Person", {:url=>{:controller=>"person", :action=>"new_relationship"}, :with=>"'ref_id='+#{@person.id}+'&role=Child'"}) %>
 							or Searching for an Existing Person: 										
 							<%= auto_complete_text_field :person, :name, {:index=>3, :size=>15, :value=>"", :onclick=>"$('role').value = 'Child'"}, {:select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@person.project.id}"}%>
-						</td></tr>						
+						</div>						
 						<% if @person.children %>
 							<% @person.children.each do |child|%>
 								<%= render :partial=>"relationship", :locals=>{:person=>child, :role=>"Child", :ref_id=>@person.id, :options=>{}}%>
 							<% end %>
 						<% end %>
-					</table>
+					</div>
 				</fieldset>
 			</td>
 		</tr>

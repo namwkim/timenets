@@ -1,9 +1,0 @@
-package genvis_old.data
-{
-	import flare.vis.data.Data;
-	
-	public class DataUtil
-	{
-
-	}
-}

@@ -35,10 +35,6 @@ test:
 
 production:
   adapter: mysql
-  encoding: utf8
-  reconnect: false
-  database: familystory_production
-  pool: 5
-  username: root
-  password: 
-  socket: /tmp/mysql.sock
+  database: akinuor_production
+  username: akinuor
+  password: knwd2695

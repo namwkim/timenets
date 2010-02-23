@@ -1,0 +1,9 @@
+<div class="container_box">
+	<% @collaborators.each do |collaborator| %>
+			<%= render :partial=>"collaborator", :locals=>{:collaborator=>collaborator}%>
+	<% end %>
+	<div style="margin:5px;">
+	<%= page_entries_info @collaborators %>
+	<%= will_paginate @collaborators,  :page_links=>false, :previous_label=>"<", :next_label=>">"%>
+	</div>
+</div>

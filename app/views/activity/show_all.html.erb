@@ -1,0 +1,14 @@
+<div class="container_box">
+	<% if @activities.length == 0%>
+		<span>No activity found!</span>
+	<% else %>
+		<% @activities.each do |activity| %>
+			<%= render :partial=>"activity", :locals=>{:activity=>activity}%>
+		<% end %>
+	<% end%>
+	<div style="margin:5px;">
+	<%= page_entries_info @activities %>
+	<%= will_paginate @activities,  :page_links=>false, :previous_label=>"<", :next_label=>">"%>
+	</div>
+	
+</div>

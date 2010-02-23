@@ -14,10 +14,11 @@ class CreateDocuments < ActiveRecord::Migration
     end
     DocType.create(:name => "Photo")
     DocType.create(:name => "Video")
-    DocType.create(:name => "Document")
+    DocType.create(:name => "Audio")
     DocType.create(:name => "Other")
   end
   def self.down
     drop_table :documents
+    drop_table :doc_types
   end
 end

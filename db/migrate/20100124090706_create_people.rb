@@ -11,6 +11,8 @@ class CreatePeople < ActiveRecord::Migration
       t.date    :date_of_death   
       t.boolean :deceased,  :defalut=>0
       t.string  :photo_url
+      t.boolean :is_dob_uncertain
+      t.boolean :is_dod_uncertain
       t.timestamps
     end
     create_table  :marriages do |t|
@@ -18,7 +20,9 @@ class CreatePeople < ActiveRecord::Migration
       t.integer :spouse_id
       t.boolean :divorced
       t.date    :start_date
-      t.date    :end_date     
+      t.date    :end_date 
+      t.boolean :is_start_uncertain
+      t.boolean :is_end_uncertain
     end
     create_table  :events_people, :id=>false do |t|
       t.integer :person_id

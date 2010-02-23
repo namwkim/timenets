@@ -9,7 +9,7 @@ class HomeController < ApplicationController
     end
   end
   def index
-    redirect_to(:controller=>"project", :action=>"show_project", :id=>@operator.main_project)
+    redirect_to(:controller=>"project", :action=>"show_project", :id=>@operator.main_project.id)
   end
   def login
     if request.post?
@@ -35,15 +35,16 @@ class HomeController < ApplicationController
   def signup
     if request.post?
       @user    = User.new(params[:user])
-      @person = person.new(params[:person]) 
+      @person = Person.new(params[:person]) 
       @user.person = @person
       if @user.save and @person.save
         session[:operator_id] = @user.id        
         #create an initial project associated with the new user
-        @project = Project.create(:name=>@person.first_name+"'s genealogy project", :description=>"Describe your genealogy project here!")
-        @person.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor")
-        @project.persons << @person
-        @person.main_project = @project
+        @project = Project.create(:name=>"The"+@person.last_name+" Family", :description=>"Describe your genealogy project here!")
+        @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor")
+        @project.people << @person
+        @user.main_project = @project
+        @user.save
         redirect_to(:action => "index")
       else
         flash[:user] = @user

@@ -14,7 +14,7 @@
 			<td> <%= link_to "Visualize", :controller=>"person", :action=>"visualize", :id=>@person.id %></td>
 		</tr>
 		<tr>
-			<td> <%= link_to "Edit Profile", :controller=>"person", :action=>"edit_person", :id=>@person.id %></td>
+			<td> <%= link_to "Edit Info", :controller=>"person", :action=>"edit_person", :id=>@person.id %></td>
 		</tr>
 		<tr>
 			<td> <%= link_to "Edit Relationships", :controller=>"person", :action=>"edit_relationships", :id=>@person.id %></td>
@@ -60,7 +60,7 @@
 						<%= event.from%>
 					<% end %>
 				</td>
-				<td><%= link_to event.name, :controller=>"Profile", :action=>"show_event", :id=>event.id %></td>
+				<td><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>
 				<td><%= event.location%></td>
 			</tr>
 		<% end %>

@@ -1,0 +1,12 @@
+<table id="<%=dom_id(collaborator)%>" >
+<tr class="top"><td>
+	<% if collaborator.person.photo_url %>
+		<%= link_to(image_tag(collaborator.person.photo_url, :class=>"thumbnail_photo", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>collaborator.person.id) %>
+	<% else %>
+		<%= link_to(image_tag("/images/person.png", :class=>"thumbnail_photo", :size=>"40x40"), :controller=>"person", :action=>"show_person", :id=>collaborator.person.id) %>
+	<% end%>	
+	</td>				
+	<td width="140px"><%= link_to collaborator.person.name, :controller=>"person", :action=>"show_person", :id=>collaborator.person.id%></td>	
+	<td><%= button_to_remote_lightbox "Send a Message", {:url=>{:controller=>"message", :action=>"new_message", :id=>collaborator.id}}, {:class=>"ui_small_button"}%></td>	
+</tr>			
+</table>

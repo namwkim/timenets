@@ -29,9 +29,18 @@ module LightboxHelper
     
     return  link_to_remote(name, link_to_remote_options, html_options)
   end
-  
+  def button_to_remote_lightbox(name, button_to_remote_options = {}, html_options = {})
+    id = id_from_url(button_to_remote_options[:url], html_options[:id])
+    hidden_content_id = "hidden_content_#{id}"
+    button_to_remote_options = lightbox_remote_options(button_to_remote_options, hidden_content_id)
+    
+    return  button_to_remote(name, button_to_remote_options, html_options)
+  end  
   def link_to_close_lightbox(name, html_options = {})
     link_to_function name, 'Lightbox.hideBox()', html_options
+  end
+  def button_to_close_lightbox(name, html_options = {})
+    button_to_function name, 'Lightbox.hideBox()', html_options
   end
   
   def button_to_close_lightbox(name, html_options = {})

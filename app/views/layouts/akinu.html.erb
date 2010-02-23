@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Genealogy</title>
+	<title>Akinu</title>
 	
 	<%= javascript_include_tag :defaults %>
 	<%= stylesheet_link_tag 'akinu' %>
@@ -15,12 +15,12 @@
 <body>
 <div class="header_wrapper">
 <div class="header"> 
-    <span class="submenu">
-		<span class="submenuitem"><%= link_to "Home", {:controller=>"project", :action=>"index"}%></span>
+    <span class="submenu">		
         <span class="submenuitem"><%= link_to "Profile", {:controller=>"person", :action=>"index"}%></span>
+		<span class="submenuitem"><%= link_to "Projects", {:controller=>"project", :action=>"index"}%></span>
         <span class="submenuitem"><%= link_to ("Logout", {:controller=>"home", :action=>"logout"})%></span>
     </span>
-	<span class="title"><%= link_to "Akinu", {:controller=> "home", :action=>"index"}%></span>
+	<%= link_to(image_tag("/images/title.png", :width=>90, :class=>"image_title"), {:controller=> "home", :action=>"index"}, :class=>"title")%>
 <!--<span class="menu">
 		<span class="menuitem"><%= link_to "Home", {:controller=> "home", :action=>"index"}%></span>
         <span class="menuitem"><%= link_to "Profile", {:controller=> "profile", :action=>"index"}%></span>
@@ -31,8 +31,9 @@
     </span>-->
 </div>
 </div>
-
+<div id="global_container">
 <div id="content" class="content"><%= yield :layout %></div>
-<div class="pageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div>
+</div>
+<div id="footerWrapper"><div class="pageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div></div>
 </body>
 </html>

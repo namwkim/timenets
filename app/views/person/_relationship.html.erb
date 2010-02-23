@@ -1,5 +1,5 @@
 <div id="<%=dom_id(person)%>">
-	<span style="padding-right:20px;">	<%=link_to(person.name, :action=>"show_person", :id=>person.id)%></span>
+	<span style="padding-right:20px;"><%=link_to(person.name, :action=>"show_person", :id=>person.id)%></span>
 	<% if role=="Spouse"%>
 		<span style="padding-right:20px;border-right:1px dotted #eeeeec"><%= options[:marriage].start_date%> - <%= options[:marriage].end_date%></span>
 	<% end %>

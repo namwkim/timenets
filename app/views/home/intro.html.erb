@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Genealogy</title>
+<title>Akinu</title>
 <%= stylesheet_link_tag 'akinu' %>
 <%= javascript_include_tag 'prototype' %>
 <% javascript_tag do%>
@@ -14,19 +14,16 @@ function initiate_login_field(obj){
 		obj.value = "";
 	}
 }
-function submit_login_form(){
-	$('login_form').submit();
-}
 function submit_signup_form(){
 
 	//email 
 	if ($('user_email').value.match(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/) == null){
 		$('signup_error').innerHTML = "Please enter a valid email address.";
-	}else if ($('profile_first_name').value == "" || $('profile_last_name').value == "" || $('user_email').value == "" || $('user_password').value == "" ||
-		$('profile_sex').options[$('profile_sex').selectedIndex].value == "-1" ||
-		$('profile_date_of_birth_1i').options[$('profile_date_of_birth_1i').selectedIndex].value == "" ||
-		$('profile_date_of_birth_2i').options[$('profile_date_of_birth_2i').selectedIndex].value == "" ||
-		$('profile_date_of_birth_3i').options[$('profile_date_of_birth_3i').selectedIndex].value == ""){
+	}else if ($('person_first_name').value == "" || $('person_last_name').value == "" || $('user_email').value == "" || $('user_password').value == "" ||
+		$('person_sex').options[$('person_sex').selectedIndex].value == "-1" ||
+		$('person_date_of_birth_1i').options[$('person_date_of_birth_1i').selectedIndex].value == "" ||
+		$('person_date_of_birth_2i').options[$('person_date_of_birth_2i').selectedIndex].value == "" ||
+		$('person_date_of_birth_3i').options[$('person_date_of_birth_3i').selectedIndex].value == ""){
 		$('signup_error').innerHTML = "You must fill in all of the fields.";
 	}else{
 		$('signup_form').submit();
@@ -41,16 +38,15 @@ function submit_signup_form(){
 <div class="ftop">
         <div class="fheader">
         	<% form_tag({:controller=>"home", :action=>"login"}, :id => "login_form") do -%>
-            <table class="login">
-            	<tr><td colspan="2" style="height:20px;"><span class="flash"><%=flash[:notice]%></span></td></td>
-            	<tr>
-            	<td><%= text_field_tag 'email', 'email', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %></td>
-                <td><%= text_field_tag 'password', 'password', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %></td>
-               	<td><a href="javascript: submit_login_form()">Login</a></td>
-                </tr>
-            </table>    
+            <div class="login">
+            	<div class="flash"><%=flash[:notice]%></div>
+            	<div><%= text_field_tag 'email', 'email', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %>
+                <%= text_field_tag 'password', 'password', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %>
+               	<%= submit_tag "Login", :class=>"ui_small_button"%>
+                </div>
+            </div>    
 			<% end %>
-            <div class="ftitle">AKINU!</div>
+            <%=image_tag "/images/title.png", :width=>150, :class=>"ftitle"%><!--<div class="ftitle">Akinu</div>-->
         </div>
 </div>
 <div class="fmain">
@@ -59,10 +55,10 @@ function submit_signup_form(){
 	  <% form_tag({:controller=>"home", :action=>"signup"}, :id=> "signup_form") do -%>	  	
         <table> 
         <tr>
-            <td>First Name:</td><td><%= text_field 'profile', 'first_name', :size=>"30" , :class=>"inputtext"%></td>
+            <td>First Name:</td><td><%= text_field 'person', 'first_name', :size=>"30" , :class=>"inputtext"%></td>
         </tr>
         <tr>
-            <td>Last Name:</td><td><%= text_field 'profile', 'last_name', :size=>"30" , :class=>"inputtext"%></td>
+            <td>Last Name:</td><td><%= text_field 'person', 'last_name', :size=>"30" , :class=>"inputtext"%></td>
         </tr>
         <tr>
             <td>Your Email:</td><td><%= text_field 'user', 'email', :size=>"30" , :class=>"inputtext" %></td>
@@ -71,22 +67,22 @@ function submit_signup_form(){
             <td>Password:</td><td><%= password_field 'user', 'password', :size=>"30" , :class=>"inputtext"%></td>
         </tr>
         <tr>
-            <td>Sex:</td><td><%= select 'profile', "sex", "<option value ='-1'>Select Sex:</option><option value='Female'>Female</option><option value='Male'>Male</option>" %></td>
+            <td>Sex:</td><td><%= select 'person', "sex", "<option value ='-1'>Select Sex:</option><option value='Female'>Female</option><option value='Male'>Male</option>" %></td>
         </tr>
         <tr>
             <td>Birth Date:</td>
-            <td><%=date_select 'profile', 'date_of_birth', :start_year => 0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+            <td><%=date_select 'person', 'date_of_birth', :start_year => 0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
         </tr>    
-		<tr><td colspan="2" align="center"><span id="signup_error" class="flash"><%= error_messages_for 'user', 'profile', :header_message=>nil, :message=>nil %></span></td></tr>
-        <tr><td></td><td><a href="javascript: submit_signup_form()">SignUp</a></td></tr>            
+		<tr><td colspan="2" align="center"><span id="signup_error" class="flash"><%= error_messages_for 'user', 'person', :header_message=>nil, :message=>nil %></span></td></tr>
+        <tr><td></td><td><%= submit_tag "SignUp", :class=>"ui_small_button"%></td></tr>            
         </table>        
 		<% end %>
     </div>
     <div class="intro">Share Your Family Stories... 
-    <img src="images/introvis.png" width="520" height="150" style="margin-top:30px;"/></div>
+    <img src="images/introvis.png" width="520" style="margin-top:30px;"/></div>
 </div>
 
-<div class="fbottom"></div>
+<div class="fbottom"><div class="fPageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div></div>
 
 </body>
 </html>

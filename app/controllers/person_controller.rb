@@ -104,7 +104,13 @@ class PersonController < ApplicationController
       when "Mother"
         @ref_person.mother = @person
       when "Spouse"
-        @person.marriages.build(params[:marriage])     
+        if is_amf?
+          params[:marriage].save
+          @person.marriages << params[:marriage]          
+        else
+          @person.marriages.build(params[:marriage])
+        end
+             
       when "Child"
         case @ref_person.sex  #TODO: what if sex is nil
           when "Male"
@@ -115,9 +121,14 @@ class PersonController < ApplicationController
     end
     if @person.save and @ref_person.save
       if @role == "Spouse"
-        params[:marriage][:person_id]= @ref_person.id
-        params[:marriage][:spouse_id] = @person.id
-        @ref_person.marriages.create(params[:marriage]) #TODO: improve this crud synchronization...   
+        if is_amf?
+          marriage = Marriage.create(:person_id=>@ref_person.id, :spouse_id=>@person.id, :start_date=>params[:marriage].start_date, :end_date=>params[:marriage].end_date)          
+          @ref_person.marriages << marriage          
+        else
+          params[:marriage][:person_id]= @ref_person.id
+          params[:marriage][:spouse_id] = @person.id
+          @ref_person.marriages.create(params[:marriage]) #TODO: improve this crud synchronization... 
+        end  
       end
       flash[:notice] = 'Person was successfully added.'
       respond_to do |format|

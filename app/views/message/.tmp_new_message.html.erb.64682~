@@ -1,0 +1,19 @@
+<% form_tag ({:action=>"send_message"}, {:id=>"msg_new_form"}) do -%>
+<%= hidden_field_tag "to_id", @to_id %>
+<fieldset>
+	<legend>New Message</legend>
+	<table>
+		<tr>
+			<td><%= label_tag "subject"%></td>
+			<td><%= text_field_tag "subject", "", {:size=>55}%></td>
+		</tr>
+		<tr>
+			<td valign="top"><%= label_tag "body", "Message"%></td>
+			<td><%= text_area_tag "body", "", {:rows=>5, :cols=>50}%></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to_close_lightbox "Send", {:onclick=>"$('msg_new_form').request();"} %> <%=link_to_close_lightbox "Cancel"%></td>
+		</tr>
+	</table>
+</fieldset>
+<% end %>

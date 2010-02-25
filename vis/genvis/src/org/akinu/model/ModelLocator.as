@@ -7,6 +7,8 @@ package org.akinu.model
 	import genvis.GenVis;
 	import genvis.data.Person;
 	
+	import org.akinu.vo.Project;
+	
 	[Bindable]
 	public class ModelLocator implements IModelLocator
 	{
@@ -23,20 +25,24 @@ package org.akinu.model
 		}
 		
 		//context menu variables
-		public static const MAIN_MENU:uint		= 0;
-		public static const PERSON_MENU:uint	= 1;
-		public var contextMenu:uint = MAIN_MENU;
+		public static const FRONT_PAGE:uint		= 0;
+		public static const PERSON_PAGE:uint	= 1;
+		public var page:uint = FRONT_PAGE;
 		
 		//local workflow state variables
-		//1. person menu context		
-		public static const TAKE_ACTION:uint		= 0;
-		public static const ADD_RELATIONSHIP:uint	= 1; 
-		public var workflowState:uint = TAKE_ACTION; //depends on contextViewType
+		//1. person menu context			
+		public static const PERSON_MAIN:uint			= 0; 
+		public static const PERSON_EDIT:uint			= 1;
+		public static const EDIT_UNSAVED_PERSON:uint	= 2;
+		public var pageState:uint = PERSON_MAIN; //depends on contextViewType
 		
 		//vis data variables
 		public var root:Person; //root person for the visualization (in case of hourglass chart, it's the center node)
 		public var selectedPerson:Person;
 		public var vis:GenVis;
+		
+		//project 
+		public var project:Project;
 		
 		//temp data between views
 		public var data:*;

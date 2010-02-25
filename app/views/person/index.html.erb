@@ -41,6 +41,33 @@
 			<td>Date of Death:</td><td><%=@person.date_of_death%></td>
 		</tr>
 		<% end %>
+		<tr>
+			<td>Father:</td><td><%=link_to @person.father.name, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.father!=nil%></td>
+		</tr>
+		<tr>
+			<td>Mother:</td><td><%=link_to @person.father, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.mother=nil%></td>
+		</tr>
+		<tr>
+			<td>Spouse:</td>
+			<td>
+				<% if @person.marriages %>
+					<% @person.marriages.each do |marriage|%>
+						<% spouse = link_to marriage.spouse_of(@person.id)%>
+						<%= link_to spouse.name, :controller=>"person", :action=>"show_person", :id=>spouse.id%>					
+					<% end %>
+				<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td>Children:</td>
+			<td>
+				<% if @person.children %>
+					<% @person.children.each do |child|%>
+						<%= link_to child.name, :controller=>"person", :action=>"show_person", :id=>child.id%>
+					<% end %>
+				<% end %>
+			</td>
+		</tr>			
 	</table>
 </fieldset>
 <fieldset>

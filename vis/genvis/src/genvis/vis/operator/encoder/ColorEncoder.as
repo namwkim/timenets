@@ -1,10 +1,11 @@
 package genvis.vis.operator.encoder
 {
-	import genvis.animate.Transitioner;
-	import genvis.scale.ScaleType;
 	import flare.util.palette.ColorPalette;
 	import flare.util.palette.Palette;
-	import genvis.vis.data.Data;
+	
+	import genvis.animate.Transitioner;
+	import genvis.data.Person;
+	import genvis.scale.ScaleType;
 	
 	/**
 	 * Encodes a data field into color values, using a scale transform and
@@ -68,11 +69,20 @@ package genvis.vis.operator.encoder
 		/** @inheritDoc */
 		protected override function encode(val:Object):*
 		{
-			if (_ordinal) {
-				return _palette.getColorByIndex(_binding.index(val));
-			} else {
-				return _palette.getColor(_binding.interpolate(val));
+			switch (val as String){
+				case Person.MALE:
+					return _palette.getColorByIndex(0);
+				case Person.FEMALE:
+					return _palette.getColorByIndex(1);
+				default:
+					return _palette.getColorByIndex(2);
+				break;
 			}
+//			if (_ordinal) {
+//				return _palette.getColorByIndex(_binding.index(val));
+//			} else {
+//				return _palette.getColor(_binding.interpolate(val));
+//			}
 		}
 		
 		/**

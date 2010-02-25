@@ -54,7 +54,7 @@ package genvis.vis.data.render
 			
 			var g:Graphics = n.graphics;
 			//2.draw lifeline
-			var color:Number = n.lineColor;
+			var color:Number = n.selected? 0xff73d216:n.lineColor;
 			var width:Number = n.block.gbLayout.lifeline.lineWidth;
 			g.lineStyle(width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 			for (var i:int=0; i<n.points.length; i++){		

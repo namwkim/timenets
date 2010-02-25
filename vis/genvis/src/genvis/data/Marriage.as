@@ -13,6 +13,9 @@ package genvis.data
 		private var _divorced:Boolean =true;
 		
 		private var _estimated:int;
+		private var _isStartUncertain:Boolean;
+		private var _isEndUncertain:Boolean;
+		private var _saved:Boolean;
 		
 		public static const NONE:int		= 0;
 		public static const STARTDATE:int	= 1;
@@ -23,7 +26,7 @@ package genvis.data
 		
 		public function set startDate(sDate:Date):void { 
 			_startDate = sDate; 
-			person1.isSorted = person2.isSorted = false;
+			if (person1!=null && person2!=null) person1.isSorted = person2.isSorted = false; //they could be null if this is used only for value object
 		}
 		public function get startDate():Date { return _startDate; }
 		
@@ -36,16 +39,26 @@ package genvis.data
 		public function get person2():Person { return _person2; }
 		
 		//TODO: is there a better way to handle this discrepancy with the backend?
-		public function set person(p:Person):void { _person1 = p; }
-		public function get person():Person { return _person1; }
-		public function set spouse(p:Person):void { _person2 = p; }
-		public function get spouse():Person { return _person2; }
+//		public function set person(p:Person):void { _person1 = p; }
+//		public function get person():Person { return _person1; }
+//		public function set spouse(p:Person):void { _person2 = p; }
+//		public function get spouse():Person { return _person2; }
 		
 		public function set estimated(flag:int):void{ _estimated |= flag; }
 		public function get estimated():int	{ return _estimated; }
 		
+		public function set isStartUncertain(su:Boolean):void { _isStartUncertain = su; }
+		public function get isStartUncertain():Boolean { return _isStartUncertain; }
+		
+		public function set isEndUncertain(su:Boolean):void { _isEndUncertain = su; }
+		public function get isEndUncertain():Boolean { return _isEndUncertain; }
+		
+		public function get saved():Boolean { return _saved; }
+		public function set saved(s:Boolean):void { _saved = s; }
+				
 		public function set divorced(d:Boolean):void { _divorced = d; }
 		public function get divorced():Boolean {
+			if (_person1==null && _person2==null) return _divorced;//when being used as a value object
 			if (_endDate == null) return false;
 			if ((_endDate.fullYear == (_person1.deceased? _person1.dateOfDeath.fullYear: (new Date()).fullYear)
 				|| _endDate.fullYear == (_person2.deceased? _person2.dateOfDeath.fullYear: (new Date()).fullYear))

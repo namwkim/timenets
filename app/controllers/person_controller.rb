@@ -8,8 +8,8 @@ class PersonController < ApplicationController
     @person = Person.find_by_id(params[:id])
   end
   def root #called from flex to get a genealogy root
-    @person = Person.find_by_id(params[0])
-    render :amf=>@person
+    @person = Person.find_by_id(params[:id])
+    render :amf=>{:root=>@person, :project=>@person.project}
   end
   def new_person
     @person = Person.new
@@ -21,7 +21,11 @@ class PersonController < ApplicationController
     end
   end
   def create_person      
-    @person = build_person params
+    if is_amf
+      @person = params[:person]
+    else
+      @person = build_person params
+    end
     @person.project = Project.find_by_id(params[:project_id])
     if @person.save      
       log "created", @person, @person.project
@@ -31,10 +35,14 @@ class PersonController < ApplicationController
           responds_to_parent do 
             render :partial=>"add_person", :locals=>{:person=>@person}
           end
-        }    
+        } 
+        format.amf { render :amf=>@person}
       end
     else
-        render :action=>"new_person"
+        respond_to do |format|
+          format.html {render :action=>"new_person"}
+          format.amf { render :amf=>@person.errors}
+        end
     end
   end
 
@@ -47,10 +55,18 @@ class PersonController < ApplicationController
     end
   end
   
-  def update_person
-    @person = Person.find_by_id(params[:id])
-    if update_person_attributes @person, params
-      log "edited", @person, @person.project
+  def update_person    
+    if is_amf
+      @person   = Person.find_by_id(params[:person].id)
+      @project  = Project.find_by_id(params[:project_id])
+      success   = @person.update_attr_from_amf  params[:person]
+    else
+      @person   = Person.find_by_id(params[:id])
+      @project  = @person.project
+      success   = update_person_attributes @person, params
+    end  
+    if success
+      log "edited", @person, @project
       respond_to do |format|
         format.html {redirect_to(:action=>"index")}
         format.js { 
@@ -58,9 +74,14 @@ class PersonController < ApplicationController
             render :partial=>"update_person", :locals=>{:person=>@person}
           end
         }
+        format.amf { render :amf=>"success"}
       end
     else
-      render :action=>"edit_person"
+      respond_to do |format|
+        format.html {render :action=>"edit_person"}
+        format.amf { render :amf=>FaultObject.new(@person.errors.full_messages.join("\n"))}
+      end
+      
     end
   end
     
@@ -71,7 +92,8 @@ class PersonController < ApplicationController
   
   def delete_person
     @person = Person.find_by_id(params[:id])
-    Person.delete_file(@person.photo_url)
+    @person.destroy_marriages
+    Person.delete_file(@person.photo_url)    
     Person.destroy(@person)
     log "deleted", @person, @person.project
     render :nothing=>true
@@ -84,9 +106,6 @@ class PersonController < ApplicationController
     @person  = Person.new
     @ref_id   = params[:ref_id]
     @role     = params[:role]
-    if @role == "Spouse"
-      @person.marriages.build
-    end
     render :layout=>false
   end
   def create_relationship
@@ -103,14 +122,7 @@ class PersonController < ApplicationController
         @ref_person.father = @person
       when "Mother"
         @ref_person.mother = @person
-      when "Spouse"
-        if is_amf?
-          params[:marriage].save
-          @person.marriages << params[:marriage]          
-        else
-          @person.marriages.build(params[:marriage])
-        end
-             
+      when "Spouse"             
       when "Child"
         case @ref_person.sex  #TODO: what if sex is nil
           when "Male"
@@ -120,24 +132,32 @@ class PersonController < ApplicationController
         end              
     end
     if @person.save and @ref_person.save
+      @marriage = nil
       if @role == "Spouse"
-        if is_amf?
-          marriage = Marriage.create(:person_id=>@ref_person.id, :spouse_id=>@person.id, :start_date=>params[:marriage].start_date, :end_date=>params[:marriage].end_date)          
-          @ref_person.marriages << marriage          
+        if is_amf
+          params[:marriage].person1_id = @ref_person.id
+          params[:marriage].person2_id = @person.id
+          params[:marriage].save
+          @marriage = params[:marriage]
         else
-          params[:marriage][:person_id]= @ref_person.id
-          params[:marriage][:spouse_id] = @person.id
-          @ref_person.marriages.create(params[:marriage]) #TODO: improve this crud synchronization... 
+          params[:marriage][:person1_id] = @ref_person.id
+          params[:marriage][:person2_id] = @person.id
+          @marriage = Marriage.create(params[:marriage])  
         end  
       end
       flash[:notice] = 'Person was successfully added.'
       respond_to do |format|
         format.html {}
         format.js { render :partial => "add_relationship", :locals=>{:person=>@person, :role=>@role, :ref_person=>@ref_person} }
-        format.amf { render :amf=>{:person=>@person, :role=>@role, :ref_id=>@ref_person.id}  }
+        format.amf { render :amf=>{:person=>@person, :marriage=>@marriage, :role=>@role, :ref_id=>@ref_person.id}  }
       end      
     else
-      render :action => "new_relationship"
+      respond_to do |format|
+        foramt.html {render :action => "new_relationship"}
+        format.amf  { render :amf => FaultObject.new(@person.errors.full_messages.join("\n") + @ref_person.errors.full_messages.join("\n")) }
+        format.js
+      end
+      
     end
   end
   def delete_relationship    
@@ -250,7 +270,7 @@ class PersonController < ApplicationController
 private
   def change_data_type
     if params[:html_format]==nil or params[:html_format]!="true"
-      request.format = :js
+      request.format = :js if is_amf!=true
     end    
   end
 

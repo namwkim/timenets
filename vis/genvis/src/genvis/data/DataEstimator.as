@@ -14,7 +14,28 @@ package genvis.data
 		public static const NONE:String		= "None";
 		public static const DATE_OF_BIRTH:String = "dateOfBirth";
 		public static const DATE_OF_DEATH:String = "dateOfDeath";
-		
+		public static function estimate(root:Person, personTable:Array):void{
+			_data 		= personTable;
+			_curDate 	= new Date();
+			//pre pass
+			root.apply(prePass, true);
+			root.visitAncestors(prePass, Infinity, true);
+			root.visitDecendants(prePass, Infinity, true);			
+			//first pass
+			root.apply(firstPass,true);			
+			root.visitAncestors(firstPass, Infinity, true);
+			root.visitDecendants(firstPass, Infinity, true);
+			//second pass
+			root.apply(secondPass,true);			
+			root.visitAncestors(secondPass, Infinity, true);
+			root.visitDecendants(secondPass, Infinity, true);
+			
+			//validation
+			root.apply(validation,true);			
+			root.visitAncestors(validation, Infinity, true);
+			root.visitDecendants(validation, Infinity, true);
+			
+		}		
 		protected static function firstPass(person:Person):void{			
 			estimateGender(person);
 			if (estimateDate(person, "dateOfBirth")==false){//TODO: if cannot estimate
@@ -25,7 +46,8 @@ package genvis.data
 			var dob:Date = person.dateOfBirth;
 			if ((dob.fullYear + _threshold) < _curDate.fullYear){
 				if (estimateDate(person, "dateOfDeath")==false){
-					Alert.show("Cannot Estimate " + person.name + "'s Date of Death.", 'Data Estimator', mx.controls.Alert.OK);						
+					person.dateOfDeath = new Date(dob.fullYear + _threshold, 0, 1);
+					//Alert.show("Cannot Estimate " + person.name + "'s Date of Death.", 'Data Estimator', mx.controls.Alert.OK);						
 				}	
 			}
 		}
@@ -90,28 +112,7 @@ package genvis.data
 			}
 			
 		}
-		public static function estimate(root:Person, personTable:Array):void{
-			_data 		= personTable;
-			_curDate 	= new Date();
-			//pre pass
-			root.apply(prePass, true);
-			root.visitAncestors(prePass, Infinity, true);
-			root.visitDecendants(prePass, Infinity, true);			
-			//first pass
-			root.apply(firstPass,true);			
-			root.visitAncestors(firstPass, Infinity, true);
-			root.visitDecendants(firstPass, Infinity, true);
-			//second pass
-			root.apply(secondPass,true);			
-			root.visitAncestors(secondPass, Infinity, true);
-			root.visitDecendants(secondPass, Infinity, true);
-			
-			//validation
-			root.apply(validation,true);			
-			root.visitAncestors(validation, Infinity, true);
-			root.visitDecendants(validation, Infinity, true);
-			
-		}
+
 		public static function estimateMarriageDateEnded(person:Person):Boolean{
 			var mar:Marriage, prevMar:Marriage=null;
 			for (var i:int=person.marriages.length-1; i>=0; i--){
@@ -234,7 +235,8 @@ package genvis.data
 				var father:Person = person.father;
 				var mother:Person = person.mother;
 				if (father.isSpouseOf(mother)==false){ //means also mother.isSpouseOf(father)==false
-					marriage = new Marriage(father, mother);
+					marriage 		= new Marriage(father, mother);
+					marriage.saved 	= false;
 					father.addMarriage(marriage);
 					mother.addMarriage(marriage);					
 				}
@@ -243,21 +245,24 @@ package genvis.data
 		//2. missing parent-child relationship
 		protected static function missingParentChildRelationship(person:Person):void{
 			if (person.parents.length ==1){
-				var marriage:Marriage;
+				
 				//2.1 if this parent has no spouse, then create a fake person
 				if (person.parents[0].spouses.length == 0){
 					var spouse:Person 	= person.parents[0].copy();
+					spouse.saved		= false;
 					//construct spouse-relationship
-					marriage = new Marriage(person.parents[0], spouse);
+					var marriage:Marriage	= new Marriage(person.parents[0], spouse);
+					marriage.saved			= false;
 					spouse.addMarriage(marriage);
 					person.parents[0].addMarriage(marriage);
 					//construct parent-child relationship
 					spouse.addChild(person);
 					person.addParent(spouse);
 					if (_data) _data.push(spouse);	
+				}else{
+					//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
+					//(this is done after estimation)
 				}
-				//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
-				//(this is done after estimation)
 			}
 		}
 	}

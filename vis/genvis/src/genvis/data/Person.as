@@ -3,30 +3,7 @@ package genvis.data
 	import genvis.vis.data.NodeSprite;
 	[RemoteClass(alias="Person")]
 	[Bindable]	
-	public class Person
-	{
-		private var _id:String;
-		private var _firstName:String;
-		private var _lastName:String;		
-		private var _gender:String;		
-		private var _dateOfBirth:Date;
-		private var _dateOfDeath:Date;
-		private var _photoUrl:String;
-		private var _deceased:Boolean;
-		
-		private var _parents:Array;
-		private var _children:Array;
-		private var _spouses:Array;
-		private var _marriages:Array; //synchronized with _spouses
-		
-		private var _isSorted:Boolean;
-		
-		private var _estimated:int 		= NONE;
-		private var _isVisited:Boolean	= false;
-		
-		private var _doi:Number;
-		private var _sprite:NodeSprite;
-		private var _marEvtPts:Array;
+	public class Person{
 		
 		public static const NONE:int		= 0;
 		public static const DOB:int 		= 1;
@@ -36,6 +13,31 @@ package genvis.data
 		public static const MALE:String		= "Male";
 		public static const FEMALE:String   = "Female";
 		public static const NOGENDER:String	= "None";
+		
+		private var _id:String;
+		private var _firstName:String;
+		private var _lastName:String;		
+		private var _gender:String;		
+		private var _dateOfBirth:Date;
+		private var _dateOfDeath:Date;
+		private var _photoUrl:String;
+		private var _deceased:Boolean;
+		private var _isDobUncertain:Boolean;
+		private var _isDodUncertain:Boolean;
+
+		private var _parents:Array;
+		private var _children:Array;
+		private var _spouses:Array;
+		private var _marriages:Array; //synchronized with _spouses
+		
+		private var _estimated:int = NONE;	
+		private var _doi:Number;
+		private var _sprite:NodeSprite;
+		private var _isVisited:Boolean	= false;
+		private var _isSorted:Boolean;
+		private var _saved:Boolean = true;//synchronized with server when being initialized
+		
+
 		
 		public function Person(){
 			_isSorted 		= false;
@@ -78,12 +80,21 @@ package genvis.data
 		
 		public function get estimated():int { return _estimated; }
 		public function set estimated(flag:int):void { _estimated = flag; }
+
+		public function get isDobUncertain():Boolean { return _isDobUncertain; }
+		public function set isDobUncertain(du:Boolean):void { _isDobUncertain = du; }
 		
+		public function get isDodUncertain():Boolean { return _isDodUncertain; }
+		public function set isDodUncertain(du:Boolean):void { _isDodUncertain = du; }
+	
 		public function get isSorted():Boolean { return _isSorted; }
 		public function set isSorted(isSorted:Boolean):void { _isSorted = isSorted; }
 		
 		public function get isVisited():Boolean { return _isVisited; }
 		public function set isVisited(isVisited:Boolean):void { _isVisited = isVisited;}
+		
+		public function get saved():Boolean { return _saved; }
+		public function set saved(s:Boolean):void { _saved = s; }
 		
 		public function get sprite():NodeSprite { return _sprite; }
 		public function set sprite(spr:NodeSprite):void { _sprite = spr; }
@@ -106,22 +117,6 @@ package genvis.data
 		public function get marriages():Array { return _marriages; }
 		public function set marriages(m:Array):void { _isSorted = false; _marriages = m; }
 		
-//		public function get marEvtPts():Array { 			
-//			if (_marEvtPts == null){
-//				if (_isSorted == false) this.sort();
-//				_marEvtPts = new Array();
-//				for each (var marInfo:MarriageInfo in _marriages){
-//					_marEvtPts.push(new EvtPt(marInfo.startDate, EvtPt.MARSTART, marInfo.spouseOf(this)));
-//					if (marInfo.isDivorced == true)	_marEvtPts.push(new EvtPt(marInfo.endDate, EvtPt.MAREND, marInfo.spouseOf(this)));
-//				}
-//				_marEvtPts.sort(function (A:EvtPt, B:EvtPt):Number{
-//					if (A.date == null && B.date!=null) return 1;
-//					if (A.date != null && B.date==null) return -1;
-//					return (A.date == B.date? 0: (A.date>B.date? 1: -1));
-//				}); 				
-//			}
-//			return _marEvtPts;
-//		}
 		
 		public function getAttribute(attrName:String):Object{
 			switch (attrName){
@@ -161,8 +156,8 @@ package genvis.data
 			return _parents[0].gender == "Male"? _parents[0]: (_parents.length == 2? _parents[1] : null);
 		}//for now, assume that data is sorted by gender
 		public function get mother():Person { 
-			if (_parents.length == 0) return null;
-			return _parents[1].gender == "Female"? _parents[1]: (_parents.length == 2? _parents[0] : null);
+			if (_parents.length == 0) return null;			
+			return _parents[0].gender == "Female"? _parents[0]: (_parents.length == 2? _parents[1] : null);
 		}	
 		public function set father(f:Person):void{
 			_isSorted = false; _parents.push(f);			
@@ -187,9 +182,9 @@ package genvis.data
 		}
 		public function copy():Person{
 			var spouse:Person 	= new Person;
-			spouse.id			= "copy_of_"+_id;
+			//spouse.id			= "copy_of_"+_id;
 			spouse.gender		= _gender=="None"? "None" : (_gender=="Male"?"Female":"Male");
-			spouse.name 		= "copy_of_"+ name;
+			spouse.name 		= "Add Spouse";//"copy_of_"+ name;
 			return spouse;
 		}
 		public function get isDivorced():Boolean{
@@ -248,7 +243,7 @@ package genvis.data
 			}
 			return children;
 		}
-		public function marriageInfoWith(spouse:Person):Array{
+		public function marriageWith(spouse:Person):Array{
 			if (_isSorted == false) this.sort();
 			var ms:Array = new Array();
 			for each (var marriage:Marriage in _marriages){
@@ -265,6 +260,12 @@ package genvis.data
 					callback(spouse);
 				}
 			}
+		}
+		public function visit(func:Function, depth:Number = Infinity, visitSps:Boolean = false):void{
+			if (depth<0) return;
+			this.apply(func, visitSps);
+			this.visitAncestors(func, depth, visitSps);
+			this.visitDecendants(func, depth, visitSps);	
 		}
 		/**
 		 * depth first search over ancestors

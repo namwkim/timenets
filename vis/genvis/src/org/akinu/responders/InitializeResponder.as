@@ -9,6 +9,7 @@ package org.akinu.responders
 	import mx.rpc.events.ResultEvent;
 	
 	import org.akinu.model.ModelLocator;
+	import org.akinu.vo.Project;
 
 	public class InitializeResponder implements IResponder
 	{
@@ -18,14 +19,17 @@ package org.akinu.responders
 
 		public function result(e:Object):void{
 			var event:ResultEvent = e as ResultEvent;
-			model.root = event.result as Person;
+	
+			model.root 		= event.result.root;
+			model.project	= event.result.project;
 			model.vis.visualize(model.root);
 			DirtySprite.renderDirty();
+
 						
 		}
 		
 		public function fault(info:Object):void{
-			trace("InitializeResponder - Fault");
+			Alert.show("InitializeResponder - Fault");
 
 		}
 		

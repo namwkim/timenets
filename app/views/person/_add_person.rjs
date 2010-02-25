@@ -1,2 +1,5 @@
 page.insert_html :bottom, "people", :partial=>"person", :locals=>{:person=>person}
 page.visual_effect :highlight, "person_#{person.id}", {:startcolor=>"#73d216", :endcolor=>"#2e3436", :duration=>"1.0"}
+page.delay(1) do 
+  page << "new Ajax.Request('/project/people/#{person.project.id}',{onLoading:function(){$('people').update(new Element('img', { src:'/images/roller.gif'}))}});"
+end

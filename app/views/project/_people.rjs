@@ -1,2 +1,6 @@
 page.replace_html "people", :partial=>"person_list", :locals=>{:project=>project, :people=>people}
-page << "if ($('person_pagination')){ var a = $('person_pagination').getElementsBySelector('a')[0]; a.observe('click', function(event){ new Ajax.Request(a.readAttribute('href'),{onLoading:function(){$('people').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});}"
+page << "if ($('person_pagination')){ "+
+" links = $('person_pagination').getElementsBySelector('a');" +
+" for (var i=0; i<links.length; i++){"+
+" var a = links[i]; a.observe('click', function(event){ new Ajax.Request($(event.target).readAttribute('href'),{onLoading:function(){$('people').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});" +
+"}}"

@@ -79,18 +79,25 @@ module RubyAMF
       :actionscript  => 'Person',
       :ruby          => 'Person',
       :type          => 'active_record',
-      :associations  => ["father", "marriages", "spouses", "mother", "children"], 
-      :attributes    => ["id", "first_name", "last_name", "sex", "date_of_birth", "date_of_death", "deceased", "photo_url"],
-      :ignore_fields => ["created_at", "father_id", "updated_at", "project_id", "mother_id"]
+      :associations  => ["father", "mother", "children"], 
+      :attributes    => ["id", "first_name", "last_name", "sex", "date_of_birth", "date_of_death", "deceased", "photo_url", "is_dob_uncertain", "is_dod_uncertain"],
+      :ignore_fields => ["created_at", "father_id", "updated_at", "project_id", "mother_id"],
+      :methods       => ["marriages", "spouses"]
       )
     ClassMappings.register(
       :actionscript  => 'Marriage',
       :ruby          => 'Marriage',
       :type          => 'active_record',
-      :associations  => ["person", "spouse"],
-      :attributes    => ["id", "divorced", "start_date", "end_date"],
-      :ignore_fields => ["created_at", "updated_at", "person_id", "spouse_id"]
+      :associations  => ["person1", "person2"],
+      :attributes    => ["id", "divorced", "start_date", "end_date", "is_start_uncertain", "is_end_uncertain"],
+      :ignore_fields => ["created_at", "updated_at", "person1_id", "person2_id"]
       )
+    ClassMappings.register(
+      :actionscript => 'Project',
+      :ruby         => 'Project',
+      :type         => 'active_record',
+      :attributes   => ["id", "name", "description"]
+    )
 
     # Now, to call the class mapping scope of editing (you are sending objects to the editing application), your controller call would look like this:
     # EX: render :amf => book, :class_mapping_scope => :editing

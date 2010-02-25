@@ -13,8 +13,8 @@ package org.akinu.commands
 
 		public function execute(event:CairngormEvent):void{
 			var e:StateChangeEvent = event as StateChangeEvent;
-			model.workflowState = e.state;
-			model.data			= e.data;
+			model.pageState = e.state;
+			model.data		= e.data;
 		}
 		
 	}

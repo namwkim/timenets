@@ -251,7 +251,7 @@ package genvis.vis.operator.label
 				var xAxis:Axis = this.visualization.xyAxes.xAxis;
 				var width:Number;
 				if (person.firstSpouse!=null){
-					var marriages:Array	 = person.marriageInfoWith(person.firstSpouse);
+					var marriages:Array	 = person.marriageWith(person.firstSpouse);
 					width = n.toLocalX(xAxis.X(marriages[0].startDate));
 				}else{
 					width = n.toLocalX((person.deceased? xAxis.X(person.dateOfDeath) : xAxis.X(new Date)));

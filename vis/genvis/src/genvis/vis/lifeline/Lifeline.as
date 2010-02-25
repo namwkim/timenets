@@ -101,7 +101,7 @@ package genvis.vis.lifeline
 			for each (var spouse:Person in person.spouses){
 				if (spouse.sprite.type != NodeSprite.SPOUSE && spouse.sprite.simplified == false){
 					//add evtpt at marriage
-					var marriages:Array = person.marriageInfoWith(spouse);
+					var marriages:Array = person.marriageWith(spouse);
 					for each (var marriage:Marriage in marriages){
 						var x:Number = n.toLocalX(_axes.xAxis.X(marriage.startDate));
 						//fix this or move this function to render

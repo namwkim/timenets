@@ -12,12 +12,16 @@ package org.akinu.control
 			this.initialize();
 		}
 		public function initialize():void{
-			//ADD COMMAND
+			//GENERIC COMMANDS
 			this.addCommand(RootChangeEvent.ROOT_CHANGE, RootChangeCommand);
 			this.addCommand(InitializeEvent.INITIALIZE, InitializeCommand);
-			this.addCommand(PersonSelectedEvent.SELECTION, PersonSelectedCommand);
+			this.addCommand(SelectEvent.SELECTION, SelectCommand);
 			this.addCommand(StateChangeEvent.STATE_CHANGE, StateChangeCommand);
-			this.addCommand(AddRelationshipEvent.ADD_RELATIONSHIP, AddRelationshipCommand);
+			
+			//PERSON COMMANDS
+			this.addCommand(CreatePersonEvent.CREATE_PERSON, PersonCommand);
+			this.addCommand(UpdatePersonEvent.UPDATE_PERSON, PersonCommand);
+			this.addCommand(AddRelationshipEvent.ADD_RELATIONSHIP, PersonCommand);
 		}
 		
 	}

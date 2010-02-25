@@ -130,7 +130,7 @@ class DocumentController < ApplicationController
 private
   def change_data_type
     if params[:html_format]==nil or params[:html_format]!="true"
-      request.format = :js
+      request.format = :js if is_amf!=true
     end    
   end  
   def build_document params

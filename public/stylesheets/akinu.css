@@ -169,6 +169,7 @@ fieldset fieldset legend{
 	margin-top:20px;
 	padding-left:10px;
 	padding:0px;
+	min-height:500px;
 }
 .inputtext{
 	font-family: Verdana, Geneva, sans-serif;

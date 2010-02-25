@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+	<![CDATA[
+		import mx.controls.Alert;
+		import org.akinu.events.RootChangeEvent;
+		import org.akinu.events.StateChangeEvent;
+			import org.akinu.model.ModelLocator;		
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			
+			public function init():void{
+				//if (model.selectedPerson.saved==false) edit();				
+			}
+			private function edit():void{
+				var stateChangeEvent:StateChangeEvent = new StateChangeEvent(ModelLocator.PERSON_EDIT);
+				stateChangeEvent.dispatch();
+			}
+			private function changeRoot():void{
+				if (model.selectedPerson == model.root) {
+					Alert.show("This person is already the root!");
+				}
+				var rootChange:RootChangeEvent = new RootChangeEvent(model.selectedPerson);
+				rootChange.dispatch();
+			}
+	]]>
+	</mx:Script>
+	<mx:HBox>
+		<mx:Label text="Name:"/> <mx:Label text="{model.selectedPerson.name}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Sex:"/> <mx:Label text="{model.selectedPerson.sex}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Date of Birth:"/> <mx:Label text="{model.selectedPerson.dateOfBirth.toUTCString()}"/>	
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Date of Death:"/> <mx:Label text="{model.selectedPerson.dateOfDeath.toUTCString()}"/>	
+	</mx:HBox>	
+	<mx:HBox>
+		<mx:Label text="Father:"/> <mx:Label text="{model.selectedPerson.father.name}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="Mother:"/> <mx:Label text="{model.selectedPerson.mother.name}"/>
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="{model.selectedPerson.spouses.length>1? 'Spouses:':'Spouse:'}"/> 
+		<mx:VBox>
+			<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
+				<mx:Label text="{spouseRepeater.currentItem.name}"/>				
+			</mx:Repeater>	
+		</mx:VBox>	
+	</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="{model.selectedPerson.children.length>1? 'Children:':'Child:'}"/> 
+		<mx:VBox>
+			<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.children}">
+				<mx:Label text="{childRepeater.currentItem.name}"/>
+			</mx:Repeater>		
+		</mx:VBox>
+	</mx:HBox>
+
+	<mx:Button label="Make This a Root" width="150" click="changeRoot()" textAlign="left"/>
+	<mx:Button label="Edit Info" width="150" click="edit()" textAlign="left"/>
+	<mx:Button label="See Life Events" width="150" textAlign="left"/>
+<!--		<mx:Button label="Add Mother" width="100" click="addRelationship('Mother')"/>
+	<mx:Button label="Add Spouse" width="100" click="addRelationship('Spouse')"/>
+	<mx:Button label="Add Child" width="100" click="addRelationship('Child')"/>		-->
+</mx:VBox>

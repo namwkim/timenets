@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			import org.akinu.events.AddRelationshipEvent;
+			import genvis.data.Marriage;
+			import org.akinu.events.CreatePersonEvent;
+			import org.akinu.events.UpdatePersonEvent;
+			import mx.controls.Alert;
+			import mx.validators.ValidationResult;
+			import mx.events.ValidationResultEvent;
+			import genvis.data.Person;
+			import org.akinu.helper.Helper;
+			import org.akinu.model.ModelLocator;		
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			public function init():void{
+				if (this.initialized==false) return;
+				var person:Person 		= model.selectedPerson;
+				firstName.text 			= person.firstName;
+				lastName.text  			= person.lastName;
+				sex.selectedIndex 		= person.sex=='Male'?1:(person.sex=='Female'? 2:0);
+				dobMonth.selectedIndex 	= person.dateOfBirth? (person.dateOfBirth.month+1):0;
+				dobDay.selectedIndex	= person.dateOfBirth? person.dateOfBirth.dateUTC:0;
+				dobYear.text			= person.dateOfBirth!=null? person.dateOfBirth.fullYear.toString():'Year';
+				deceased.selected		= person.deceased;
+				if (person.deceased){
+					dodMonth.selectedIndex	= person.dateOfDeath? (person.dateOfDeath.month+1):0;
+					dodDay.selectedIndex	= person.dateOfDeath? person.dateOfDeath.dateUTC:0;
+					dodYear.text			= person.dateOfDeath!=null? person.dateOfDeath.fullYear.toString():'Year';
+				}
+			}
+			private function validateForm():Boolean{
+				var dobValid:ValidationResultEvent = dobYearValidator.validate();
+				if (dobValid.type == ValidationResultEvent.INVALID) {
+					Alert.show("Birth year should be a number!");
+					return false;
+				}
+				var dodValid:ValidationResultEvent = dodYearValidator.validate();
+				if ( dodValid.type == ValidationResultEvent.INVALID){
+					Alert.show("Death year should be a number!");
+					return false;
+				}
+				return true;
+			}
+			private function populateVO():void{
+				var person:Person = model.selectedPerson;
+				person.firstName 	= firstName.text;
+				person.lastName  	= lastName.text;
+				person.sex			= sex.selectedItem.data
+				person.dateOfBirth 	= Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
+				person.deceased	= deceased.selected;
+				if (person.deceased)
+					person.dateOfDeath = Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
+			}
+			private function submitForm():void{
+				//validate form data
+				if (validateForm()){
+					populateVO();
+					var person:Person = model.selectedPerson;
+					if (person.saved==true){
+						var updateEvent:UpdatePersonEvent = new UpdatePersonEvent(person);
+						updateEvent.dispatch();
+					}else{
+						//save this person & marriage & parent-child link									
+						var nextEvents:Array = new Array();			
+						for each (var child:Person in person.children){
+							nextEvents.push(new AddRelationshipEvent(child, null, person.id, "Child", null, false, false));
+						}
+						var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(person, person.firstMarriage, person.firstSpouse.id, "Spouse", nextEvents);
+						addRelEvent.dispatch();											
+					}
+				}
+			}
+			private function cancelForm():void{
+				init();
+			}
+		
+		]]>
+	</mx:Script>
+	<mx:NumberValidator id="dobYearValidator" source="{dobYear}" property="text" domain="int" required="false"/>
+	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
+	<mx:Label text="This record is not yet saved!" styleName="smallTitle" visible="{!model.selectedPerson.saved}" includeInLayout="{!model.selectedPerson.saved}" paddingLeft="5"/>
+	<mx:Form id="infoForm" defaultButton="{submit}">
+		<mx:FormItem label="First Name">
+			<mx:TextInput id="firstName"/>		
+		</mx:FormItem>
+		<mx:FormItem label="Last Name">
+			<mx:TextInput id="lastName"/>		
+		</mx:FormItem>
+	    <mx:FormItem label="Sex">
+		    <mx:ComboBox id="sex" dataProvider="{Helper.sexArray}"/>
+	    </mx:FormItem>
+	    <mx:FormItem direction="vertical" label="Birth Date">
+	    	<mx:HBox>
+		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dobMonth" />
+		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dobDay"/>
+		    	<mx:TextInput id="dobYear" width="40" click="if(dobYear.text=='Year') dobYear.text=''"/>	
+	    	</mx:HBox>
+	    	<mx:CheckBox label="Deceased?" id="deceased"/>   	   	
+	    </mx:FormItem>
+	    <mx:FormItem direction="vertical" label="Death Date" includeInLayout="{deceased.selected}" visible="{deceased.selected}">
+	    	<mx:HBox>
+		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dodMonth" />
+		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>
+		    	<mx:TextInput id="dodYear" width="40" click="if(dodYear.text=='Year') dodYear.text=''"/>	
+	    	</mx:HBox>	   	
+	    </mx:FormItem>
+	    <mx:FormItem direction="horizontal">
+	        <mx:Button id="submit" label="Save" click="submitForm();"/>
+	        <mx:Button id="cancel" label="Cancel" click="cancelForm();"/>
+	    </mx:FormItem>	
+	</mx:Form>
+	
+
+</mx:Canvas>

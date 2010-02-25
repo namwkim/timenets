@@ -4,17 +4,18 @@ package org.akinu.events
 	
 	import flash.events.Event;
 	
+	import genvis.data.Person;
+	
 	public class RootChangeEvent extends CairngormEvent
 	{
 		public static const ROOT_CHANGE:String = "RootChange";
-		public var _root_id:uint; //person id
-		public function RootChangeEvent(_root_id:uint){
-			_root_id = _root_id;
+		public var root:Person; //person id
+		public function RootChangeEvent(root:Person){
+			this.root = root;
 			super(ROOT_CHANGE);
 		}
 		override public function clone():Event{
-			return new RootChangeEvent(_root_id);
-			trace("event cloned");
+			return new RootChangeEvent(root);
 		}
 
 	}

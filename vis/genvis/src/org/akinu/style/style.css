@@ -2,13 +2,18 @@
 Canvas {
 	font-family:Arial,Helvetica, sans-serif;
 	background-color: #2e3436;
-	color: #eeeeec;
+	color: #dddddd;
 	font-size: 12px;	
 }
-.emp{
+.smallTitle{
+	font-size:14px;
+	color:#e9b96e;
+	font-weight:bold;	
+}
+.mediumTitle{
 	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-weight: bold;
-	color:#fcaf3e;
+	color:#e9b96e;
 	font-size:16px;
 }
 
@@ -70,7 +75,7 @@ ApplicationControlBar
 global
 {
 	backgroundGradientAlphas: 1.0, 1.0;
-	backgroundGradientColors: #000000, #000000;
+	backgroundGradientColors: #2e3436, #2e3436;
 	backgroundDisabledColor: #DDDDDD;
 	focusThickness: 1;
 	/* focusAlpha: 0.05; */
@@ -110,7 +115,7 @@ Accordion
 	textRollOverColor: #FFFFFF;
 	textSelectedColor:#FFFFFF;
 	disabledColor:#5A5A5A;
-	backgroundColor: #333333;
+	backgroundColor: #2e3436;
 	/*backgroundImage: Embed(source="kingnarestyle.swf", symbol="Global_Bg");
 	backgroundSize:"100%";*/
 }
@@ -123,7 +128,6 @@ Accordion
 */
 AccordionHeader
 {
-
 	disabledSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_disabledSkin");
 	downSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_downSkin");
 	overSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_overSkin");
@@ -237,6 +241,10 @@ ColorPicker
 	verticalGap:0;
 }
 
+.menu{
+	borderColor:#555576;
+	borderThickness:1
+}
 
 /*
 //------------------------------

@@ -82,7 +82,7 @@ package genvis.vis.data
 		public function set parentNode(p:NodeSprite):void 	{ _parentNode	= p;  }
 		public function set expanded(e:Boolean):void		{ _expanded 	= e;  }
 		public function set visited(v:Boolean):void			{ _visited 		= v;  }
-		public function set selected(s:Boolean):void		{ _selected		= s;  }
+		public function set selected(s:Boolean):void		{ _selected		= s;  dirty(); }
 		
 		public function get label():TextSprite { return _label; }
 		public function get bbox():Box 		{ return _bbox; 	}
@@ -103,6 +103,12 @@ package genvis.vis.data
 		//public function set willVisible(v:Boolean):void { _willVisible = v; }
 		public function set block(b:BlockSprite):void	{ _block	= b; }	
 		
+		public function addChildNode(child:NodeSprite):void{
+			if (_childNodes.indexOf(child)<0) childNodes.push(child);
+		}
+		public function addPseudoParent(p:NodeSprite):void{
+			if (_pseudoParents.indexOf(p)<0) _pseudoParents.push(p);
+		}
 		public function simplify():void { 
 			_simplified = true;
 			//recursively simplify childNodes (may not be necessary if automatically simplified according to doi)

@@ -73,7 +73,14 @@ package genvis.vis.data
 			return (_aggregated || _focus.visible);	
 		}
 		public function get nodes():Array {	return _nodes;	}
-				
+		
+		public function addChildBlock(child:BlockSprite):void{
+			if (_childBlocks.indexOf(child)<0) _childBlocks.push(child);
+		}
+		public function addPseudoParent(p:BlockSprite):void{
+			if (_pseudoParents.indexOf(p)<0) _pseudoParents.push(p);
+		}
+						
 		public function BlockSprite()
 		{
 			_primaryNodes 	= new Array();

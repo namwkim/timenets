@@ -1,0 +1,19 @@
+<table id='<%=dom_id(document)%>' width="100%"><tr class='record_row'>
+	<td width="60px">
+		<% if document.file_url %>
+			<% 	case document.type.name when "Photo"%>				
+					<%= link_to(image_tag(document.file_url, :class=>"thumbnail_photo", :size=>"50x50"), document.file_url, :rel=>"lytebox") %>
+				<% when "Video"%>
+					<%= link_to(image_tag("/images/video.png", :class=>"thumbnail_photo", :size=>"50x50"),  document.file_url) %>
+				<% when "Audio"%>
+					<%= link_to(image_tag("/images/audio.png", :class=>"thumbnail_photo", :size=>"50x50"),  document.file_url) %>
+				<% else "Other" %>
+					<%= link_to(image_tag("/images/other.png", :class=>"thumbnail_photo", :size=>"50x50"),  document.file_url) %>
+			<% end %>
+		<% end %>
+	</td>
+	<td width="150px;"><%=link_to_remote_lightbox( document.name, {:url=>{:controller=>"document", :action=>"show_document", :id=>document.id}})%></td>
+	<td width="200px;"><%=document.type.name%></td>
+	<td width="30px"><%=button_to_remote_lightbox( "Edit", {:url=>{:controller=>"document", :action=>"edit_document", :id=>document.id}}, {:class=>"ui_small_button"})%></td>
+	<td width="30px"><%=button_to_remote("Remove", {:url=>{:controller=>"document", :action=>"delete_document", :id=>document.id}, :confirm=>"do you really want to delete this document?", :complete=>"$('#{dom_id(document)}').remove()"}, {:class=>"ui_small_button"})%></td>
+</tr></table>

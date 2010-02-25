@@ -38,7 +38,6 @@
 		</tr>	
 		<% if @role=="Spouse"%>
 			<% fields_for :marriage do |mf|%>
-				<%= hidden_field_tag "marriage[spouse_id]", @ref_id%>
 			<tr>
 				<td><%= mf.label "start_date", "Marriage Date"%></td>
 				<td><%= mf.date_select :start_date, :start_year => Time.new.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>

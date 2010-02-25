@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Button;
+			import mx.controls.Label;
+			import genvis.data.Person;	
+			import org.akinu.model.ModelLocator;		
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			private var relForm:NewRelationshipForm = new NewRelationshipForm();	
+			public function init():void{
+				if (this.initialized==false) return;
+			}							
+			private function newRelationship(role:String):void{							
+				this.addChild(relForm);
+				relForm.init(role);								
+			}
+				
+	
+		]]>
+		</mx:Script>
+	<mx:HBox>
+		<mx:Spacer width="5"/>
+		<mx:VBox>
+			<mx:Spacer height="5"/>
+			<mx:HBox id="fatherContainer">
+				<mx:Label text="Father:" width="55"/> 
+				<mx:Button id="fBtn" label="Add Father" visible="{model.selectedPerson.father==null}" includeInLayout="{fBtn.visible}" click="newRelationship('Father')"/>
+				<mx:Label text="{fBtn.visible==false? model.selectedPerson.father.name : ''}" visible="{!fBtn.visible}" includeInLayout="{!fBtn.includeInLayout}"/>
+			</mx:HBox>
+			<mx:HBox id="motherContainer">
+				<mx:Label text="Mother:" width="55"/> 
+				<mx:Button id="mBtn" label="Add Mother" visible="{model.selectedPerson.mother==null}" includeInLayout="{mBtn.visible}" click="newRelationship('Mother')"/>
+				<mx:Label text="{mBtn.visible==false? model.selectedPerson.mother.name : ''}" visible="{!mBtn.visible}" includeInLayout="{!mBtn.includeInLayout}"/>
+			</mx:HBox>
+			<mx:HBox>
+				<mx:HBox>
+					<mx:Label text="{model.selectedPerson.spouses.length>1? 'Spouses:':'Spouse:'}" width="55"/>			
+				</mx:HBox>
+				<mx:VBox>
+					<mx:Button label="Add Spouse" click="newRelationship('Spouse')"/>
+					<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
+						<mx:Label text="{spouseRepeater.currentItem.name}"/>				
+					</mx:Repeater>	
+				</mx:VBox>	
+			</mx:HBox>
+			<mx:HBox>
+				<mx:HBox>
+					<mx:Label text="{model.selectedPerson.children.length>1? 'Children:':'Child:'}" width="55"/> 
+				</mx:HBox>		
+				<mx:VBox>
+					<mx:Button label="Add Child" click="newRelationship('Child')"/>
+					<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.children}">
+						<mx:Label text="{childRepeater.currentItem.name}"/>
+					</mx:Repeater>		
+				</mx:VBox>
+			</mx:HBox>			
+		</mx:VBox>	
+	</mx:HBox>
+</mx:VBox>

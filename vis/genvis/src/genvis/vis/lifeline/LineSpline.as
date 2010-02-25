@@ -129,11 +129,11 @@ package genvis.vis.lifeline
 			points.push(evt);
 			var mergeY:Number = refNode.y-node.y+((node.y-refNode.y)<0?-(GAMMA+BETA+1.5*_lineWidth):(GAMMA+BETA+1.5*_lineWidth));		
 			
-			var marriages:Array = refPerson.marriageInfoWith(person);
-			var isDivorced:Boolean = person.isDivorced;
+			var marriages:Array = person.marriageWith(refPerson);
+			//var isDivorced:Boolean = person.isDivorced;
 			var deathDate:Date = person.deceased? person.dateOfDeath: node.block.gbLayout.curDate;
 			var deathX:Number = node.toLocalX(axes.xAxis.X(deathDate));
-			var deathY:Number = isDivorced? 0 : (person.spouses.length == 0? 0:mergeY);
+			var deathY:Number;// = isDivorced? 0 : (person.spouses.length == 0? 0:mergeY);
 			//add marriage and divorce points
 			//assume that multiple marriages with a single person shouldn't be overlapping
 			for each (var marriage:Marriage in marriages){
@@ -144,6 +144,7 @@ package genvis.vis.lifeline
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), 0, EvtPt.DATING, marriage.startDate, refPerson));
 						}else if (evt.type == EvtPt.MARRIAGE){
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), mergeY, EvtPt.MARRIAGE, marriage.startDate, refPerson));
+							deathY = mergeY;
 						}
 					}else if (evt.date == marriage.endDate){
 						if (evt.type == EvtPt.DIVORCE){
@@ -154,6 +155,7 @@ package genvis.vis.lifeline
 								deathX 	= node.toLocalX(refNode.toGlobalX(evt.x)) + EPSILON;
 							}
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), 0, EvtPt.RESTING, marriage.endDate, refPerson));
+							deathY = 0;
 						}
 					}
 					prevEvt = evt;

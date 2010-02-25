@@ -10,5 +10,8 @@
 	  showBusyCursor="true">
 	  <mx:method name="root"/>
 	  <mx:method name="create_relationship"/>
+	  <mx:method name="update_person"/>
+	  <mx:method name="create_person"/>
 	</mx:RemoteObject>
+
 </cairngorm:ServiceLocator>

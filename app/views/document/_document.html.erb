@@ -15,5 +15,5 @@
 	<td width="150px;"><%=link_to_remote_lightbox( document.name, {:url=>{:controller=>"document", :action=>"show_document", :id=>document.id}})%></td>
 	<td width="200px;"><%=document.type.name%></td>
 	<td width="30px"><%=button_to_remote_lightbox( "Edit", {:url=>{:controller=>"document", :action=>"edit_document", :id=>document.id}}, {:class=>"ui_small_button"})%></td>
-	<td width="30px"><%=button_to_remote("Remove", {:url=>{:controller=>"document", :action=>"delete_document", :id=>document.id}, :confirm=>"do you really want to delete this document?", :complete=>"$('#{dom_id(document)}').remove()"}, {:class=>"ui_small_button"})%></td>
+	<td width="30px"><%=button_to_remote("Remove", {:url=>{:controller=>"document", :action=>"delete_document", :id=>document.id}, :confirm=>"do you really want to delete this document?", :complete=>"$('#{dom_id(document)}').remove(); new Ajax.Request('/project/documents/#{document.project.id}',{onLoading:function(){$('documents').update(new Element('img', { src:'/images/roller.gif'}))}});"}, {:class=>"ui_small_button"})%></td>
 </tr></table>

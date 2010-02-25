@@ -8,6 +8,6 @@
 	</td>
 	<td width="250px;"><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>
 	<td width="130px"><%= event.location%></td>
-	<td width="40px"><%= button_to "Edit", {:url=>{:controller=>"event", :action=>"edit_event", :id=>event.id, :project_id=>@project.id}}, {:class=>"ui_small_button"}%></td>
+	<td width="40px"><%= button_to "Edit", {:controller=>"event", :action=>"edit_event", :id=>event.id, :project_id=>@project.id}, {:class=>"ui_small_button"}%></td>
 	<td width="60px"><%= button_to_remote "Remove", {:url=>{:controller=>"event", :action=>"delete_event", :id=>event.id}, :confirm=>"do you really want to delete this event?", :complete=>"$('#{dom_id(event)}').remove()"}, {:class=>"ui_small_button"} %></td>
 </tr></table>

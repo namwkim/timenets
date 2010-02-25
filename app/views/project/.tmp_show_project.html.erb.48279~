@@ -1,0 +1,127 @@
+<% javascript_tag do%>
+var selected_menu_id;
+var shown_elem_id;
+document.observe("dom:loaded", function() {
+	selected_menu_id 	= "people_menu";
+	shown_elem_id 		= "people_box";
+	$('events_box').hide();
+	$('documents_box').hide();
+	load_list();
+});
+
+function select_menu(menu, elem_id){
+	//hide previously selected menu
+	$(selected_menu_id).removeClassName("selected");
+	$(shown_elem_id).hide();
+	
+	//show currently selected menu
+	selected_menu_id = menu.id;
+	shown_elem_id	 = elem_id;
+	$(selected_menu_id).addClassName("selected");
+	$(shown_elem_id).show();
+	load_list();
+	
+}
+function load_list(){
+	var img = new Element('img', { src:"/images/roller.gif"});
+	
+	if (shown_elem_id=="people_box"){
+		if ($('people').empty()==false) return;
+		$('people').insert(img);
+		<%= remote_function(:url=>{:controller=>"project", :action=>"people", :id=>@project.id})%>
+	}else if (shown_elem_id=="events_box"){
+		if ($('events').empty()==false) return;
+		$('events').insert(img);
+		<%= remote_function(:url=>{:controller=>"project", :action=>"events", :id=>@project.id})%>
+	}else{
+		if ($('documents').empty()==false) return;
+		$('documents').insert(img);
+		<%= remote_function(:url=>{:controller=>"project", :action=>"documents", :id=>@project.id})%>	
+	}
+}
+
+
+function flip_dob_field(chk_box){
+	if (chk_box.checked){
+		$('dod_label').setStyle("display:inline");
+		$('dod_text').setStyle("display:inline");	
+	}else{
+		$('dod_label').setStyle("display:none");	
+		$('dod_text').setStyle("display:none");	
+		//also clear the form elements
+		$('person_date_of_death_1i').selectedIndex = 0;
+		$('person_date_of_death_2i').selectedIndex = 0;
+		$('person_date_of_death_3i').selectedIndex = 0;
+	}
+}
+
+<% end %>
+<div class="large_title">
+	<span class="right"><%=button_to "VISUALIZE", {:controller=>"person", :action=>"visualize", :id=>@root.id}, {:class=>"large_title ui_small_button"} %></span>
+	<span class="project_title"><%= link_to @project.name, :controller=>"project", :action=>"show_project", :id=>@project.id%></span>	
+</div>
+<div class="project_desc"><%= @project.description%></div>
+<div class="container_box">
+	<div class="left_col">
+		<div id="activities" class="container_box_left">
+			<div class="underlined"><%= link_to "See All",{:controller=>"activity",:action=>"show_all", :project_id=>@project.id},{:class=>"right"} %><span class="small_title">Recent Activities</span></div>
+			<% if @project.activities.length == 0%>
+				<span>No activity found!</span>
+			<% else %>
+				<% @project.activities.length.downto(@project.activities.length-4) do |i| %>
+					<%= render :partial=>"activity/activity", :locals=>{:activity=>@project.activities[i-1]} if (i-1)>=0%>				
+				<% end %>
+			<% end %>
+		</div>
+		<div class="container_box_left">
+			<div class="underlined"><%= link_to "See All",{:controller=>"user",:action=>"show_collaborators", :project_id=>@project.id},{:class=>"right"} %><span class="small_title">Members</span></div>
+			<div class="content_box">
+			<% @project.users.length.downto(@project.users.length-4) do |i|%>
+					<%= render :partial=>"user/collaborator", :locals=>{:collaborator=>@project.users[i-1]} if (i-1)>=0%>
+			<% end %>		
+			</div>	
+		</div>
+	</div>
+	<div class="right_col">
+		<div class="container_box_right">
+			<div class="underlined">
+				<div id="project_menu">
+					<a id="people_menu" class="small_menu_box small_title selected" onclick="select_menu(this, 'people_box')" href="#">People</a>
+					<a id="events_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'events_box')" href="#">Events</a>
+					<a id="documents_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'documents_box')" href="#">Documents</a> 	
+				</div>
+			</div>
+			<div id="people_box">
+				<div class="submenu_box">
+					<% form_remote_tag do %>
+						<%=button_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person"}, :with=>"'project_id='+#{@project.id}"}, {:class=>"right ui_small_button"}%>
+						<%= auto_complete_text_field :person, :name, {:size=>25, :value=>"", :class=>"inputtext"}, {:url=>{:controller=>"person", :action=>"auto_complete_search_for_person"}, :select=>"show_this", :with=>"'person_name='+element.value+'&project_id='+#{@project.id}"}%>
+						<%=submit_tag "Search", :class=>"ui_small_button"%>
+					<% end %>
+				</div>	
+				<div id="people"></div>
+			</div>
+			<div id="events_box">
+				<div class="submenu_box">
+					<%= button_to( "Create a New Event",{:controller=>"event", :action=>"new_event",:project_id=>@project.id},{:class=>"right ui_small_button"})%>
+					<% form_remote_tag do %>					
+					<%= auto_complete_text_field :event, :name, {:size=>25, :value=>"", :class=>"inputtext"}, {:url=>{:controller=>"event", :action=>"auto_complete_search_for_event"}, :select=>"show_this", :with=>"'event_name='+element.value+'&project_id='+#{@project.id}"}%>
+					<%=submit_tag "Search", :class=>"ui_small_button", :disabled=>true%>
+					<% end %>
+				</div>		
+				<div id="events"></div>			
+			</div>
+			<div id="documents_box">
+				<div class="submenu_box">
+					<% form_remote_tag do %>
+						<%=button_to_remote_lightbox( "Create a New Document", {:url=>{:controller=>"document", :action=>"new_document"}, :with=>"'project_id='+#{@project.id}"}, {:class=>"right ui_small_button"}) %>
+						<%= auto_complete_text_field :document, :name, {:size=>25, :value=>"", :class=>"inputtext"}, {:url=>{:controller=>"document", :action=>"auto_complete_search_for_document"}, :select=>"show_this", :with=>"'document_name='+element.value+'&project_id='+#{@project.id}"}%>
+						<%=submit_tag "Search", :class=>"ui_small_button"%>														
+					<% end %>
+				</div>		
+				<div id="documents"></div>		
+			</div>
+		</div>
+	</div>
+</div>
+<iframe id='upload_frame' name='upload_frame' style="display:none;"></iframe>

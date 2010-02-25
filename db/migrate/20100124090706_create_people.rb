@@ -16,8 +16,8 @@ class CreatePeople < ActiveRecord::Migration
       t.timestamps
     end
     create_table  :marriages do |t|
-      t.integer :person_id
-      t.integer :spouse_id
+      t.integer :person1_id
+      t.integer :person2_id
       t.boolean :divorced
       t.date    :start_date
       t.date    :end_date 

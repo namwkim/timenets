@@ -56,17 +56,35 @@ class ProjectController < ApplicationController
   end
   def people
     @project = Project.find_by_id(params[:id])
-    @people = @project.people.paginate :page=>params[:page], :per_page=>5, :order=>"last_name"
+    if (params[:search_person]==nil)
+      @people = @project.people.paginate :page=>params[:page], :per_page=>5, :order=>"last_name"
+    else
+      query = "%#{params[:search_person]}%"
+      @people = Person.find(:all, :conditions=>['project_id=? and (LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?)', @project.id, query, query])
+      @people = @people.paginate :page=>params[:page], :per_page=>5, :order=>"last_name"
+    end    
     render :partial=>"people", :locals=>{:project=>@project, :people=>@people}     
   end
   def events
     @project = Project.find_by_id(params[:id])
-    @events = @project.events.paginate :page=>params[:page], :per_page=>5, :order=>"name"    
+    if (params[:search_event]==nil)
+      @events = @project.events.paginate :page=>params[:page], :per_page=>5, :order=>"name"
+    else
+      query = "%#{params[:search_event]}%"
+      @events = Event.find(:all, :conditions=>['project_id=? and (LOWER(name) LIKE ?)', @project.id, query])
+      @events = @events.paginate :page=>params[:page], :per_page=>5, :order=>"name"
+    end    
     render :partial=>"events", :locals=>{:project=>@project, :events=>@events}
   end
   def documents
-    @project = Project.find_by_id(params[:id])
-    @documents = @project.documents.paginate :page=>params[:page], :per_page=>5, :order=>"name"
+    @project = Project.find_by_id(params[:id]) 
+    if (params[:search_document]==nil)
+      @documents = @project.documents.paginate :page=>params[:page], :per_page=>5, :order=>"name"
+    else
+      query = "%#{params[:search_document]}%"
+      @documents = Event.find(:all, :conditions=>['project_id=? and (LOWER(name) LIKE ?)', @project.id, query])
+      @documents = @documents.paginate :page=>params[:page], :per_page=>5, :order=>"name"
+    end   
     render :partial=>"documents", :locals=>{:project=>@project, :documents=>@documents}
   end
 end

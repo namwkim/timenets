@@ -7,7 +7,7 @@ case role
     page.insert_html :bottom, "mother", :partial=>'relationship', :locals=>{:person=>person, :role=>role,  :ref_id=>ref_person.id, :options=>{:add_link_id=>"add_mother"}}
     page << "$('add_mother').hide()" 
   when "Spouse"
-    page.insert_html :bottom, "spouses", :partial=>'relationship', :locals=>{:person=>person, :role=>role,  :ref_id=>ref_person.id, :options=>{  :marriage=>person.marriages.find(:first, :conditions=>['spouse_id=?',ref_person.id]) }}
+    page.insert_html :bottom, "spouses", :partial=>'relationship', :locals=>{:person=>person, :role=>role,  :ref_id=>ref_person.id, :options=>{ :marriage=>person.marriage_with(ref_person.id) }}
   when "Child"
     page.insert_html :bottom, "children", :partial=>'relationship', :locals=>{:person=>person, :role=>role, :ref_id=>ref_person.id, :options=>{}}
 end

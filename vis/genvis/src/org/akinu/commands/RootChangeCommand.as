@@ -14,7 +14,9 @@ package org.akinu.commands
 		}
 		public function execute(event:CairngormEvent):void{
 			var rootChangeEvent:RootChangeEvent = event as RootChangeEvent;
-			trace("RootChangeCommand executed");
+			model.root = rootChangeEvent.root;
+			model.vis.visualize(model.root);
+			model.page = ModelLocator.FRONT_PAGE;			
 		}
 
 	}

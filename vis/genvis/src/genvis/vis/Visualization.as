@@ -86,7 +86,7 @@ package genvis.vis
 		private var _hscrollbar:ScrollBar;
 		private var _vscrollbar:ScrollBar;
 		//internal use
-		private var _maskEnabled:Boolean 	= false;
+		private var _maskEnabled:Boolean 	= true;
 		private var _scrollEnabled:Boolean 	= true;
 		private var _fitVertBound:Boolean	= true;
 		/** An object storing extra properties for the visualziation. */
@@ -214,13 +214,13 @@ package genvis.vis
 		}
 		public function setMask():void{
 			_vismask.x = bounds.x;
-			_vismask.y = bounds.y;
-			_vismask.w = bounds.width+_vscrollbar.width;
-			_vismask.h = bounds.height+_hscrollbar.height;
+			_vismask.y = bounds.y-15;
+			_vismask.w = bounds.width+15;//+_vscrollbar.width;
+			_vismask.h = bounds.height+30;//+_hscrollbar.height;
 			_vismask.fillColor = 0xff000000;
 		}
 		public function setScrollbar():void{
-			_hscrollbar.y 		= bounds.height;	
+			_hscrollbar.y 		= -15;//bounds.height;	
 			_hscrollbar.width 	= bounds.width;
 			_vscrollbar.x		= bounds.width;
 			_vscrollbar.height	= bounds.height+_hscrollbar.height;
@@ -241,8 +241,7 @@ package genvis.vis
 			_hscrollbar.setScrollProperties(range, 0, range);
 			_hscrollbar.setScrollPosition(0);
 			_layers.x = (bounds.x - min);
-			if (range<=0) _hscrollbar.visible = false;
-			else _hscrollbar.visible = true;
+			_hscrollbar.visible = true;
 			
 			//vertical scrollbar
 			min = bounds.y;
@@ -258,8 +257,7 @@ package genvis.vis
 			_vscrollbar.setScrollProperties(range, 0, range);
 			_vscrollbar.setScrollPosition(0);
 			_layers.y = (bounds.y - min);	
-			if (range<=0) _vscrollbar.visible = false;
-			else _vscrollbar.visible = true;		
+			_vscrollbar.visible = true;		
 		}
 		public function hscrollHandler(se:ScrollEvent):void{
 			_layers.x -= se.delta;

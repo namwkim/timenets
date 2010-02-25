@@ -162,7 +162,8 @@ package genvis.vis.data
 		public function addNode(d:Object=null):NodeSprite
 		{
 			var ns:NodeSprite = NodeSprite(d is NodeSprite ? d : newNode(d));
-			_nodes.add(ns);
+			if (_nodes.contains(ns)==false)
+				_nodes.add(ns);
 			return ns;
 		}
 		
@@ -257,15 +258,13 @@ package genvis.vis.data
 			return false;
 		}
 		public function constructNode(person:Person, type:int):NodeSprite{
-			var ns:NodeSprite  = person.sprite == null? this.addNode(person): person.sprite;
+			var ns:NodeSprite  = person.sprite == null? this.addNode(person) : this.addNode(person.sprite);
 			ns.type = type;
 			person.sprite = ns;
 
 			for each (var spouse:Person in person.spouses){
-				if (spouse.sprite == null){
-					spouse.sprite		= this.addNode(spouse);
-					spouse.sprite.type  = NodeSprite.SPOUSE;
-				}
+				spouse.sprite		= spouse.sprite==null? this.addNode(spouse) : this.addNode(spouse.sprite);
+				spouse.sprite.type  = NodeSprite.SPOUSE;
 			}
 			return ns;
 		}
@@ -327,10 +326,10 @@ package genvis.vis.data
 			root.sprite.visit(function(n:NodeSprite):void{
 				for each (var childNode:NodeSprite in n.childNodes){
 					if (n.block.childBlocks.indexOf(childNode.block)!=-1) continue;
-					n.block.childBlocks.push(childNode.block);
+					n.block.addChildBlock(childNode.block);
 					//if not null, this block is where intermarriage happens
 					childNode.block.parentBlock==null? childNode.block.parentBlock = n.block 
-													 : childNode.block.pseudoParents.push(n.block);	
+													 : childNode.block.addPseudoParent(n.block);	
 					if (childNode.block.pseudoParents.length >0) trace("pseudo-block");					
 				} 
 			});
@@ -369,33 +368,33 @@ package genvis.vis.data
 		protected function constructDOITree(root:Person):void {
 			
 			//root's links
-			for each (var parent:Person in root.parents){
-				root.sprite.childNodes.push(parent.sprite);
+			for each (var parent:Person in root.parents){				
+				root.sprite.addChildNode(parent.sprite);
 				parent.sprite.parentNode == null? parent.sprite.parentNode = root.sprite
-												: parent.sprite.pseudoParents.push(root.sprite);
+												: parent.sprite.addPseudoParent(root.sprite);
 				if (parent.sprite.pseudoParents.length >0) trace("pseudo:"+parent.sprite.data.name);
 			}
 			for each (var child:Person in root.children){
-				root.sprite.childNodes.push(child.sprite);
+				root.sprite.addChildNode(child.sprite);
 				child.sprite.parentNode == null? child.sprite.parentNode = root.sprite
-											: child.sprite.pseudoParents.push(root.sprite);
+											: child.sprite.addPseudoParent(root.sprite);
 				if (child.sprite.pseudoParents.length >0) trace("pseudo:"+child.sprite.data.name);							
 			}
 			//walkdown ancestor hierarchy
 			root.visitAncestors(function(p:Person):void{
 				for each (var parent:Person in p.parents){					
-					p.sprite.childNodes.push(parent.sprite);
+					p.sprite.addChildNode(parent.sprite);
 					parent.sprite.parentNode == null? parent.sprite.parentNode = p.sprite
-												: parent.sprite.pseudoParents.push(p.sprite);
+												: parent.sprite.addPseudoParent(p.sprite);
 					if (parent.sprite.pseudoParents.length >0) trace("pseudo:"+parent.sprite.data.name);							
 				}
 			});
 			//walkdown descendant hierarchy
 			root.visitDecendants(function(p:Person):void{
 				for each (var child:Person in p.children){
-					p.sprite.childNodes.push(child.sprite);
+					p.sprite.addChildNode(child.sprite);
 					child.sprite.parentNode == null? child.sprite.parentNode = p.sprite
-												: child.sprite.pseudoParents.push(p.sprite);
+												: child.sprite.addPseudoParent(p.sprite);
 					if (child.sprite.pseudoParents.length >0) trace("pseudo:"+child.sprite.data.name);							
 				}
 			});

@@ -63,11 +63,13 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
   end
 
   create_table "marriages", :force => true do |t|
-    t.integer "person_id"
-    t.integer "spouse_id"
+    t.integer "person1_id"
+    t.integer "person2_id"
     t.boolean "divorced"
     t.date    "start_date"
     t.date    "end_date"
+    t.boolean "is_start_uncertain"
+    t.boolean "is_end_uncertain"
   end
 
   create_table "messages", :force => true do |t|
@@ -89,6 +91,8 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
     t.date     "date_of_death"
     t.boolean  "deceased"
     t.string   "photo_url"
+    t.boolean  "is_dob_uncertain"
+    t.boolean  "is_dod_uncertain"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -49,7 +49,7 @@ package genvis
 	import mx.events.SliderEvent;
 	import mx.styles.CSSStyleDeclaration;
 	
-	import org.akinu.events.PersonSelectedEvent;
+	import org.akinu.events.SelectEvent;
 	
 //	import org.alivepdf.display.Display;
 //	import org.alivepdf.layout.Orientation;
@@ -101,7 +101,7 @@ package genvis
 		private var _xrange:Number					= 100;
 		private var _selectedBlock:BlockSprite		= null;
 		//node config
-		private var _nColors:Array 		= [0xcc0000, 0x3465a4, 0x555753];
+		private var _nColors:Array 		= [0x3465a4, 0xcc0000, 0x555753];
 		private var _nLineAlpha:Number	= 1.0;
 		private var _nFillAlpha:Number	= 0.1;
 		//block config
@@ -149,7 +149,10 @@ package genvis
 			_uiCtrls.enabled = true;
 		}
 		public function visualize(root:Person):void{
+			//#1. clear sprites if reusing data
+			clear();
 			_root = root;
+
 			//#2. estimate missing data
 			DataEstimator.estimate(_root, null);	
 			//#3. construct display list
@@ -166,6 +169,14 @@ package genvis
 			_uiCtrls.enabled = false;
 			
 			DirtySprite.renderDirty();
+		}
+		private function clear():void{
+			if (_vis.data == null) return;
+			_vis.data.nodes.visit(function(n:NodeSprite):void{
+				var p:Person = n.data as Person;
+				p.sprite = null;
+				n.data 	 = null;
+			});
 		}
 		private function onResize(evt:ResizeEvent):void{			
 			resize(width, height);
@@ -645,13 +656,16 @@ package genvis
 			_vis.controls.add(new ClickControl(NodeSprite, 1,
 				// set search query to the occupation name
 				function(e:SelectionEvent):void {
-					if (_selectedNode) _selectedNode.selected = false;
+					if (_selectedNode){
+						_selectedNode.selected = false;
+					}
+					
 					_selectedNode = e.node;
 					_selectedNode.selected = true;
 					
 					//Dispatch Selection Event
-					var personSelected:PersonSelectedEvent = new PersonSelectedEvent(_selectedNode.data as Person);
-					personSelected.dispatch();
+					var selectPerson:SelectEvent = new SelectEvent(SelectEvent.PERSON, _selectedNode.data as Person);
+					selectPerson.dispatch();
 					
 //					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
 //						|| _doiEnabled==false) return;

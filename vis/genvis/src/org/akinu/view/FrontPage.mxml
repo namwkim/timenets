@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" >
+
+	<mx:Script>
+		<![CDATA[
+				import org.akinu.model.ModelLocator;		
+				[Bindable]
+				private var model:ModelLocator = ModelLocator.getInstance();
+		]]>
+	</mx:Script>
+	<mx:VBox>
+			<mx:LinkButton id="projectTitle" label="{model.project.name}" styleName="mediumTitle" click="navigateToURL(new URLRequest('/'), '_blank')"
+				    rollOverColor="0x2e3436" selectionColor="0x2e3436" textRollOverColor="0xfcaf3e" textSelectedColor="0xfcaf3e"/>
+			<mx:Text text="{model.project.description}"/>		
+
+	</mx:VBox>
+	
+
+</mx:Canvas>

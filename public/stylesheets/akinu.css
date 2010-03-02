@@ -186,7 +186,7 @@ fieldset fieldset legend{
 
 .medium_title{
 	font-size:18px;
-	color:#e9b96e;
+	color:#dddddd;
 	font-weight:bold;
 }
 .large_title{
@@ -233,11 +233,11 @@ fieldset fieldset legend{
 .container_box{
 	width:100%;
 }
-.container_box_right{
+.project_box_right{
 	width:95%;
 	margin:15px 0px 15px 10px;
 }
-.container_box_left{
+.project_box_left{
 	width:95%;
 	margin:15px 10px 15px 0px;
 }
@@ -304,28 +304,83 @@ fieldset fieldset legend{
 	background-image:url("/images/project_background.png");
 	background-repeat:no-repeat;
 }
+.page_title{
+	height:40px;
+	width:100%;
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-weight:bold;
+	font-size:20px;
+	padding-top:5px;
+	padding-left:20px;
+	text-shadow:1px 1px 3px #222222;
+	background-image:url("/images/pagetitle_background.png");
+	background-repeat:no-repeat;	
+}
+.page_title a{
+	color:#dddddd;
+}
+.page_title a:hover{
+	color:#eeeeec;
+	text-decoration:none;
+}
+.mute{
+	color:#888A85;
+}
+.overflow{
+	overflow:auto;
+}
 /****************** person ********************/
-.person{
-
+.person_box{
+	width:80%;
+	margin-left:30px;
 }
 .person_photo_frame{
 	vertical-align:top;
-	margin-right:20px;
-	float:left;
-
+	margin:0px 10px 10px 0px;
+}
+.person_photo_frame img{
+	border:0px;
+	display:block;
 }
 .person_photo_frame td{
-	border-bottom:1px dotted #d3d7cf;
+	border-bottom:1px solid #555753;
 }
-.person_photo{
-	margin:5px 5px 5px 5px;
+.person_event_box{
 }
 .person_info{
 	vertical-align:top;
-	text-align:left;
+}
+.person_left_col{
 	float:left;
 }
+.person_right_col{
+	width:550px;
+	float:left;	
+}
+.person_name{
+	color:#dddddd;
+	font-weight:bold;
+	font-size:24px;
+}
 
+.person_content_container{
+	margin-top:20px;
+}
+
+#person_menu a:hover{	
+	text-decoration:none;
+}
+.person_action{
+	padding-left:5px;
+	color:#dddddd;
+	text-decoration:none;
+	display:block;
+}
+.person_action:hover{
+	background-color:#555753;
+	color:#dddddd;
+	text-decoration:none;	
+}
 /***************** event ********************/
 .document_property{
 	margin-right:10px;

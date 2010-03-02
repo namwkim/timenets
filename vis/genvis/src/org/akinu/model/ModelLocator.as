@@ -30,7 +30,8 @@ package org.akinu.model
 		public var page:uint = FRONT_PAGE;
 		
 		//local workflow state variables
-		//1. person menu context			
+		//1. person menu context
+		public static const INDEX:uint					= 0;			
 		public static const PERSON_MAIN:uint			= 0; 
 		public static const PERSON_EDIT:uint			= 1;
 		public static const EDIT_UNSAVED_PERSON:uint	= 2;

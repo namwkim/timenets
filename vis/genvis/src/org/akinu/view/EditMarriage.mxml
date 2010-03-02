@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import org.akinu.helper.Role;
+			import org.akinu.events.AddRelationshipEvent;
+			import genvis.data.Person;
+			import org.akinu.events.UpdateMarriageEvent;
+			import mx.controls.Alert;
+			import mx.events.ValidationResultEvent;
+			import genvis.data.Marriage;
+			import org.akinu.helper.Helper;
+			private var marriage:Marriage;
+			public function init(marriage:Marriage):void{
+				if (this.initialized==false) this.initialize();
+				this.marriage			= marriage;
+				marMonth.selectedIndex 	= marriage.startDate? (marriage.startDate.getMonth()+1):0;
+				marDay.selectedIndex	= marriage.startDate? marriage.startDate.getDate():0;
+				marYear.text			= marriage.startDate!=null? marriage.startDate.getFullYear().toString():'Year';
+				divorced.selected		= marriage.divorced;
+				if (marriage.divorced){
+					divMonth.selectedIndex	= marriage.endDate? (marriage.endDate.getMonth()+1):0;
+					divDay.selectedIndex	= marriage.endDate? marriage.endDate.getDate():0;
+					divYear.text			= marriage.endDate!=null? marriage.endDate.getFullYear().toString():'Year';
+				}
+				
+			}
+			private function validateForm():Boolean{
+				var marValid:ValidationResultEvent = marYearValidator.validate();
+				if (marValid.type == ValidationResultEvent.INVALID) {
+					Alert.show("Marriage year should be a number!", "Validation Error",4, this);
+					return false;
+				}
+				var divValid:ValidationResultEvent = divYearValidator.validate();
+				if ( divValid.type == ValidationResultEvent.INVALID && divorced.selected){
+					Alert.show("Divorce year should be a number!", "Validation Error",4, this);
+					return false;
+				}				
+				return true;						
+			}
+			private function populateVO():void{
+				marriage.startDate 	= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
+				marriage.divorced	= divorced.selected;
+				if (divorced.selected)
+					marriage.endDate = Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
+			}
+			private function submitMarForm():void{
+				if (validateForm()){
+					populateVO();					
+					if (marriage.person1.saved==false || marriage.person2.saved==false){				
+						Alert.show("There is unsaved person record in this marriage. Please save it beforehand.");
+					}else{
+						if (marriage.saved==true){
+							var updateEvent:UpdateMarriageEvent = new UpdateMarriageEvent(marriage);
+							updateEvent.dispatch();
+						}else{
+							var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(marriage.person1, marriage, marriage.person2.id, Role.SPOUSE, null, false, true);
+							addRelEvent.dispatch();
+						}
+					}
+				}
+				this.parent.removeChild(this);			
+			}
+			private function cancelMarForm():void{
+				this.parent.removeChild(this);
+			}
+		]]>
+	</mx:Script>
+	<mx:NumberValidator id="marYearValidator" source="{marYear}" property="text" domain="int" required="false"/>
+	<mx:NumberValidator id="divYearValidator" source="{divYear}" property="text" domain="int" required="false"/>    
+	<mx:Form id="marForm" defaultButton="{submit}">
+	    <mx:FormItem direction="vertical" label="Marriage Date">
+	    	<mx:HBox>
+		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="marMonth"/>
+		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="marDay"/>
+		    	<mx:TextInput id="marYear" width="40" text=" Year" click="marYear.text=''"/>	
+	    	</mx:HBox>
+	    	<mx:CheckBox label="Divorced?" id="divorced"/>   	   	
+	    </mx:FormItem>
+	    <mx:FormItem direction="vertical" label="Divorce Date" visible="{divorced.selected}" includeInLayout="{divorced.selected}">
+	    	<mx:HBox>
+		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="divMonth"/>
+		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="divDay"/>
+		    	<mx:TextInput id="divYear" width="40" text=" Year" click="divYear.text=''"/>	
+	    	</mx:HBox>	   	
+	    </mx:FormItem>	
+	    <mx:FormItem direction="horizontal">
+		        <mx:Button id="submit" label="Save" click="submitMarForm();"/>
+		        <mx:Button id="cancel" label="Cancel" click="cancelMarForm();"/>
+	    </mx:FormItem>	
+    </mx:Form>
+</mx:Canvas>

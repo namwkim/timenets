@@ -45,20 +45,22 @@ class Person < ActiveRecord::Base
     self.date_of_birth  = new_person.date_of_birth
     self.deceased       = new_person.deceased
     self.date_of_death  = new_person.date_of_death if self.deceased
+    self.father_id      = new_person.father_id
+    self.mother_id      = new_person.mother_id
     self.save
   end
   def marriages
     Marriage.find(:all, :conditions=>"person1_id = '#{id}' OR person2_id = '#{id}'")
   end
   def marriage_with spouse_id
-    @marriage = nil
+    @marriages = Array.new
     marriages.each do |marriage|
       spouse = marriage.spouse_of(id)
-      if spouse.id = spouse_id
-        @marriage = marriage
-        break;
+      if spouse.id == spouse_id
+        @marriages << marriage
       end
     end
+    @marriages
   end
   def spouses
     @spouses = Array.new
@@ -67,6 +69,15 @@ class Person < ActiveRecord::Base
       @spouses << marriage.person2 if marriage.person2.id != id        
     end
     @spouses
+  end
+  def children_with spouse
+    @children =  Array.new
+    children.each do |child|
+      if child.father.id == spouse.id or child.mother_id == spouse.id
+        @children << child
+      end
+    end
+    @children
   end
   def destroy_marriages
     marriages.each do |marriage|

@@ -30,6 +30,7 @@ class HomeController < ApplicationController
       @operator = nil
       session[:operator_id] = nil
     end
+    #flash[:notice]=""
     redirect_to(:action => "intro")   
   end
   def signup
@@ -40,7 +41,7 @@ class HomeController < ApplicationController
       if @user.save and @person.save
         session[:operator_id] = @user.id        
         #create an initial project associated with the new user
-        @project = Project.create(:name=>"The"+@person.last_name+" Family", :description=>"Describe your genealogy project here!")
+        @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")
         @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor")
         @project.people << @person
         @user.main_project = @project

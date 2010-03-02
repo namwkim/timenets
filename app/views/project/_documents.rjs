@@ -1,3 +1,6 @@
 page.replace_html "documents", :partial=>"document_list", :locals=>{:project=>project, :documents=>documents}
-page << "if ($('document_pagination')){ var a = $('document_pagination').getElementsBySelector('a')[0]; a.observe('click', function(event){ new Ajax.Request(a.readAttribute('href'),{onLoading:function(){$('documents').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});" +
-"var a = $('document_pagination').getElementsBySelector('a')[1]; a.observe('click', function(event){ new Ajax.Request(a.readAttribute('href'),{onLoading:function(){$('documents').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});}"
+page << "if ($('document_pagination')){ "+
+" links = $('document_pagination').getElementsBySelector('a');" +
+" for (var i=0; i<links.length; i++){"+
+" var a = links[i]; a.observe('click', function(event){ new Ajax.Request($(event.target).readAttribute('href'),{onLoading:function(){$('documents').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});" +
+"}}"

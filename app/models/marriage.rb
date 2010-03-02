@@ -5,4 +5,10 @@ class Marriage < ActiveRecord::Base
   def spouse_of person_id
     @spouse = person1.id==person_id ? person2 : person1
   end
+  def update_attr_from_amf new_marriage
+    self.start_date = new_marriage.start_date
+    self.divorced   = new_marriage.divorced
+    self.end_date   = new_marriage.end_date if self.divorced
+    self.save
+  end
 end

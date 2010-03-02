@@ -1,0 +1,95 @@
+<fieldset class="person">
+	<legend>Person</legend>
+	<table class="person_photo_frame">
+		<tr>
+			<td>
+			<% if @person.photo_url %>
+				<%= link_to(image_tag(@person.photo_url, :class=>"person_photo", :size=>"200x200"), "/images/"+@person.photo_url, :rel=>"lytebox") %>
+			<% else %>
+				<%= link_to(image_tag("/images/person.png", :class=>"person_photo", :size=>"200x200"), "/images/person.png", :rel=>"lytebox", :title=>"Add Photo") %>
+			<% end%>
+			</td>
+		</tr>
+		<tr>
+			<td> <%= link_to "Visualize", :controller=>"person", :action=>"visualize", :id=>@person.id %></td>
+		</tr>
+		<tr>
+			<td> <%= link_to "Edit Info", :controller=>"person", :action=>"edit_person", :id=>@person.id %></td>
+		</tr>
+		<tr>
+			<td> <%= link_to "Edit Relationships", :controller=>"person", :action=>"edit_relationships", :id=>@person.id %></td>
+		</tr>
+	</table> 
+	<table class="person_info">
+		<% if @person.name!=nil%>
+		<tr>
+			<td>Name:</td><td><%=@person.name%></td>
+		</tr>		
+		<% end %>
+		<% if @person.sex!=nil%>
+		<tr>
+			<td>Sex:</td><td><%=@person.sex if @person.sex!=nil%></td>
+		</tr>
+		<% end %>
+		<% if @person.date_of_birth %>
+		<tr>
+			<td>Date of Birth:</td><td><%=@person.date_of_birth%></td>
+		</tr>
+		<% end%>
+		<% if @person.date_of_death %>
+		<tr>
+			<td>Date of Death:</td><td><%=@person.date_of_death%></td>
+		</tr>
+		<% end %>
+		<tr>
+			<td>Father:</td><td><%=link_to @person.father.name, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.father!=nil%></td>
+		</tr>
+		<tr>
+			<td>Mother:</td><td><%=link_to @person.father, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.mother=nil%></td>
+		</tr>
+		<tr>
+			<td>Spouse:</td>
+			<td>
+				<% if @person.marriages %>
+					<% @person.marriages.each do |marriage|%>
+						<% spouse = link_to marriage.spouse_of(@person.id)%>
+						<%= link_to spouse.name, :controller=>"person", :action=>"show_person", :id=>spouse.id%>					
+					<% end %>
+				<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td>Children:</td>
+			<td>
+				<% if @person.children %>
+					<% @person.children.each do |child|%>
+						<%= link_to child.name, :controller=>"person", :action=>"show_person", :id=>child.id%>
+					<% end %>
+				<% end %>
+			</td>
+		</tr>			
+	</table>
+</fieldset>
+<fieldset>
+	<legend>Events</legend>
+	<table width="100%">
+		<tr>
+			<td width="20%">Date</td>
+			<td width="40%">Name</td>
+			<td width="20%">Location</td>
+		</tr>
+		<% (@person.events.sort!{ |a,b| a.from <=> b.from}).each do |event|%>
+			<tr id="<%="event_"+event.id.to_s%>">
+				<td>
+					<% if event.isRange %>
+						<%= event.from%> - <%=event.to%>
+					<% else %>
+						<%= event.from%>
+					<% end %>
+				</td>
+				<td><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>
+				<td><%= event.location%></td>
+			</tr>
+		<% end %>
+	</table>
+</fieldset>

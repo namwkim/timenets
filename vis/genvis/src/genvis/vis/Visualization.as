@@ -241,7 +241,7 @@ package genvis.vis
 			_hscrollbar.setScrollProperties(range, 0, range);
 			_hscrollbar.setScrollPosition(0);
 			_layers.x = (bounds.x - min);
-			_hscrollbar.visible = true;
+			_hscrollbar.visible = true;	
 			
 			//vertical scrollbar
 			min = bounds.y;

@@ -28,9 +28,14 @@ package genvis.vis.data
 		public function set doi(d:Number):void		{ _doi 		= d; 	}			
 		
 		public function get draw():Boolean	{
-			var drawEdge:Boolean = true;
+			var drawEdge:Boolean = false;
 			if (_child.simplified) drawEdge = false;
-			if (_parents[0].simplified && _parents[1].simplified) drawEdge = false;
+			for (var i:uint=0; i<_parents.length; i++){
+				if (_parents[i].simplified==false){
+					drawEdge = true;
+					break;
+				} 
+			}			
 			return drawEdge;
 		}
 		/**
@@ -42,11 +47,15 @@ package genvis.vis.data
 		public function EdgeSprite(father:NodeSprite, mother:NodeSprite, child:NodeSprite, data:Object = null)
 		{
 			_parents = new Array();
-			_parents.push(father);
-			_parents.push(mother);
-			_child	= child;
-			father.addOutEdge(this);
-			mother.addOutEdge(this);
+			if (father){
+				_parents.push(father);
+				father.addOutEdge(this);
+			}
+			if (mother){
+				mother.addOutEdge(this);
+				_parents.push(mother);
+			}			
+			_child	= child;	
 			child.inEdge = this;
 			this.data	= data;
 		}
@@ -54,8 +63,8 @@ package genvis.vis.data
 			var p:Person = _child.data as Person;
 			//var marInfo:MarriageInfo = p.father.marriageInfoWith(p.mother);
 			var bx:Number = _child.block.gbLayout.xAxis.X(p.dateOfBirth);
-			var fy:Number = p.father.sprite.Y(bx);
-			var my:Number = p.mother.sprite.Y(bx); 
+			var fy:Number = p.father? p.father.sprite.Y(bx):NaN;
+			var my:Number = p.mother? p.mother.sprite.Y(bx):NaN; 
 			var by:Number = (isNaN(fy)? my: (isNaN(my)? fy: (fy+my)/2));
 			return new Point(bx, by);	//in global coord
 		}

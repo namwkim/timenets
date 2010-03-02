@@ -1,22 +1,107 @@
 /* CSS file */
-Canvas {
-	font-family:Arial,Helvetica, sans-serif;
-	background-color: #2e3436;
-	color: #dddddd;
-	font-size: 12px;	
-}
+
 .smallTitle{
-	font-size:14px;
+	fontSize:14;
 	color:#e9b96e;
-	font-weight:bold;	
+	fontWeight:bold;	
+}
+.emp{
+	fontWeight:bold;
 }
 .mediumTitle{
-	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-weight: bold;
+	fontFamily:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	fontWeight:bold;
 	color:#e9b96e;
-	font-size:16px;
+	fontSize:16;
+}
+.solidBorder{
+	borderColor:#555753;
+	borderThickness:1;
+	borderStyle:solid;
+}
+.padding5{
+	paddingLeft:5;
+	paddingRight:5;
+	paddingTop:5;
+	paddingBottom:5;
+}
+.contentBox{
+	borderColor:#555753;
+	borderThickness:1;
+	borderStyle:solid;
+	paddingLeft:2;
+	paddingRight:2;
+	paddingTop:2;
+	paddingBottom:2;
 }
 
+/*
+//------------------------------
+//  Backgrounds
+//------------------------------
+*/
+.darkGreyBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="darkGrey_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.darkGreyInsetBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="darkGreyInset_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.darkGreyShadowBg
+{
+    backgroundImage: Embed(source="darkroom.swf", symbol="darkGreyShadow_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.lightGreyBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="lightGrey_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.lightGreyBevelBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="lightGreyBevel_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.centerLightGreyBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="centerLightGrey_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.sortBarBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="sortBarBg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.lightBoxBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="lightBox_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
+
+.linesBg
+{
+	backgroundImage: Embed(source="darkroom.swf", symbol="lines_Bg");
+	backgroundSize: "100%";
+	borderStyle:none;
+}
 /*
 KingnareStyle by Jinxin.
 Based on instructions from Adobe and inspired by Express Photoshop. 
@@ -51,8 +136,8 @@ SOFTWARE.
 */
 Application
 {
-	backgroundGradientAlphas: 1.0, 1.0;
-	backgroundGradientColors: #333333, #333333;
+	backgroundGradientAlphas: 1.0, 1.0;	
+	backgroundGradientColors: #2e3436, #2e3436;
 }
 
 
@@ -80,7 +165,11 @@ global
 	focusThickness: 1;
 	/* focusAlpha: 0.05; */
 	focusAlpha: 0.0;
+	fontSize:12;
 	themeColor: #FFFFFF;
+	fontFamily:Arial,Helvetica, sans-serif;
+	backgroundColor: #2e3436;
+	color: #dddddd;
 }
 
 
@@ -111,7 +200,7 @@ Accordion
 	borderColor:#000000;
 	borderThickness:1;
 	fontWeight:normal;
-	color: #aaaaaa;
+	color: #dddddd;
 	textRollOverColor: #FFFFFF;
 	textSelectedColor:#FFFFFF;
 	disabledColor:#5A5A5A;
@@ -134,13 +223,16 @@ AccordionHeader
 	selectedDisabledSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_disabledSkin");
 	selectedDownSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_downSkin");
 	selectedOverSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_overSkin");
-	selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_selectedSkin");
-	upSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_upSkin");
-	color: #aaaaaa;
+	selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_upSkin");
+	upSkin: Embed(source="kingnarestyle.swf", symbol="AccordionHeader_selectedSkin");
+	color: #dddddd;
+	fontSize:12;
+	fontWeight:normal;
 	textRollOverColor: #ffffff;
 	textSelectedColor:#444444;
 	disabledColor:#111111;
 	selectedColor:#ffffff;
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
 }
 
 
@@ -151,21 +243,19 @@ AccordionHeader
 */
 Button
 {
-	color: #AAAAAA;
-	textRollOverColor: #FFFFFF;
-	textSelectedColor:#FFFFFF;
-	disabledColor:#5A5A5A;
+	disabledSkin: Embed(source="darkroom.swf", symbol="Button_disabledSkin");
+	downSkin: Embed(source="darkroom.swf", symbol="Button_downSkin");
+	overSkin: Embed(source="darkroom.swf", symbol="Button_overSkin");
+	upSkin: Embed(source="darkroom.swf", symbol="Button_upSkin");
+	selectedDisabledSkin: Embed(source="darkroom.swf", symbol="Button_disabledSkin");
+	selectedDownSkin: Embed(source="darkroom.swf", symbol="Button_upSkin");
+	selectedOverSkin: Embed(source="darkroom.swf", symbol="Button_overSkin");
+	selectedUpSkin: Embed(source="darkroom.swf", symbol="Button_downSkin");
+	color: #babdb6;
+	textRollOverColor: #eeeeec;
+	textSelectedColor:#eeeeec;
+	disabledColor:#111111;
 	fontWeight:normal;
-	
-	upSkin: Embed(source="kingnarestyle.swf", symbol="Button_upSkin");
-	overSkin: Embed(source="kingnarestyle.swf", symbol="Button_overSkin");
-	downSkin: Embed(source="kingnarestyle.swf", symbol="Button_downSkin");
-	disabledSkin: Embed(source="kingnarestyle.swf", symbol="Button_disabledSkin");
-	
-	selectedUpSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedUpSkin');
-	selectedOverSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedOverSkin');
-	selectedDownSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedDownSkin');
-	selectedDisabledSkin: Embed(source='kingnarestyle.swf', symbol='Button_selectedDisabledSkin');
 }
 
 
@@ -234,7 +324,7 @@ ColorPicker
 	swatchGridBackgroundColor:#000000;
 	swatchGridBorderSize:0;
 	swatchHeight:12;
-	swatchHighlightColor:#ffffff;
+	swatchHighlightColor:#eeeeec;
 	swatchHighlightSize:1;
 	swatchWidth:12;
 	textFieldWidth:72;
@@ -276,8 +366,8 @@ ComboBox
 	editableDisabledSkin: ClassReference("com.kingnare.skins.ComboBox.ComboBoxSkin");
 */	
 	color: #CCCCCC;
-	textRollOverColor: #ffffff;
-	textSelectedColor:#ffffff;
+	textRollOverColor: #eeeeec;
+	textSelectedColor:#eeeeec;
 	textDisabledColor: #1e1e1e;
 	cornerRadius: 0;
 	arrowButtonWidth: 18;
@@ -302,7 +392,7 @@ ComboBox
 	borderColor: #000000;
 	cornerRadius:0;
 	color: #CCCCCC;
-	textRollOverColor: #ffffff;
+	textRollOverColor: #eeeeec;
 	textSelectedColor:#dddddd;
 	rollOverColor: #333333;
 	selectionColor: #444444;
@@ -353,8 +443,8 @@ DataGrid
 	color:#BBBBBB;
 	rollOverColor: #555555;
 	selectionColor: #444444;
-	textRollOverColor:#ffffff;
-	textSelectedColor:#ffffff;
+	textRollOverColor:#eeeeec;
+	textSelectedColor:#eeeeec;
 	selectiondDisabledColor: #1e1e1e;
 	borderStyle: solid;
 	borderThickness:1;
@@ -374,9 +464,9 @@ DataGrid
 */
 .dataGridHeader
 {
-	color: #aaaaaa;
-	textRollOverColor:#ffffff;
-	textSelectedColor:#ffffff;
+	color: #dddddd;
+	textRollOverColor:#eeeeec;
+	textSelectedColor:#eeeeec;
 }
 
 
@@ -391,9 +481,9 @@ DateChooser
 	cornerRadius:0;
 	borderColor:#000000;
 	backgroundColor:#444444;
-	color:#aaaaaa;
-	textRollOverColor:#ffffff;
-	textSelectedColor: #ffffff;
+	color:#dddddd;
+	textRollOverColor:#eeeeec;
+	textSelectedColor: #eeeeec;
 	selectionColor:#222222;
 	
 	nextMonthDisabledSkin: Embed(source="kingnarestyle.swf", symbol="DateChooser_nextMonthDisabledSkin");
@@ -442,14 +532,14 @@ DateField
 }
 .dateChooserHeader
 {
-	color: #ffffff;
+	color: #eeeeec;
 	horizontalGap:4;
 	fontWeight:normal;
 	height:20px;
 }
 .dateChooserWeekDay
 {
-	color: #ffffff;
+	color: #eeeeec;
 	horizontalGap:4;
 	fontWeight:normal;
 }
@@ -536,7 +626,7 @@ HSlider
 */
 Label
 {
-	color: #FFFFFF;
+	color: #eeeeec;
 	disabledColor: #BBBBBB;
 }
 
@@ -565,8 +655,8 @@ List
 	color: #BBBBBB;
 	rollOverColor: #555555;
 	selectionColor: #444444;
-	textRollOverColor: #FFFFFF;
-	textSelectedColor: #FFFFFF;
+	textRollOverColor: #eeeeec;
+	textSelectedColor: #eeeeec;
 	borderColor: #222222;
 	disabledColor: #666666;
 	backgroundColor: #333333;
@@ -591,16 +681,16 @@ Menu
 	separatorSkin: Embed(source="kingnarestyle.swf",symbol="Menu_separatorSkin");
 	backgroundImage: Embed(source="kingnarestyle.swf", symbol="BackgroundSkin"); 
 	backgroundSize: "100%";  
-	backgroundColor: #111111;
-	backgroundAlpha: 1.0;
+	backgroundColor: #d3d7cf;
+	backgroundAlpha: 0.5;
 	borderStyle: solid;
 	borderThickness: 1;
 	borderColor: #000000;
 	roundedCorners:0;
-	color: #CCCCCC;
-	textRollOverColor: #ffffff;
+	color: #dddddd;
+	textRollOverColor: #dddddd;
 	textSelectedColor:#dddddd;
-	rollOverColor: #333333;
+	rollOverColor: #555753;
 	selectionColor: #444444;
 	shadowDistance: 0;
 }
@@ -618,11 +708,11 @@ MenuBar
 	itemUpSkin: Embed(source="kingnarestyle.swf", symbol="MenuBar_itemUpSkin");
 	itemOverSkin: Embed(source="kingnarestyle.swf", symbol="MenuBar_itemOverSkin");
 	itemDownSkin: Embed(source="kingnarestyle.swf", symbol="MenuBar_itemDownSkin");
-	color: #AAAAAA;
-	backgroundColor:#ffffff;
-	textSelectedColor:#ffffff;
-	textRollOverColor:#ffffff;
-	rollOverColor:#ffffff;
+	color: #dddddd;
+	backgroundColor:#eeeeec;
+	textSelectedColor:#eeeeec;
+	textRollOverColor:#eeeeec;
+	rollOverColor:#eeeeec;
 	menuStyleName: "dropDown";
 	disabledColor: #AAB3B3;
 }
@@ -661,7 +751,7 @@ NumericStepper
 	fontWeight: normal;
 	backgroundColor:#666666;
 	color:#eeeeee;
-	textRollOverColor:#ffffff;
+	textRollOverColor:#eeeeec;
 }
 
 
@@ -687,16 +777,16 @@ NumericStepper
 Panel
 {
 	color: #DDDDDD;
-	backgroundColor: #333333;
+	backgroundColor: #2e3436;
 	cornerRadius: 2;
 	roundedBottomCorners: true;
 	shadowDistance: 1;
 	dropShadowEnabled: true;
 	
-	borderColor: #555555;
+	borderColor: #555753;
 	borderAlpha: 0.9;
 	borderStyle: solid;
-	borderThickness:2;
+	borderThickness:1;
 	
 	headerHeight: 28;
 	titleBackgroundSkin: Embed(source="kingnarestyle.swf", symbol="Panel_titleBackgroundSkin");
@@ -739,8 +829,8 @@ PopUpButton
 	popUpOverSkin: ClassReference("com.kingnare.skins.PopUpButton.PopUpButtonSkin");
  */
 	color: #cccccc;
-	textRollOverColor: #ffffff;
-	textSelectedColor:#ffffff;
+	textRollOverColor: #eeeeec;
+	textSelectedColor:#eeeeec;
 	textDisabledColor: #1e1e1e;
 	fontWeight:normal;
 	arrowButtonWidth:16;
@@ -770,8 +860,8 @@ PopUpMenuButton
 	popUpOverSkin: ClassReference("com.kingnare.skins.PopUpButton.PopUpButtonSkin");
  */	
 	color: #cccccc;
-	textRollOverColor: #ffffff;
-	textSelectedColor:#ffffff;
+	textRollOverColor: #eeeeec;
+	textSelectedColor:#eeeeec;
 	textDisabledColor: #1e1e1e;
 	fontWeight:normal;
 	arrowButtonWidth:16;
@@ -786,7 +876,7 @@ PopUpMenuButton
 ProgressBar
 {
 	color: #CCCCCC;
-	barColor: #FFFFFF;
+	barColor: #eeeeec;
 	trackSkin: Embed(source="kingnarestyle.swf", symbol="ProgressBarTrackSkin");
 	barSkin: Embed(source="kingnarestyle.swf", symbol="ProgressBarSkin");
 	indeterminateSkin: Embed(source="kingnarestyle.swf", symbol="ProgressIndeterminateSkin",
@@ -843,8 +933,8 @@ TabBar
 	lastButtonStyleName: "tabStyle";
 	lastTabStyleName: "tabStyle";
 	selectedTabTextStyleName: "selectedTabText";
-	color: #aaaaaa;
-	textRollOverColor: #ffffff;
+	color: #dddddd;
+	textRollOverColor: #eeeeec;
 	textSelectedColor:#CCCCCC;
 	disabledColor:#111111;
 }
@@ -858,15 +948,15 @@ TabBar
 	selectedOverSkin: Embed(source="kingnarestyle.swf", symbol="TabSelected_upSkin");  
 	selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="TabSelected_upSkin"); 
 	upSkin: Embed(source="kingnarestyle.swf", symbol="Tab_upSkin"); 
-	color:#aaaaaa;
-	textRollOverColor:#ffffff;
-	textSelectedColor:#ffffff;
+	color:#dddddd;
+	textRollOverColor:#eeeeec;
+	textSelectedColor:#eeeeec;
 }
 .selectedTabText 
 {
-	color: #ffffff;
-	textRollOverColor: #ffffff;
-	textSelectedColor:#aaaaaa;
+	color: #eeeeec;
+	textRollOverColor: #eeeeec;
+	textSelectedColor:#dddddd;
 	disabledColor:#111111;
 }
 
@@ -883,8 +973,8 @@ TabNavigator
 	borderThickness:1;
 	backgroundColor:#333333;
 	fontWeight:normal;
-	color: #AAAAAA;
-	textRollOverColor: #ffffff;
+	color: #dddddd;
+	textRollOverColor: #eeeeec;
 	textSelectedColor:#444444;
 	disabledColor:#111111;
 	paddingTop: 0;
@@ -898,7 +988,7 @@ TabNavigator
 */
 TextArea
 {
-	color: #FFFFFF;
+	color: #eeeeec;
 	borderColor: #000000;
 	borderSkin: Embed(source="kingnarestyle.swf", symbol="TextAreaBackground");
 	backgroundAlpha: 1.0; 
@@ -918,7 +1008,6 @@ TextInput
 	borderSkin: Embed(source="kingnarestyle.swf", symbol="TextInput_borderSkin");
 	borderStyle: none;
 	paddingTop: 2;
-	
 }
 
 
@@ -952,7 +1041,7 @@ TitleWindow
 
 
 /*
-//------------------------------
+//------------------------------	
 //  ToggleButtonBar
 //------------------------------
 */
@@ -972,9 +1061,9 @@ ToggleButtonBar
         selectedOverSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_firstSelectedUpSkin");
         selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_firstSelectedUpSkin");
         upSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_firstUpSkin");
-        color: #aaaaaa;
-		textRollOverColor: #ffffff;
-		textSelectedColor: #ffffff;
+        color: #dddddd;
+		textRollOverColor: #eeeeec;
+		textSelectedColor: #eeeeec;
 		disabledColor:#444444;
 }
 .middleButtonBarButton 
@@ -987,9 +1076,9 @@ ToggleButtonBar
         selectedOverSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_buttonSelectedUpSkin");
         selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_buttonSelectedUpSkin");
         upSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_buttonUpSkin");
-        color: #aaaaaa;
-		textRollOverColor: #ffffff;
-		textSelectedColor: #ffffff;
+        color: #dddddd;
+		textRollOverColor: #eeeeec;
+		textSelectedColor: #eeeeec;
 		disabledColor:#444444;
 }
 .lastButtonBarButton 
@@ -1002,9 +1091,9 @@ ToggleButtonBar
         selectedOverSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_lastSelectedUpSkin");
         selectedUpSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_lastSelectedUpSkin");
         upSkin: Embed(source="kingnarestyle.swf", symbol="ButtonBar_lastUpSkin");
-        color: #aaaaaa;
-		textRollOverColor: #ffffff;
-		textSelectedColor: #ffffff;
+        color: #dddddd;
+		textRollOverColor: #eeeeec;
+		textSelectedColor: #eeeeec;
 		disabledColor:#444444; 
 }
 
@@ -1016,7 +1105,7 @@ ToggleButtonBar
 */
 ToolTip
 {
-	color: #FFFFFF;
+	color: #eeeeec;
 	backgroundColor: 0;
 	borderSkin: Embed(source="kingnarestyle.swf", symbol="ToolTip_Border");
 	paddingLeft: 10;

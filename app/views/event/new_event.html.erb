@@ -61,7 +61,7 @@ function submit_add_doc_form(doc_id){
 		</tr>
 		<tr>
 			<td><%= f.label :from, "Date", :id=>"from_label"%></td>
-			<td><%= f.date_select :from, :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td><%= f.date_select :from, :start_year =>Time.now.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
 			<td>Range: <%= f.check_box(:isRange, { :onchange=>"flip_range(this)"},true, false)%></td>
 		</tr>
 			

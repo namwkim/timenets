@@ -2,6 +2,6 @@
 		<%= page_entries_info documents %>
 		<%= will_paginate documents,  :page_links=>false, :previous_label=>"<", :next_label=>">", :id=>"document_pagination"%>
 	</div>
-	<% project.documents.each do |document|%>
+	<% documents.each do |document|%>
 		<%= render :partial=>"document/document", :locals=>{:document=>document}%>
 	<% end %>

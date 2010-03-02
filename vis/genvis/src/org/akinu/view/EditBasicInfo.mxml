@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
 	<mx:Script>
 		<![CDATA[
 			import org.akinu.events.AddRelationshipEvent;
@@ -47,7 +47,7 @@
 				var person:Person = model.selectedPerson;
 				person.firstName 	= firstName.text;
 				person.lastName  	= lastName.text;
-				person.sex			= sex.selectedItem.data
+				person.sex			= sex.selectedItem.data;
 				person.dateOfBirth 	= Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
 				person.deceased	= deceased.selected;
 				if (person.deceased)
@@ -65,7 +65,7 @@
 						//save this person & marriage & parent-child link									
 						var nextEvents:Array = new Array();			
 						for each (var child:Person in person.children){
-							nextEvents.push(new AddRelationshipEvent(child, null, person.id, "Child", null, false, false));
+							nextEvents.push(new AddRelationshipEvent(person, null, child.id, person.sex==Person.MALE?"Father":"Mother", null, false, false));
 						}
 						var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(person, person.firstMarriage, person.firstSpouse.id, "Spouse", nextEvents);
 						addRelEvent.dispatch();											
@@ -80,7 +80,7 @@
 	</mx:Script>
 	<mx:NumberValidator id="dobYearValidator" source="{dobYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
-	<mx:Label text="This record is not yet saved!" styleName="smallTitle" visible="{!model.selectedPerson.saved}" includeInLayout="{!model.selectedPerson.saved}" paddingLeft="5"/>
+	<mx:Label text="This record is not yet saved!" styleName="smallTitle" visible="{!model.selectedPerson.saved}" includeInLayout="{!model.selectedPerson.saved}" paddingLeft="15"/>
 	<mx:Form id="infoForm" defaultButton="{submit}">
 		<mx:FormItem label="First Name">
 			<mx:TextInput id="firstName"/>		
@@ -108,9 +108,9 @@
 	    </mx:FormItem>
 	    <mx:FormItem direction="horizontal">
 	        <mx:Button id="submit" label="Save" click="submitForm();"/>
-	        <mx:Button id="cancel" label="Cancel" click="cancelForm();"/>
+	        <mx:Button id="cancel" label="Reset" click="cancelForm();"/>
 	    </mx:FormItem>	
 	</mx:Form>
 	
 
-</mx:Canvas>
+</mx:VBox>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="250" horizontalAlign="center" title="Remove Person">
+	<mx:Script>
+		<![CDATA[
+			import org.akinu.model.ModelLocator;
+			import org.akinu.helper.Role;
+			import genvis.data.Marriage;
+			import org.akinu.events.RemoveRelationshipEvent;
+			import org.akinu.events.RemovePersonEvent;
+			import genvis.data.Person;
+			import mx.managers.PopUpManager;
+			[Bindable]
+			public var person:Person;
+			public var refPerson:Person;
+			public var role:String;
+			private var model:ModelLocator = ModelLocator.getInstance();
+			private function removePerson():void{
+				var rmEvent:RemovePersonEvent = new RemovePersonEvent(person.id);
+				rmEvent.dispatch();
+				//remove links
+				person.remove();
+				//update vis
+				model.vis.visualize(model.root);
+				cancel();
+			}
+			private function detachPerson():void{
+				var marriage:Marriage;
+				var rmRelEvent:RemoveRelationshipEvent = new RemoveRelationshipEvent(person.id, refPerson.id, role);
+				switch (role){
+					case Role.FATHER:
+					case Role.MOTHER: 
+					//remove parent-child link 
+					refPerson.removeParent(person);
+					person.removeChild(refPerson);
+					//create a dummy parent
+					var parent:Person = refPerson.parents[0].copy();
+					//add parent-child link
+					parent.addChild(refPerson);
+					refPerson.addParent(parent);
+					//add marriage link
+					marriage	= new Marriage(refPerson.parents[0], parent);
+					marriage.saved			= false;
+					parent.addMarriage(marriage);
+					refPerson.parents[0].addMarriage(marriage);				
+					break;
+					case Role.SPOUSE:
+					//remove parent-child link
+					var children:Array = person.childrenWith(refPerson);
+					for each (var child:Person in children){
+						person.removeChild(child);
+						child.removeParent(person);
+					}
+					//remove marriage link
+					refPerson.removeMarriages(person);
+					person.removeMarriages(refPerson);
+					//create unsaved spouse if there exist at least child belongs to the marriage
+					//create a dummy parent
+					if (children.length > 0){
+						var spouse:Person = refPerson.copy();
+						//add parent-child link
+						for each (child in children){
+							spouse.addChild(child);
+							child.addParent(spouse);
+						}
+						//add marriage link
+						marriage		= new Marriage(refPerson, spouse);
+						marriage.saved	= false;
+						spouse.addMarriage(marriage);
+						refPerson.addMarriage(marriage);	
+					}					
+					break;
+					case Role.CHILD:
+					//remove parent-child link
+					refPerson.removeChild(person);
+					person.removeParent(refPerson);
+					person.parents[0].removeChild(person);
+					person.removeParent(person.parents[0]);
+					break;
+				}
+				model.vis.visualize(model.root);
+				cancel();
+				
+			}
+			private function cancel():void{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</mx:Script>
+	<!--<mx:Text htmlText="Click detach if you do not want to remove person but remove relationship" width="100%"/>-->
+	<mx:Button label="Remove" click="removePerson()" width="150"/>
+	<mx:Button label="Detach" click="detachPerson()" width="150"/>
+	<mx:Button label="Cancel" click="cancel()" width="150"/>
+</mx:TitleWindow>

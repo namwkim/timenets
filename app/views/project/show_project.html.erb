@@ -63,7 +63,7 @@ function flip_dob_field(chk_box){
 <div class="project_desc"><%= @project.description%></div>
 <div class="container_box">
 	<div class="left_col">
-		<div id="activities" class="container_box_left">
+		<div id="activities" class="project_box_left">
 			<div class="underlined"><%= link_to "See All",{:controller=>"activity",:action=>"show_all", :project_id=>@project.id},{:class=>"right"} %><span class="small_title">Recent Activities</span></div>
 			<% if @project.activities.length == 0%>
 				<span>No activity found!</span>
@@ -73,7 +73,7 @@ function flip_dob_field(chk_box){
 				<% end %>
 			<% end %>
 		</div>
-		<div class="container_box_left">
+		<div class="project_box_left">
 			<div class="underlined"><%= link_to "See All",{:controller=>"user",:action=>"show_collaborators", :project_id=>@project.id},{:class=>"right"} %><span class="small_title">Members</span></div>
 			<div class="content_box">
 			<% @project.users.length.downto(@project.users.length-4) do |i|%>
@@ -83,7 +83,7 @@ function flip_dob_field(chk_box){
 		</div>
 	</div>
 	<div class="right_col">
-		<div class="container_box_right">
+		<div class="project_box_right">
 			<div class="underlined">
 				<div id="project_menu">
 					<a id="people_menu" class="small_menu_box small_title selected" onclick="select_menu(this, 'people_box')" href="#">People</a>

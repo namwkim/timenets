@@ -22,6 +22,24 @@ package org.akinu.business
 			var call:AsyncToken = AsyncToken(_service.root({id: rootID}));
 			call.addResponder(_responder);
 		}
+		//
+		//// PERSON
+		//
+		public function createPerson(person:Person, project_id:String):void{
+			var call:AsyncToken = AsyncToken(_service.create_person({project_id:project_id, person:person}));
+			call.addResponder(_responder);
+		}
+		public function updatePerson(person:Person, project_id:String):void{
+			var call:AsyncToken = AsyncToken(_service.update_person({project_id:project_id, person:person}));
+			call.addResponder(_responder);
+		}
+		public function removePerson(id:String):void{
+			var call:AsyncToken = AsyncToken(_service.delete_person({id:id}));
+			call.addResponder(_responder);
+		}
+		//
+		//// RELATIONSHIP
+		//
 		public function addRelationship(person:Person, marriage:Marriage, ref_id:String, role:String, create:Boolean):void{
 			var call:AsyncToken;
 			if (create){
@@ -31,14 +49,16 @@ package org.akinu.business
 			}
 			call.addResponder(_responder);			
 		}
-		public function createPerson(person:Person, project_id:String):void{
-			var call:AsyncToken = AsyncToken(_service.create_person({project_id:project_id, person:person}));
+		public function removeRelationship(id:String, ref_id:String, role:String):void{
+			var call:AsyncToken = AsyncToken(_service.delete_relationship({id:id, ref_id:ref_id, role:role}));
+			call.addResponder(_responder);						
+		}
+		public function updateMarriage(marriage:Marriage):void{
+			var call:AsyncToken;
+			call = AsyncToken(_service.update_marriage({marriage:marriage}));
 			call.addResponder(_responder);
 		}
-		public function updatePerson(person:Person, project_id:String):void{
-			var call:AsyncToken = AsyncToken(_service.update_person({project_id:project_id, person:person}));
-			call.addResponder(_responder);
-		}
+
 
 	}
 }

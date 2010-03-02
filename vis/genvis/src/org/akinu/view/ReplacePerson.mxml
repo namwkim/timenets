@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
+	<mx:Text text="Replace person"/>
+	<mx:VBox>
+		<mx:Button label="Create a New Person"/>
+		<mx:Form>
+			<mx:FormItem>
+				<mx:TextInput text=""/><mx:Button label="Search"/>
+			</mx:FormItem>	
+		</mx:Form>	
+	</mx:VBox>	
+	<mx:Button label="Cancel"/>
+</mx:VBox>

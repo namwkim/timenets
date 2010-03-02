@@ -16,13 +16,13 @@
 			public function init():void{
 				if (this.initialized==false) return;
 				//initialize each sub-page
+				navi.selectedIndex=0;
 				editBasicInfo.init();
 				editRelationshp.init();
 			}
 			private function doneEditing():void{
 				var stateChange:StateChangeEvent = new StateChangeEvent(ModelLocator.PERSON_MAIN);
-				stateChange.dispatch();
-				accordion.selectedIndex = 2;
+				stateChange.dispatch();				
 			}
 		
 		]]>
@@ -32,11 +32,10 @@
 			<mx:Label text="Click a section below to edit it"/>
 			<mx:Button label="Done Editing" click="doneEditing();"/>
 		</mx:HBox>
-		<mx:Accordion id="accordion" width="100%" height="100%" selectedIndex="2">
-			<view:EditRelationship id="editRelationshp" label="Relationships" width="100%" height="100%"/>
+		<mx:TabNavigator id="navi" width="100%" height="100%" selectedIndex="0">
 			<view:EditBasicInfo id="editBasicInfo" label="Basic Information" width="100%" height="100%" />
-			
-		</mx:Accordion>
+			<view:EditRelationship id="editRelationshp" label="Relationships" width="100%" height="100%"/>		
+		</mx:TabNavigator>
 	</mx:VBox>
 	
 

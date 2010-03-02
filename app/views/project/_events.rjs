@@ -1,2 +1,7 @@
 page.replace_html "events", :partial=>"event_list", :locals=>{:project=>project, :events=>events}
-page << "if ($('event_pagination')) {var a = $('event_pagination').getElementsBySelector('a')[0]; a.observe('click', function(event){ new Ajax.Request(a.readAttribute('href'),{onLoading:function(){$('events').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});}"
+page << "if ($('event_pagination')){ "+
+" links = $('event_pagination').getElementsBySelector('a');" +
+" for (var i=0; i<links.length; i++){"+
+" var a = links[i]; a.observe('click', function(event){ new Ajax.Request($(event.target).readAttribute('href'),{onLoading:function(){$('events').update(new Element('img', { src:'/images/roller.gif'}))}}); Event.stop(event)});" +
+"}}"
+

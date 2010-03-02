@@ -229,6 +229,7 @@ package genvis.data
 		}
 		//1. missing spouse relationship
 		protected static function missingSpouseRelationship(person:Person):void{
+			//if (person.saved==false) return;
 			//1. missing spouse relationship
 			if (person.parents.length == 2){
 				var marriage:Marriage;
@@ -244,6 +245,7 @@ package genvis.data
 		}
 		//2. missing parent-child relationship
 		protected static function missingParentChildRelationship(person:Person):void{
+			//if (person.saved==false) return;
 			if (person.parents.length ==1){
 				
 				//2.1 if this parent has no spouse, then create a fake person
@@ -258,7 +260,7 @@ package genvis.data
 					//construct parent-child relationship
 					spouse.addChild(person);
 					person.addParent(spouse);
-					if (_data) _data.push(spouse);	
+					//if (_data) _data.push(spouse);	
 				}else{
 					//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
 					//(this is done after estimation)

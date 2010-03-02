@@ -137,8 +137,16 @@ package genvis.data
 				case "dateOfDeath": 	if (val is Date) 	_dateOfDeath = val as Date; break;
 			}
 		}
-		public function addParent(parent:Person):void { _isSorted = false; _parents.push(parent); }
-		public function addChild(child:Person):void {  _isSorted = false; _children.push(child); }
+		public function addParent(parent:Person):void { 
+			if (_parents.indexOf(parent)>0) return; //exist
+			_isSorted = false; 
+			_parents.push(parent); 
+		}
+		public function addChild(child:Person):void {  
+			if (_children.indexOf(child)>0) return; //exist
+			_isSorted = false; 
+			_children.push(child);
+		}
 		public function addMarriage(marriage:Marriage):void {  _isSorted = false; _marriages.push(marriage); }
 		
 		public function isSpouseOf(person:Person):Boolean{
@@ -173,7 +181,7 @@ package genvis.data
 				var sortedSpouses:Array = new Array();
 				for each (var marriage:Marriage in _marriages){
 					var sp:Person = marriage.spouseOf(this);
-					if (sortedSpouses.indexOf(sp)==-1) sortedSpouses.push(sp);
+					if (sortedSpouses.indexOf(sp)<0) sortedSpouses.push(sp);
 				}
 				_spouses = sortedSpouses;
 			}
@@ -184,7 +192,12 @@ package genvis.data
 			var spouse:Person 	= new Person;
 			//spouse.id			= "copy_of_"+_id;
 			spouse.gender		= _gender=="None"? "None" : (_gender=="Male"?"Female":"Male");
-			spouse.name 		= "Add Spouse";//"copy_of_"+ name;
+			spouse.name 		= "Add Person";//"copy_of_"+ name;
+			spouse.dateOfBirth	= new Date(this.dateOfBirth);
+			if (this.deceased){
+				spouse.dateOfDeath	= new Date(this.dateOfDeath);
+			}
+			spouse.saved		= false;
 			return spouse;
 		}
 		public function get isDivorced():Boolean{
@@ -229,7 +242,7 @@ package genvis.data
 			if (_parents.length!=2) return null;
 			var siblings:Array = new Array();
 			for each (var sibling:Person in _parents[0].children){
-				if (_parents[0].isParentOf(sibling) && sibling != this)
+				if (_parents[1].isParentOf(sibling) && sibling != this)
 					siblings.push(sibling);
 			}
 			return siblings;
@@ -253,6 +266,45 @@ package genvis.data
 			}
 			return (ms.length==0?null:ms);
 		}
+		public function removeMarriages(spouse:Person):void{
+			var sidx:uint = _spouses.indexOf(spouse);
+			if (sidx<0) return;
+			var mars:Array = marriageWith(spouse);
+			for each (var mar:Marriage in mars){
+				var idx:uint = _marriages.indexOf(mar);
+				_marriages.splice(idx, 1);	
+			}			
+			_spouses.splice(sidx,1);
+		}
+		public function removeChild(child:Person):void{
+			var cidx:uint = _children.indexOf(child);
+			if (cidx<0) return;
+			_children.splice(cidx, 1);
+		}
+		public function removeParent(parent:Person):void{
+			var pidx:uint = _parents.indexOf(parent);
+			if (pidx<0) return;
+			_parents.splice(pidx, 1);
+		}
+		public function remove():void{
+			for each (var spouse:Person in _spouses){
+				spouse.removeMarriages(this);	
+				if (spouse.saved == false){
+					 	var chs:Array = childrenWith(spouse);
+					 	for each (var ch:Person in chs) {
+					 		ch.removeParent(spouse);
+					 	}
+				}			
+			}
+			for each (var parent:Person in _parents){
+				parent.removeChild(this);
+			}
+			for each (var child:Person in _children){
+				child.removeParent(this);
+			}
+					
+		}
+		
 		public function apply(callback:Function, applySpouse:Boolean = false):void{
 			callback(this);
 			if (applySpouse){

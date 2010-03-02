@@ -289,8 +289,8 @@ package genvis.vis.data
 			});	
 		}
 		protected function constructEdge(person:Person):void{
-			if (person.parents.length != 2) return;
-			var e:EdgeSprite = new EdgeSprite(person.father.sprite, person.mother.sprite, person.sprite);
+			//if (person.parents.length != 2) return;
+			var e:EdgeSprite = new EdgeSprite(person.father? person.father.sprite:null, person.mother?person.mother.sprite:null, person.sprite);
 			_edges.add(e);
 		}
 		protected function constructEdges(root:Person):void{

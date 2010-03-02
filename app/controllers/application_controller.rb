@@ -3,7 +3,7 @@
 
 class ApplicationController < ActionController::Base
   session :session_key=>"_akinu_session_id"
-  before_filter :authenticate, :except => [:login, :intro, :signup, :root, :create_relationship, :update_person] 
+  #before_filter :authenticate, :except => [:login, :intro, :signup, :root, :create_relationship, :update_person] 
   before_filter :authorize
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
@@ -30,12 +30,12 @@ protected
     end
   end
   def log action_verb, record, project
-    #time = Time.now.strftime("%B %d at %H:%M%p")
-    html_text = @operator.person.name+" "+action_verb+" "+record.name#+" in "+project.name + ", "+time
-    activity = Activity.create(:html=>html_text)
-    project.activities<<activity
-    @operator.activities<<activity
-    @operator.save
-    project.save
+#    #time = Time.now.strftime("%B %d at %H:%M%p")
+#    html_text = @operator.person.name+" "+action_verb+" "+record.name#+" in "+project.name + ", "+time
+#    activity = Activity.create(:html=>html_text)
+#    project.activities<<activity
+#    @operator.activities<<activity
+#    @operator.save
+#    project.save
   end  
 end

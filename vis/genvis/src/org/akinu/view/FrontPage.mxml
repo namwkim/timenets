@@ -11,7 +11,7 @@
 	<mx:VBox>
 			<mx:LinkButton id="projectTitle" label="{model.project.name}" styleName="mediumTitle" click="navigateToURL(new URLRequest('/'), '_blank')"
 				    rollOverColor="0x2e3436" selectionColor="0x2e3436" textRollOverColor="0xfcaf3e" textSelectedColor="0xfcaf3e"/>
-			<mx:Text text="{model.project.description}"/>		
+			<mx:Text text="{model.project.description}" paddingLeft="20"/>		
 
 	</mx:VBox>
 	

@@ -1,95 +1,80 @@
-<fieldset class="person">
-	<legend>Person</legend>
-	<table class="person_photo_frame">
-		<tr>
-			<td>
-			<% if @person.photo_url %>
-				<%= link_to(image_tag(@person.photo_url, :class=>"person_photo", :size=>"200x200"), "/images/"+@person.photo_url, :rel=>"lytebox") %>
-			<% else %>
-				<%= link_to(image_tag("/images/person.png", :class=>"person_photo", :size=>"200x200"), "/images/person.png", :rel=>"lytebox", :title=>"Add Photo") %>
-			<% end%>
-			</td>
-		</tr>
-		<tr>
-			<td> <%= link_to "Visualize", :controller=>"person", :action=>"visualize", :id=>@person.id %></td>
-		</tr>
-		<tr>
-			<td> <%= link_to "Edit Info", :controller=>"person", :action=>"edit_person", :id=>@person.id %></td>
-		</tr>
-		<tr>
-			<td> <%= link_to "Edit Relationships", :controller=>"person", :action=>"edit_relationships", :id=>@person.id %></td>
-		</tr>
-	</table> 
-	<table class="person_info">
-		<% if @person.name!=nil%>
-		<tr>
-			<td>Name:</td><td><%=@person.name%></td>
-		</tr>		
-		<% end %>
-		<% if @person.sex!=nil%>
-		<tr>
-			<td>Sex:</td><td><%=@person.sex if @person.sex!=nil%></td>
-		</tr>
-		<% end %>
-		<% if @person.date_of_birth %>
-		<tr>
-			<td>Date of Birth:</td><td><%=@person.date_of_birth%></td>
-		</tr>
-		<% end%>
-		<% if @person.date_of_death %>
-		<tr>
-			<td>Date of Death:</td><td><%=@person.date_of_death%></td>
-		</tr>
-		<% end %>
-		<tr>
-			<td>Father:</td><td><%=link_to @person.father.name, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.father!=nil%></td>
-		</tr>
-		<tr>
-			<td>Mother:</td><td><%=link_to @person.father, :controller=>"person", :action=>"show_person", :id=>@person.father.id if @person.mother=nil%></td>
-		</tr>
-		<tr>
-			<td>Spouse:</td>
-			<td>
-				<% if @person.marriages %>
-					<% @person.marriages.each do |marriage|%>
-						<% spouse = link_to marriage.spouse_of(@person.id)%>
-						<%= link_to spouse.name, :controller=>"person", :action=>"show_person", :id=>spouse.id%>					
-					<% end %>
-				<% end %>
-			</td>
-		</tr>
-		<tr>
-			<td>Children:</td>
-			<td>
-				<% if @person.children %>
-					<% @person.children.each do |child|%>
-						<%= link_to child.name, :controller=>"person", :action=>"show_person", :id=>child.id%>
-					<% end %>
-				<% end %>
-			</td>
-		</tr>			
-	</table>
-</fieldset>
-<fieldset>
-	<legend>Events</legend>
-	<table width="100%">
-		<tr>
-			<td width="20%">Date</td>
-			<td width="40%">Name</td>
-			<td width="20%">Location</td>
-		</tr>
-		<% (@person.events.sort!{ |a,b| a.from <=> b.from}).each do |event|%>
-			<tr id="<%="event_"+event.id.to_s%>">
+<% javascript_tag do%>
+var selected_menu_id;
+var shown_elem_id;
+document.observe("dom:loaded", function() {
+	selected_menu_id 	= "info_menu";
+	shown_elem_id 		= "info_box";
+	$('events_box').hide();
+	load_list();
+});
+
+function select_menu(menu, elem_id){
+	//hide previously selected menu
+	$(selected_menu_id).removeClassName("selected");
+	$(shown_elem_id).hide();
+	
+	//show currently selected menu
+	selected_menu_id = menu.id;
+	shown_elem_id	 = elem_id;
+	$(selected_menu_id).addClassName("selected");
+	$(shown_elem_id).show();
+	load_list();
+	
+}
+function load_list(){
+	var img = new Element('img', { src:"/images/roller.gif"});	
+	if (shown_elem_id=="info_box"){
+		if ($('info').empty()==false) return;
+		$('info').insert(img);
+		<%= remote_function(:update=>"info", :url=>{:controller=>"person", :action=>"info", :id=>@person.id})%>
+	}else if (shown_elem_id=="events_box"){
+		if ($('events').empty()==false) return;
+		$('events').insert(img);
+		<%= remote_function(:update=>"events_box", :url=>{:controller=>"person", :action=>"person_events", :id=>@person.id})%>
+	}
+}
+<% end %>
+<div class="container_box">
+	<div class="person_left_col">
+		<table class="person_photo_frame">		
+			<tr>			
 				<td>
-					<% if event.isRange %>
-						<%= event.from%> - <%=event.to%>
-					<% else %>
-						<%= event.from%>
-					<% end %>
+				<% if @person.photo_url %>
+					<%= link_to(image_tag(@person.photo_url, :class=>"person_photo", :width=>200), "/images/"+@person.photo_url, :rel=>"lytebox") %>
+				<% else %>
+					<%= link_to(image_tag("/images/person.png", :class=>"person_photo", :width=>200), "/images/person.png", :rel=>"lytebox", :title=>"Add Photo") %>
+				<% end%>
 				</td>
-				<td><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>
-				<td><%= event.location%></td>
 			</tr>
-		<% end %>
-	</table>
-</fieldset>
+			<tr>
+				<td> <%= link_to "Visualize", {:controller=>"person", :action=>"visualize", :id=>@person.id}, :class=>"person_action" %></td>
+			</tr>
+			<tr>
+				<td> <%= link_to "Edit Info", {:controller=>"person", :action=>"edit_person", :id=>@person.id}, :class=>"person_action" %></td>
+			</tr>
+			<tr>
+				<td> <%= link_to "Edit Relationships", {:controller=>"person", :action=>"edit_relationships", :id=>@person.id}, :class=>"person_action" %></td>
+			</tr>
+		</table> 
+	</div>
+	<div class="person_right_col">
+		<div colspan="2" class="person_name"><%= @person.name%></div>
+		<div class="person_content_container">
+			<div class="underlined">
+				<div id="person_menu">
+					<a id="info_menu" class="small_menu_box small_title selected" onclick="select_menu(this, 'info_box')" href="#">Info</a>
+					<a id="events_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'events_box')" href="#">Events</a> 	
+				</div>
+			</div>
+			<div id="info_box">
+				<div id="info"></div>
+			</div>
+			<div id="events_box">
+				<div id="events"></div>
+			</div>			
+		</div>
+	</div>
+</div>	
+
+
+

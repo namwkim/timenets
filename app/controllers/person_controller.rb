@@ -94,9 +94,14 @@ class PersonController < ApplicationController
     @person = Person.find_by_id(params[:id])
     @person.destroy_marriages
     Person.delete_file(@person.photo_url)    
-    Person.destroy(@person)
+    @person.destroy
     log "deleted", @person, @person.project
-    render :nothing=>true
+    respond_to do |format|
+      format.html {render :nothing=>true}
+      format.js {render :nothing=>true}
+      format.amf {render :amf=>"Success"}      
+    end
+    
   end
   ############################## Relationship ##############################
   def new_relationship
@@ -164,30 +169,53 @@ class PersonController < ApplicationController
     @person = Person.find_by_id(params[:id])
     @ref_person = Person.find_by_id(params[:ref_id])
     case params[:role]
-      when "Father"
+      when "Father" #remove father and a marriage record with mother
         @ref_person.father = nil
-      when "Mother"
         @ref_person.mother = nil
-      when "Spouse"        
-        @ref_person.spouses.delete(@person)
-        @person.spouses.delete(@ref_person)
+      when "Mother" #remove mother and a marriage record with mother
+        @ref_person.mother = nil
+        @ref_person.father = nil
+      when "Spouse" 
+        #remove parent-child link
+        @children = @ref_person.children_with @person
+        @children.each do |child|
+          child.father = nil if child.father!=nil and child.father.id == @person.id
+          child.mother = nil if child.mother!=nil and child.mother.id == @person.id
+        end
+        @marriages = @ref_person.marriage_with @person.id
+        @marriages.each do |marriage|
+          marriage.destroy  
+        end        
       when "Child"
-        case @ref_person.sex  #TODO: what if sex is nil
-          when "Male"
-            @person.father = nil
-          else "Female"
-            @person.mother = nil
-        end    
+        @person.father = nil
+        @person.mother = nil   
     end
     @ref_person.save
     @person.save
-    render :nothing=>true
+    respond_to do |format|
+      format.html {render :nothing=>true}
+      format.js   {render :nothing=>true}
+      format.amf  {render :amf=>'Success'}
+    end
+    
   end
   def edit_marriage
-    
+
   end
   def update_marriage
-    
+    if is_amf
+      @marriage = Marriage.find_by_id(params[:marriage].id)
+      success   = @marriage.update_attr_from_amf params[:marriage]
+    else
+      @marriage = Marriage.find_by_id(params[:id])
+      success   = @marriage.update_attributes params[:marriage]
+    end    
+    if success
+      respond_to do |format|
+        format.html 
+        format.amf { render :amf=>"Success"}
+      end
+    end
   end
   def edit_relationships
     @person =  Person.find_by_id(params[:id])
@@ -266,7 +294,14 @@ class PersonController < ApplicationController
     end    
     render :partial=>"add_person_in_event", :locals=>{:person=>@person, :event=>@event}
   end
-
+  def info
+    @person = Person.find_by_id(params[:id])
+    render :partial=>"info", :locals=>{:person=>@person}
+  end
+  def person_events
+    @person = Person.find_by_id(params[:id])
+    render :partial=>"person_events", :locals=>{:person=>@person}
+  end
 private
   def change_data_type
     if params[:html_format]==nil or params[:html_format]!="true"

@@ -1,0 +1,7 @@
+	<div class="pagination_box">
+		<%= page_entries_info events %>
+		<%= will_paginate events,  :page_links=>false, :previous_label=>"<", :next_label=>">", :id=>"event_pagination"%>
+	</div>				
+	<% project.events.each do |event|%>
+		<%= render :partial=>"event/event", :locals=>{:event=>event}%>
+	<% end %>		

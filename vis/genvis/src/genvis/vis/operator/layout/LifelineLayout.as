@@ -433,7 +433,7 @@ package genvis.vis.operator.layout
 			
 			//descendant layout without overlaps with ancestors
 			// TODO: construct interval tree of ancestors (assuming that no ancestors whose depths are 
-			// greater than 2 intersect descendants
+			// greater than 3 intersect descendants
 			y = _root.block.bbox.height;					
 			var childBlock:BlockSprite;
 			for each (childBlock in _root.block.childBlocks){
@@ -447,18 +447,19 @@ package genvis.vis.operator.layout
 						_root.block.visit(function (ab:BlockSprite):void{
 							if (ab.type == BlockSprite.ANCESTOR){
 								if (ab.intersect(b)) {
-									ancestors.push(ab);
+									//ancestors.push(ab);									
+									if (b.ty < (ab.ty+ab.bbox.height)) b.ty = y = (ab.ty+ab.bbox.height);
 								}
 							}
 						},2);
-						//calculate aggregated height of those ancestors
-						if (ancestors.length !=0){
-							var newY:Number = b.ty;
-							for each (var ab:BlockSprite in ancestors){
-								if (newY < (ab.ty+ab.bbox.height)) newY = (ab.ty+ab.bbox.height);
-							}
-							b.ty = y = newY; //update new position
-						}
+//						//calculate aggregated height of those ancestors
+//						if (ancestors.length !=0){
+//							var newY:Number = b.ty;
+//							for each (var ab:BlockSprite in ancestors){
+//								if (newY < (ab.ty+ab.bbox.height)) newY = (ab.ty+ab.bbox.height);
+//							}
+//							b.ty = y = newY; //update new position
+//						}
 						y += b.bbox.height + 4;						
 					});
 				}

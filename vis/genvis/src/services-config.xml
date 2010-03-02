@@ -17,7 +17,7 @@
   <channels>
    <channel-definition id="rubyamf"     
      class="mx.messaging.channels.AMFChannel">
-    <endpoint uri="http://www.akinu.org/rubyamf_gateway"     
+    <endpoint uri="http://akinu.org/rubyamf_gateway"     
         class="flex.messaging.endpoints.AMFEndpoint"/>
    </channel-definition>
   </channels>

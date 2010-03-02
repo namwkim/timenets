@@ -2,6 +2,8 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
 		<mx:Script>
 		<![CDATA[
+			import org.akinu.helper.Role;
+			import mx.managers.PopUpManager;
 			import org.akinu.helper.Helper;
 			import org.akinu.events.AddRelationshipEvent;
 			import genvis.data.Marriage;
@@ -18,10 +20,12 @@
 			private var model:ModelLocator = ModelLocator.getInstance();
 			[Bindable]
 			private var role:String;
+			private var corrParent:Person;
 							
-			public function init(r:String):void{
-				role = r;
-				formHeader.label="Add "+role;				
+			public function init(role:String, corrParent:Person):void{
+				this.role = role;
+				this.corrParent = corrParent;
+				formHeader.label=role == Role.SPOUSE? "Add Marriage" : "Add "+role;									
 				clearForm();
 				switch (role){
 					case "Father":
@@ -33,9 +37,6 @@
 					case "Spouse":
 						sex.selectedIndex = model.selectedPerson.sex == Person.MALE? 2 : 1;  sex.enabled = false;
 						break;
-					default:
-						sex.selectedIndex  = 0; sex.enabled = true;						
-						break;
 				}
 			}				
 			
@@ -46,20 +47,22 @@
 					return false;
 				}
 				var dodValid:ValidationResultEvent = dodYearValidator.validate();
-				if ( dodValid.type == ValidationResultEvent.INVALID){
+				if ( dodValid.type == ValidationResultEvent.INVALID &&  deceased.selected){
 					Alert.show("Death year should be a number!");
 					return false;
 				}
-				var marValid:ValidationResultEvent = marYearValidator.validate();
-				if (marValid.type == ValidationResultEvent.INVALID) {
-					Alert.show("Marriage year should be a number!");
-					return false;
+				if (role==Role.SPOUSE){
+					var marValid:ValidationResultEvent = marYearValidator.validate();
+					if (marValid.type == ValidationResultEvent.INVALID) {
+						Alert.show("Marriage year should be a number!");
+						return false;
+					}
+					var divValid:ValidationResultEvent = divYearValidator.validate();
+					if ( divValid.type == ValidationResultEvent.INVALID && divorced.selected){
+						Alert.show("Divorce year should be a number!");
+						return false;
+					}				
 				}
-				var divValid:ValidationResultEvent = divYearValidator.validate();
-				if ( divValid.type == ValidationResultEvent.INVALID){
-					Alert.show("Divorce year should be a number!");
-					return false;
-				}				
 				return true;					
 			}
 
@@ -68,18 +71,19 @@
 				//initialize person
 				firstName.text=lastName.text="";
 				sex.selectedIndex = 0;
+				sex.enabled = true;
 				dobMonth.selectedIndex = dobDay.selectedIndex = dodMonth.selectedIndex = dodDay.selectedIndex = 0;
-				dobYear.text = dodYear.text = "";
+				dobYear.text = dodYear.text = "Year";
 				deceased.selected = false;
 				
 				marMonth.selectedIndex = marDay.selectedIndex = divMonth.selectedIndex = divDay.selectedIndex = 0;
-				marYear.text = divYear.text = "";
+				marYear.text = divYear.text = "Year";
 				divorced.selected = false;
 			}
 
 			private function submitRelForm():void{
 				if (validateForm()){
-					var person:Person = model.selectedPerson;
+					var person:Person = model.selectedPerson;					
 					//populate person
 					var newPerson:Person = new Person();
 					newPerson.firstName = firstName.text;
@@ -89,14 +93,25 @@
 					newPerson.deceased	= deceased.selected;
 					if (newPerson.deceased)
 						newPerson.dateOfDeath = Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
-					//populate marriage
+						
+					//create missing links
 					var newMarriage:Marriage = null;
 					if (role=="Father" || role=="Mother"){
 						person.addParent(newPerson);
 						newPerson.addChild(person);
+						
+//						//construct missing marriage
+//						if (person.parents.length == 2){
+//							var marriage:Marriage = new Marriage(model.selectedPerson.father, model.selectedPerson.mother)
+//							model.selectedPerson.father.addMarriage(marriage);
+//							model.selectedPerson.mother.addMarriage(marriage);
+//						}
 					}else if (role=="Child"){
 						newPerson.addParent(person);
 						person.addChild(newPerson);
+						newPerson.addParent(corrParent);
+						corrParent.addChild(newPerson);
+						
 					}else if (role=="Spouse"){
 						newMarriage = new Marriage(model.selectedPerson, newPerson);
 						model.selectedPerson.addMarriage(newMarriage);
@@ -115,6 +130,7 @@
 			private function cancelRelForm():void{
 				//detach this from the parent
 				this.parent.removeChild(this);
+				//PopUpManager.removePopUp(this);
 			}
 		]]>
 		</mx:Script>

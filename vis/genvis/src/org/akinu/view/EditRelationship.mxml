@@ -1,61 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" styleName="padding5">
 	<mx:Script>
 		<![CDATA[
+			import org.akinu.events.UpdatePersonEvent;
+			import org.akinu.events.RemoveRelationshipEvent;
+			import mx.events.CloseEvent;
+			import genvis.data.Marriage;
+			import org.akinu.helper.Role;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
 			import mx.controls.Button;
 			import mx.controls.Label;
 			import genvis.data.Person;	
 			import org.akinu.model.ModelLocator;		
 			[Bindable]
 			private var model:ModelLocator = ModelLocator.getInstance();
-			private var relForm:NewRelationshipForm = new NewRelationshipForm();	
+			private var relForm:NewRelationshipForm = new NewRelationshipForm();
+			private var marForm:EditMarriage 		= new EditMarriage();
+			private var removePopup:RemovePerson 	= new RemovePerson();	
 			public function init():void{
 				if (this.initialized==false) return;
 			}							
-			private function newRelationship(role:String):void{							
-				this.addChild(relForm);
-				relForm.init(role);								
+			private function newRelationship(role:String, indices:Array=null, repeaters:Array=null):void{	
+//				PopUpManager.addPopUp(relForm, this.parent, true);
+//				PopUpManager.centerPopUp(relForm);
+				var corrParent:Person;
+				switch(role){
+					case "Father":
+						father.addChild(relForm);
+						break;
+					case "Mother":
+						mother.addChild(relForm);
+						break;
+					case "Spouse":
+						spouse.addChild(relForm);
+						break;
+					case "Child":
+						child[indices[indices.length-1]].addChild(relForm);
+						corrParent = repeaters[indices.length-1].dataProvider[indices.length-1];
+						break;
+					
+				}						
+				relForm.init(role, corrParent);								
 			}
-				
-	
+			private function remove(person:Person, role:String):void{
+//				if (person.id != model.root.id) {
+//					removePopup.person 		= person;
+//					removePopup.refPerson	= model.selectedPerson;
+//					removePopup.role		= role;
+//					PopUpManager.addPopUp(removePopup, this, true);
+//					PopUpManager.centerPopUp(removePopup);
+//				}else{
+//					Alert.show("You cannot remove the root. Please change it beforehand.");
+//				}
+				if (person!=null && person.saved==false){
+					Alert.show("The relationship that you are about to remove is not saved yet. You can only remove a saved relationship.", "Advice", 4, this);
+					return;
+				}
+				var msg:String;
+				switch (role){
+					case Role.SPOUSE:
+					break;
+					case Role.CHILD:
+					break;
+					default:
+					
+				}
+				Alert.show("This will only remove the relationship, not the actuall record. Are you sure you want proceed?",
+					"Remove Relationship", Alert.YES|Alert.NO, this, function removeHandler(evt:CloseEvent):void{
+					if (evt.detail == Alert.YES){
+						var refPerson:Person = model.selectedPerson;
+						var newParent:Person, father:Person, mother:Person;
+						var marriage:Marriage;									
+						var update:UpdatePersonEvent;
+						var children:Array;	
+						switch (role){
+							case Role.PARENT:
+							//remove parent-child link 
+							father	 = refPerson.father;
+							mother	 = refPerson.mother;
+							children = father.childrenWith(mother);
+							father.removeChild(refPerson);
+							mother.removeChild(refPerson);
+							refPerson.removeParent(father);
+							refPerson.removeParent(mother);
+							if (children.length == 1){
+								if (father.saved == false || mother.saved == false){
+									father.removeMarriages(mother);
+									mother.removeMarriages(father);
+								}								
+							}
+//							refPerson.removeParent(person);
+//							person.removeChild(refPerson);
+//							if (refPerson.parents.length>0){
+//								refPerson.removeParent(refPerson.parents[0]);
+//								refPerson.parents[0].removeChild(refPerson);
+//							}
+							//create a dummy parent  if necessary
+//							if (refPerson.parents.length>0){
+//								if (refPerson.parents[0].saved){						
+//									newParent = refPerson.parents[0].copy();
+//									//add parent-child link
+//									newParent.addChild(refPerson);
+//									refPerson.addParent(newParent);
+//									//add marriage link
+//									marriage	= new Marriage(refPerson.parents[0], newParent);
+//									marriage.saved			= false;
+//									newParent.addMarriage(marriage);
+//									refPerson.parents[0].addMarriage(marriage);										
+//								}else{
+//									refPerson.removeParent(refPerson.parents[0]);
+//									refPerson.parents[0].removeChild(refPerson);
+//								}
+//							}
+							update = new UpdatePersonEvent(refPerson);
+							update.dispatch();
+							break;
+							case Role.SPOUSE:
+							//remove parent-child link
+							children = person.childrenWith(refPerson);
+							for each (var child:Person in children){
+								person.removeChild(child);
+								child.removeParent(person);
+							}
+							//remove marriage link
+							refPerson.removeMarriages(person);
+							person.removeMarriages(refPerson);
+							//create unsaved spouse if there exist at least child belongs to the marriage
+							//create a dummy parent
+							if (children.length > 0){
+								var spouse:Person = refPerson.copy();
+								//add parent-child link
+								for each (child in children){
+									spouse.addChild(child);
+									child.addParent(spouse);
+								}
+								//add marriage link
+								marriage		= new Marriage(refPerson, spouse);
+								marriage.saved	= false;
+								spouse.addMarriage(marriage);
+								refPerson.addMarriage(marriage);	
+							}	
+							var rmRelEvent:RemoveRelationshipEvent = new RemoveRelationshipEvent(person.id, refPerson.id, Role.SPOUSE);
+							rmRelEvent.dispatch();										
+							break;
+							case Role.CHILD:
+							//remove parent-child link 							
+							father	 = person.father;
+							mother	 = person.mother
+							children = father.childrenWith(mother);
+							father.removeChild(person);
+							mother.removeChild(person);
+							person.removeParent(father);
+							person.removeParent(mother);
+							
+							//if this is only child and, one of parent is unsaved person, remove the parent
+							if (children.length == 1){
+								if (father.saved == false || mother.saved == false){
+									father.removeMarriages(mother);
+									mother.removeMarriages(father);
+								}
+							}
+//							//create a dummy parent
+//							newParent = person.parents[0].copy();
+//							//add parent-child link
+//							newParent.addChild(person);
+//							person.addParent(newParent);
+//							//add marriage link
+//							marriage		= new Marriage(person.parents[0], newParent);
+//							marriage.saved	= false;
+//							newParent.addMarriage(marriage);
+//							person.parents[0].addMarriage(marriage);		
+							update = new UpdatePersonEvent(person);
+							update.dispatch();						
+							break;
+						}						
+					}				
+				});
+			}
+			private function editMarriage(marriage:Marriage, indices:Array):void{
+				marForm.init(marriage);				
+				editMarForm[indices[0]].addChild(marForm);
+			}
+			
+
 		]]>
-		</mx:Script>
-	<mx:HBox>
-		<mx:Spacer width="5"/>
-		<mx:VBox>
-			<mx:Spacer height="5"/>
-			<mx:HBox id="fatherContainer">
-				<mx:Label text="Father:" width="55"/> 
-				<mx:Button id="fBtn" label="Add Father" visible="{model.selectedPerson.father==null}" includeInLayout="{fBtn.visible}" click="newRelationship('Father')"/>
-				<mx:Label text="{fBtn.visible==false? model.selectedPerson.father.name : ''}" visible="{!fBtn.visible}" includeInLayout="{!fBtn.includeInLayout}"/>
-			</mx:HBox>
-			<mx:HBox id="motherContainer">
-				<mx:Label text="Mother:" width="55"/> 
-				<mx:Button id="mBtn" label="Add Mother" visible="{model.selectedPerson.mother==null}" includeInLayout="{mBtn.visible}" click="newRelationship('Mother')"/>
-				<mx:Label text="{mBtn.visible==false? model.selectedPerson.mother.name : ''}" visible="{!mBtn.visible}" includeInLayout="{!mBtn.includeInLayout}"/>
-			</mx:HBox>
-			<mx:HBox>
-				<mx:HBox>
-					<mx:Label text="{model.selectedPerson.spouses.length>1? 'Spouses:':'Spouse:'}" width="55"/>			
-				</mx:HBox>
-				<mx:VBox>
-					<mx:Button label="Add Spouse" click="newRelationship('Spouse')"/>
-					<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
-						<mx:Label text="{spouseRepeater.currentItem.name}"/>				
-					</mx:Repeater>	
-				</mx:VBox>	
-			</mx:HBox>
-			<mx:HBox>
-				<mx:HBox>
-					<mx:Label text="{model.selectedPerson.children.length>1? 'Children:':'Child:'}" width="55"/> 
-				</mx:HBox>		
-				<mx:VBox>
-					<mx:Button label="Add Child" click="newRelationship('Child')"/>
-					<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.children}">
-						<mx:Label text="{childRepeater.currentItem.name}"/>
-					</mx:Repeater>		
-				</mx:VBox>
-			</mx:HBox>			
-		</mx:VBox>	
-	</mx:HBox>
+	</mx:Script>
+		<mx:HBox width="100%">
+			<mx:Label text="Parents"  styleName="emp"/> <mx:Button label="Remove Parents" click="remove(null, Role.PARENT)" visible="{model.selectedPerson.father!=null}" includeInLayout="{model.selectedPerson.father!=null}"/>
+		</mx:HBox>	  	
+		<mx:Grid styleName="contentBox" width="100%">
+			<mx:GridRow>
+				<mx:GridItem>
+					<mx:Label text="Father"/>
+				</mx:GridItem>
+				<mx:GridItem>
+					<mx:Button id="fBtn" label="Add" visible="{model.selectedPerson.father==null}" includeInLayout="{model.selectedPerson.father==null}" click="newRelationship(Role.FATHER)"/>
+					<mx:Label text="{model.selectedPerson.father? model.selectedPerson.father.name : ''}" visible="{model.selectedPerson.father!=null}" includeInLayout="{model.selectedPerson.father!=null}"/>												
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow><mx:GridItem id="father" colSpan="2"/></mx:GridRow>
+			<mx:GridRow>
+				<mx:GridItem>
+					<mx:Label text="Mother"/>
+				</mx:GridItem>
+				<mx:GridItem>
+					<mx:Button id="mBtn" label="Add" visible="{model.selectedPerson.mother==null}" includeInLayout="{model.selectedPerson.mother==null}" click="newRelationship(Role.MOTHER)"/>
+					<mx:Label text="{model.selectedPerson.mother? model.selectedPerson.mother.name : ''}" visible="{model.selectedPerson.mother!=null}" includeInLayout="{model.selectedPerson.mother!=null}" />										
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow><mx:GridItem id="mother" colSpan="2"/></mx:GridRow>
+		</mx:Grid>
+		<mx:HRule strokeColor="0xdddddd" shadowColor="0xdddddd" strokeWidth="2" width="100%"/>
+		<mx:HBox>
+			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Marriages':'Marriage'}" styleName="emp"/>
+			<mx:Button label="Add" click="newRelationship(Role.SPOUSE)"/>	
+		</mx:HBox>
+		<mx:Box id="spouse"/>
+		<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
+			<mx:Grid styleName="contentBox"  width="100%">
+				<mx:GridRow>	
+					<mx:GridItem>
+						<mx:Label text="With"/><mx:Label text="{spouseRepeater.currentItem.name}"/>
+					</mx:GridItem>	
+					<mx:GridItem>
+						<mx:VBox>
+							<mx:Repeater id="marriageRepeater" dataProvider="{model.selectedPerson.marriageWith(spouseRepeater.currentItem as Person)}">
+								<mx:HBox>
+									<mx:Label text="{(marriageRepeater.currentItem as Marriage).startDate.getFullYear()}"/><mx:Label text="-"/>
+									<mx:Label text="{marriageRepeater.currentItem.divorced? ((marriageRepeater.currentItem as Marriage).endDate as Date).getFullYear():''}"/>
+									<mx:Button label="Edit" click="editMarriage(event.currentTarget.getRepeaterItem() as Marriage, event.target.instanceIndices)"/>
+								</mx:HBox>									
+							</mx:Repeater>								
+						</mx:VBox>										
+					</mx:GridItem>	
+					<mx:GridItem>
+						<mx:Button label="Remove" click="remove(event.currentTarget.getRepeaterItem() as Person, Role.SPOUSE)"/>						
+					</mx:GridItem>															
+				</mx:GridRow>
+				<mx:GridRow><mx:GridItem id="editMarForm" colSpan="3"/></mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem colSpan="3">
+						<mx:Label text="Children"/><mx:Button label="Add" click="newRelationship(Role.CHILD, event.target.instanceIndices, event.target.repeaters)"/>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow><mx:GridItem id="child" colSpan="3"/></mx:GridRow>
+				<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.childrenWith(spouseRepeater.currentItem as Person)}">
+					<mx:GridRow>
+						<mx:GridItem><mx:Label text="{childRepeater.currentItem.name}"/></mx:GridItem>
+						<mx:GridItem colSpan="2"><mx:Button label="Remove" click="remove(event.currentTarget.getRepeaterItem() as Person, Role.CHILD)"/></mx:GridItem>								
+					</mx:GridRow>		
+				</mx:Repeater>							
+			</mx:Grid>						
+		</mx:Repeater>	
 </mx:VBox>

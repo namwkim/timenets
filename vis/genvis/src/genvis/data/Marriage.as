@@ -10,19 +10,19 @@ package genvis.data
 		private var _endDate:Date;
 		private var _person1:Person;
 		private var _person2:Person;
-		private var _divorced:Boolean =true;
+		private var _divorced:Boolean;
 		
 		private var _estimated:int;
 		private var _isStartUncertain:Boolean;
 		private var _isEndUncertain:Boolean;
-		private var _saved:Boolean;
+		private var _saved:Boolean = true;
 		
 		public static const NONE:int		= 0;
 		public static const STARTDATE:int	= 1;
 		public static const ENDDATE:int		= 2;
 		
 		public function set id(id:String):void { _id = id; }
-		public function get id():String { return _id; }
+		public function get id():String { return _id; }		
 		
 		public function set startDate(sDate:Date):void { 
 			_startDate = sDate; 

@@ -41,6 +41,7 @@ package genvis
 	import mx.controls.ComboBox;
 	import mx.controls.HSlider;
 	import mx.controls.Label;
+	import mx.controls.Menu;
 	import mx.controls.TextArea;
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
@@ -93,7 +94,7 @@ package genvis
 		private static const LABLER:String		= "labler";
 		private static const OPS:Array			= [ENCODER, FILTER, LAYOUT, LABLER];
 				
-		private var _labelStyle:int = Lifeline.LABELOUTSIDE;
+		private var _labelStyle:int = Lifeline.LABELINSIDE;
 		private var _layoutMode:int	= AUTOMATIC;
 		private var _layoutType:int = LifelineLayout.HOURGLASSCHART;
 		private var _lifelineType:int				= Lifeline.LINESPLINE;
@@ -633,40 +634,46 @@ package genvis
 				});
 			_vis.controls.add(_hoverCtrl);
 			//2. toolTip Control
-			_toolTip = new TooltipControl (NodeSprite, null,
-        			function( evt:TooltipEvent ):void
-        			{        				
-						var person:Person = evt.node.data as Person;
-						var birthYear:Number = person.dateOfBirth.fullYear
-						var deathYear:Number = person.dateOfDeath != null? person.dateOfDeath.fullYear : (new Date()).fullYear;
-						var toolTip:String = "<b>"+person.name+"<br>"+person.gender+"<br>"+birthYear+"-"+deathYear;
-						for (var i:int=0; i<person.marriages.length; i++){
-							var marriage:Marriage = person.marriages[i];
-							toolTip	+= "<br>marriage#"+(i+1)+
-								": "+ marriage.startDate.fullYear+"-"+
-								(marriage.divorced? marriage.endDate.fullYear : "");
-						}
-						toolTip += "</b>";
-						//father and mother
-						if (person.father) toolTip += "<br>father:" + person.father.name + "<br>";
-						if (person.mother) toolTip += "mother:" + person.mother.name;
-						TextSprite( evt.tooltip ).htmlText = toolTip;
-    	    		});
-			_vis.controls.add(_toolTip);			
-			_vis.controls.add(new ClickControl(NodeSprite, 1,
+//			_toolTip = new TooltipControl (NodeSprite, null,
+//        			function( evt:TooltipEvent ):void
+//        			{        				
+//						var person:Person = evt.node.data as Person;
+//						var birthYear:Number = person.dateOfBirth.fullYear
+//						var deathYear:Number = person.dateOfDeath != null? person.dateOfDeath.fullYear : (new Date()).fullYear;
+//						var toolTip:String = "<b>"+person.name+"<br>"+person.gender+"<br>"+birthYear+"-"+deathYear;
+//						for (var i:int=0; i<person.marriages.length; i++){
+//							var marriage:Marriage = person.marriages[i];
+//							toolTip	+= "<br>marriage#"+(i+1)+
+//								": "+ marriage.startDate.fullYear+"-"+
+//								(marriage.divorced? marriage.endDate.fullYear : "");
+//						}
+//						toolTip += "</b>";
+//						//father and mother
+//						if (person.father) toolTip += "<br>father:" + person.father.name + "<br>";
+//						if (person.mother) toolTip += "mother:" + person.mother.name;
+//						TextSprite( evt.tooltip ).htmlText = toolTip;
+//    	    		});
+//			_vis.controls.add(_toolTip);			
+			_vis.controls.add(new ClickControl(null, 1,
 				// set search query to the occupation name
 				function(e:SelectionEvent):void {
-					if (_selectedNode){
-						_selectedNode.selected = false;
+					if (e.object is NodeSprite){
+						if (_selectedNode){
+							_selectedNode.selected = false;
+						}
+						
+						_selectedNode = e.node;
+						_selectedNode.selected = true;
+						
+						//Dispatch Selection Event
+						var selectPerson:SelectEvent = new SelectEvent(SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
+						selectPerson.dispatch();
+						
+					}else{
+						if (_selectedNode){
+							_selectedNode.selected = false;
+						}						
 					}
-					
-					_selectedNode = e.node;
-					_selectedNode.selected = true;
-					
-					//Dispatch Selection Event
-					var selectPerson:SelectEvent = new SelectEvent(SelectEvent.PERSON, _selectedNode.data as Person);
-					selectPerson.dispatch();
-					
 //					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
 //						|| _doiEnabled==false) return;
 //					if (e.node.type != NodeSprite.ROOT){

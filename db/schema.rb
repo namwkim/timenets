@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100204140003) do
+ActiveRecord::Schema.define(:version => 20100303044343) do
 
   create_table "activities", :force => true do |t|
     t.integer  "user_id"
@@ -54,6 +54,16 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
   create_table "events_people", :id => false, :force => true do |t|
     t.integer "person_id"
     t.integer "event_id"
+  end
+
+  create_table "invitations", :force => true do |t|
+    t.integer "sender_id"
+    t.integer "project_id"
+    t.string  "recipient_email"
+    t.string  "token"
+    t.string  "message"
+    t.boolean "accepted",        :default => false
+    t.date    "sent_at"
   end
 
   create_table "managed_projects", :force => true do |t|
@@ -116,6 +126,7 @@ ActiveRecord::Schema.define(:version => 20100204140003) do
   create_table "users", :force => true do |t|
     t.integer  "person_id"
     t.integer  "project_id"
+    t.integer  "invitation_id"
     t.string   "email"
     t.string   "hashed_password"
     t.string   "salt"

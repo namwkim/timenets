@@ -2,7 +2,6 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  session :session_key=>"_akinu_session_id"
   #before_filter :authenticate, :except => [:login, :intro, :signup, :root, :create_relationship, :update_person] 
   before_filter :authorize
   helper :all # include all helpers, all the time

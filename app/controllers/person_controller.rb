@@ -68,7 +68,7 @@ class PersonController < ApplicationController
     if success
       log "edited", @person, @project
       respond_to do |format|
-        format.html {redirect_to(:action=>"index")}
+        format.html {redirect_to(:action=>"show_person", :id=>@person.id)}
         format.js { 
           responds_to_parent do 
             render :partial=>"update_person", :locals=>{:person=>@person}

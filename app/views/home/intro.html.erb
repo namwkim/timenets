@@ -7,6 +7,12 @@
 <%= stylesheet_link_tag 'akinu' %>
 <%= javascript_include_tag 'prototype' %>
 <% javascript_tag do%>
+document.observe("dom:loaded", function() {
+	if ('<%=@email%>'!=""){	
+		$('user_email').value = '<%=@email%>';	
+		$('invite').innerHTML = 'You are invited by '+'<%=@invitation.sender.person.name if @invitation!=nil %>' +'. Please login or sign up to collaborate with him on '+ '<%=@invitation.project.name if @invitation!=nil%>'+'!';
+	}
+});
 function initiate_login_field(obj){
 	if (obj.value == "password"){
 		obj.value = "";
@@ -39,6 +45,7 @@ function submit_signup_form(){
 <div class="ftop">
         <div class="fheader">
         	<% form_tag({:controller=>"home", :action=>"login"}, :id => "login_form") do -%>
+			<%= hidden_field_tag :login_invitation_token, @invitation_token%>
             <div class="login">
             	<div class="flash"><%=flash[:notice]%></div>
             	<div><%= text_field_tag 'email', 'email', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %>
@@ -51,9 +58,11 @@ function submit_signup_form(){
         </div>
 </div>
 <div class="fmain">
+	<div id="invite" class="small_title"></div>
 	<div class="signup">
    	  <strong style="font-size:16px">Sign Up:</strong>
-	  <% form_tag({:controller=>"home", :action=>"signup"}, :id=> "signup_form") do -%>	  	
+	  <% form_tag({:controller=>"home", :action=>"signup"}, :id=> "signup_form") do -%>
+	  	<%= hidden_field_tag :signup_invitation_token, @invitation_token%>	  	
         <table> 
         <tr>
             <td>First Name:</td><td><%= text_field 'person', 'first_name', :size=>"30" , :class=>"inputtext"%></td>
@@ -80,7 +89,7 @@ function submit_signup_form(){
 		<% end %>
     </div>
     <div class="intro">Share Your Family Stories... 
-    <img src="images/introvis.png" width="520" style="margin-top:30px;"/></div>
+    <%=image_tag "introvis.png", :width=>520, :style=>"margin-top:30px"%></div>
 </div>
 
 <div class="fbottom"><div class="fPageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div></div>

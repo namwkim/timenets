@@ -50,11 +50,11 @@ function load_list(){
 				<td> <%= link_to "Visualize", {:controller=>"person", :action=>"visualize", :id=>@person.id}, :class=>"person_action" %></td>
 			</tr>
 			<tr>
-				<td> <%= link_to "Edit Info", {:controller=>"person", :action=>"edit_person", :id=>@person.id}, :class=>"person_action" %></td>
+				<td> <%= link_to "Edit Person", {:controller=>"person", :action=>"edit_person", :id=>@person.id}, :class=>"person_action" %></td>
 			</tr>
-			<tr>
+			<!--<tr>
 				<td> <%= link_to "Edit Relationships", {:controller=>"person", :action=>"edit_relationships", :id=>@person.id}, :class=>"person_action" %></td>
-			</tr>
+			</tr>-->
 		</table> 
 	</div>
 	<div class="person_right_col">

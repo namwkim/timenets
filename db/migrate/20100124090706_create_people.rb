@@ -24,10 +24,7 @@ class CreatePeople < ActiveRecord::Migration
       t.boolean :is_start_uncertain
       t.boolean :is_end_uncertain
     end
-    create_table  :events_people, :id=>false do |t|
-      t.integer :person_id
-      t.integer :event_id
-    end
+
 #    profile = Profile.create(:first_name => "Nam Wook",
 #                  :last_name => "Kim",
 #                  :sex => "Male",

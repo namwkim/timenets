@@ -1,7 +1,0 @@
-<div class="pagination_box">
-	<%= page_entries_info people %>
-	<%= will_paginate people,  :page_links=>false, :previous_label=>"<", :next_label=>">", :id=>"person_pagination"%>
-</div>
-<% people.each do |person|%>
-	<%= render :partial=>"person/person", :locals=>{:person=>person}%>
-<% end %>

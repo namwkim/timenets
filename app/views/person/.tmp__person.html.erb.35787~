@@ -1,0 +1,16 @@
+<table id="<%=dom_id(person)%>"  width="100%"><tr class="record_row">
+	<td>
+		<% if person.photo_url %>
+			<%= link_to(image_tag(person.photo_url, :class=>"thumbnail_photo", :size=>"50x50"), :controller=>"person", :action=>"show_person", :id=>person.id) %>
+		<% else %>
+			<%= link_to(image_tag("/images/person.png", :class=>"thumbnail_photo", :size=>"50x50"), :controller=>"person", :action=>"show_person", :id=>person.id) %>
+		<% end%>
+	</td>
+	<td width="200px" ><%= link_to person.name, :controller=>"person", :action=>"show_person", :id=>person.id%></td>
+	<td width="50px"><%=person.sex%></td>
+	<td width="90px"><%=person.date_of_birth%></td>
+	<td width="60px"><%=button_to "Visualize", {:controller=>"person", :action=>"visualize", :id=>person.id},{:class=>"ui_small_button"}%></td>
+	<td width="40px"><%= button_to_remote_lightbox "Edit", {:url=>{:controller=>"person", :action=>"edit_person", :id=>person.id}}, {:class=>"ui_small_button"} %></td>
+	<td width="60px"><%=button_to_remote("Remove", { :url=>{:controller=>"person", :action=>"delete_person", :id=>person.id},  :confirm=>"do you really want to delete this person?", :complete=>"$('#{dom_id(person)}').remove(); new Ajax.Request('/project/people/#{person.project.id}',{onLoading:function(){$('people').update(new Element('img', { src:'/images/roller.gif'}))}});"}, {:class=>"ui_small_button"})%></td>
+</tr>
+</table>

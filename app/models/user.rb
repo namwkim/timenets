@@ -7,6 +7,8 @@ class User < ActiveRecord::Base
   has_many :messages, :dependent=>:destroy
   has_many :activities, :dependent=>:destroy
   has_many :revisions #revision more strongly belongs to a project..
+  has_many :sent_invitations, :class_name => 'Invitation', :foreign_key => 'sender_id'
+  belongs_to :invitation
   
   #many to many through
   has_many :managed_projects, :dependent=>:destroy
@@ -20,10 +22,18 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email
   validates_confirmation_of :password 
   validate  :password_non_blank
-  
-  attr_accessor :password_confirmation
-  
 
+  
+  attr_accessor :password_confirmation, :invitation_token
+  
+  def invitation_token
+    invitation.token if invitation
+  end
+  
+  def invitation_token=(token)
+    self.invitation = Invitation.find_by_token(token)
+  end
+  
   def password
     @password
   end
@@ -43,7 +53,7 @@ class User < ActiveRecord::Base
     end
     user
   end
-  
+
 private
   def password_non_blank
     errors.add(:password, "Missing password") if hashed_password.blank?

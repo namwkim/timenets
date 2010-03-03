@@ -154,6 +154,7 @@ fieldset fieldset legend{
 .submenu{
 	margin-top:15px;
 	float:right;
+	font-weight:bold;
 }
 .submenuitem{
 	margin-right:5px;
@@ -329,6 +330,9 @@ fieldset fieldset legend{
 .overflow{
 	overflow:auto;
 }
+.invite{
+	margin:5px 5px 5px 218px;
+}
 /****************** person ********************/
 .person_box{
 	width:80%;
@@ -361,6 +365,7 @@ fieldset fieldset legend{
 	color:#dddddd;
 	font-weight:bold;
 	font-size:24px;
+
 }
 
 .person_content_container{

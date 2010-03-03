@@ -3,6 +3,7 @@ class CreateUsers < ActiveRecord::Migration
     create_table :users do |t|
       t.integer :person_id
       t.integer :project_id
+      t.integer :invitation_id
       t.string  :email
       t.string  :hashed_password
       t.string  :salt

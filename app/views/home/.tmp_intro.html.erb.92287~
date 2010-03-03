@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Akinu</title>
+<link rel="shortcut icon" href="/images/favicon.png">
+<%= stylesheet_link_tag 'akinu' %>
+<%= javascript_include_tag 'prototype' %>
+<% javascript_tag do%>
+function initiate_login_field(obj){
+	if (obj.value == "password"){
+		obj.value = "";
+		obj.type = "password";
+	}else if (obj.value == "email"){
+		obj.value = "";
+	}
+}
+function submit_signup_form(){
+
+	//email 
+	if ($('user_email').value.match(/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/) == null){
+		$('signup_error').innerHTML = "Please enter a valid email address.";
+	}else if ($('person_first_name').value == "" || $('person_last_name').value == "" || $('user_email').value == "" || $('user_password').value == "" ||
+		$('person_sex').options[$('person_sex').selectedIndex].value == "-1" ||
+		$('person_date_of_birth_1i').options[$('person_date_of_birth_1i').selectedIndex].value == "" ||
+		$('person_date_of_birth_2i').options[$('person_date_of_birth_2i').selectedIndex].value == "" ||
+		$('person_date_of_birth_3i').options[$('person_date_of_birth_3i').selectedIndex].value == ""){
+		$('signup_error').innerHTML = "You must fill in all of the fields.";
+	}else{
+		$('signup_form').submit();
+	}
+	
+}
+<% end %>
+</head>
+
+<body>
+
+<div class="ftop">
+        <div class="fheader">
+        	<% form_tag({:controller=>"home", :action=>"login"}, :id => "login_form") do -%>
+			<%= hidden_field_tag :invitation_token, @invitation_token%>
+            <div class="login">
+            	<div class="flash"><%=flash[:notice]%></div>
+            	<div><%= text_field_tag 'email', 'email', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %>
+                <%= text_field_tag 'password', 'password', :class=>"inputtext", :size=>"20", :onfocus=>"initiate_login_field(this);" %>
+               	<%= submit_tag "Login", :class=>"ui_small_button"%>
+                </div>
+            </div>    
+			<% end %>
+            <%=image_tag "/images/title.png", :width=>150, :class=>"ftitle"%><!--<div class="ftitle">Akinu</div>-->
+        </div>
+</div>
+<div class="fmain">
+	<div class="signup">
+   	  <strong style="font-size:16px">Sign Up:</strong>
+	  <% form_tag({:controller=>"home", :action=>"signup"}, :id=> "signup_form") do -%>	  	
+        <table> 
+        <tr>
+            <td>First Name:</td><td><%= text_field 'person', 'first_name', :size=>"30" , :class=>"inputtext"%></td>
+        </tr>
+        <tr>
+            <td>Last Name:</td><td><%= text_field 'person', 'last_name', :size=>"30" , :class=>"inputtext"%></td>
+        </tr>
+        <tr>
+            <td>Your Email:</td><td><%= text_field 'user', 'email', :size=>"30" , :class=>"inputtext" %></td>
+        </tr>
+        <tr>
+            <td>Password:</td><td><%= password_field 'user', 'password', :size=>"30" , :class=>"inputtext"%></td>
+        </tr>
+        <tr>
+            <td>Sex:</td><td><%= select 'person', "sex", "<option value ='-1'>Select Sex:</option><option value='Female'>Female</option><option value='Male'>Male</option>" %></td>
+        </tr>
+        <tr>
+            <td>Birth Date:</td>
+            <td><%=date_select 'person', 'date_of_birth', :start_year =>Time.now.year, :end_year=>1900, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+        </tr>    
+		<tr><td colspan="2" align="center"><span id="signup_error" class="flash"><%= error_messages_for 'user', 'person', :header_message=>nil, :message=>nil %></span></td></tr>
+        <tr><td></td><td><%= submit_tag "SignUp", :class=>"ui_small_button"%></td></tr>            
+        </table>        
+		<% end %>
+    </div>
+    <div class="intro">Share Your Family Stories... 
+    <img src="images/introvis.png" width="520" style="margin-top:30px;"/></div>
+</div>
+
+<div class="fbottom"><div class="fPageFooter">Copyright 2010 <a href='http://vis.stanford.edu'>Stanford Visualization Group</a></div></div>
+
+</body>
+</html>

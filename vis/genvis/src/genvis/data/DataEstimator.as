@@ -236,8 +236,10 @@ package genvis.data
 				var father:Person = person.father;
 				var mother:Person = person.mother;
 				if (father.isSpouseOf(mother)==false){ //means also mother.isSpouseOf(father)==false
-					marriage 		= new Marriage(father, mother);
-					marriage.saved 	= false;
+					marriage 					= new Marriage(father, mother);
+					marriage.isStartUncertain 	= true;
+					marriage.isEndUncertain 	= true;
+					marriage.saved 				= false;
 					father.addMarriage(marriage);
 					mother.addMarriage(marriage);					
 				}
@@ -253,8 +255,10 @@ package genvis.data
 					var spouse:Person 	= person.parents[0].copy();
 					spouse.saved		= false;
 					//construct spouse-relationship
-					var marriage:Marriage	= new Marriage(person.parents[0], spouse);
-					marriage.saved			= false;
+					var marriage:Marriage		= new Marriage(person.parents[0], spouse);
+					marriage.isStartUncertain 	= true;
+					marriage.isEndUncertain 	= true;
+					marriage.saved				= false;
 					spouse.addMarriage(marriage);
 					person.parents[0].addMarriage(marriage);
 					//construct parent-child relationship

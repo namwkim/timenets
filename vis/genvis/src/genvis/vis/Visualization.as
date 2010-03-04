@@ -71,7 +71,7 @@ package genvis.vis
 		
 		private var _bounds:Rectangle = new Rectangle(0,0,500,500);
 		
-		private var _layers:UIComponent; // sprite for all layers in visualization
+		private var _layers:Sprite; // sprite for all layers in visualization
 		private var _marks:Sprite;  // sprite for all visualized data items
 		private var _labels:Sprite; // (optional) sprite for labels
 		private var _axes:Axes;     // (optional) axes, lines, and axis labels
@@ -148,13 +148,15 @@ package genvis.vis
 			if (_data != null) {
 				_data.visit(_marks.removeChild, Data.BLOCKS);
 				_data.visit(_marks.removeChild, Data.EDGES);
+				_data.visit(_marks.removeChild, Data.ATTRIBUTES);
 				_data.removeEventListener(DataEvent.ADD, dataAdded);
 				_data.removeEventListener(DataEvent.REMOVE, dataRemoved);
 			}
 			_data = d;
-			if (_data != null) {
+			if (_data != null) {//Each node sprite has a block as a parent sprite.
 				_data.visit(_marks.addChild, Data.EDGES);
 				_data.visit(_marks.addChild, Data.BLOCKS);
+				_data.visit(_marks.addChild, Data.ATTRIBUTES);
 				
 				_data.addEventListener(DataEvent.ADD, dataAdded);
 				_data.addEventListener(DataEvent.REMOVE, dataRemoved);
@@ -180,7 +182,7 @@ package genvis.vis
 		 */
 		public function Visualization(data:Data=null, axes:Axes=null) {
 			if (_maskEnabled) addChild(this.mask = _vismask = new RectSprite());
-			addChild(_layers = new UIComponent());
+			addChild(_layers = new Sprite());
 			_layers.name = "_layers";
 			
 			_layers.addChild(_marks = new Sprite()); 

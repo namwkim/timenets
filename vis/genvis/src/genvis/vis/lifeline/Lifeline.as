@@ -12,7 +12,7 @@ package genvis.vis.lifeline
 		//font size
 		public static const FONTSIZE:int	= 12;
 		public static const TOPMARGIN:int	= 2;
-		public static const BOTTOMMARGIN:int= 0;
+		public static const BOTTOMMARGIN:int= 1;
 		
 		//params for lifeline
 		public static const ALPHA:int		= 5; //in years, time-span between dating & marriage, divorce & resting

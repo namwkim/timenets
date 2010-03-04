@@ -39,14 +39,16 @@ class Person < ActiveRecord::Base
     FileUtils.rm path if path!=nil and File.exist?(path)
   end 
   def update_attr_from_amf new_person    
-    self.first_name     = new_person.first_name
-    self.last_name      = new_person.last_name
-    self.sex            = new_person.sex
-    self.date_of_birth  = new_person.date_of_birth
-    self.deceased       = new_person.deceased
-    self.date_of_death  = new_person.date_of_death if self.deceased
-    self.father_id      = new_person.father_id
-    self.mother_id      = new_person.mother_id
+    self.first_name         = new_person.first_name
+    self.last_name          = new_person.last_name
+    self.sex                = new_person.sex
+    self.date_of_birth      = new_person.date_of_birth
+    self.is_dob_uncertain   = new_person.is_dob_uncertain
+    self.deceased           = new_person.deceased
+    self.date_of_death      = new_person.date_of_death if self.deceased
+    self.is_dod_uncertain   = new_person.is_dod_uncertain if self.deceased
+    self.father_id          = new_person.father_id
+    self.mother_id          = new_person.mother_id
     self.save
   end
   def marriages

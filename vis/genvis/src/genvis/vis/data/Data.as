@@ -5,7 +5,9 @@ package genvis.vis.data
 	import flare.vis.events.DataEvent;
 	
 	import flash.events.EventDispatcher;
+	import flash.utils.Dictionary;
 	
+	import genvis.data.Marriage;
 	import genvis.data.Person;
 	
 	[Event(name="add",    type="flare.vis.events.DataEvent")]
@@ -49,16 +51,22 @@ package genvis.vis.data
 	public class Data extends EventDispatcher
 	{
 		/** Constant indicating the nodes in a Data object. */
-		public static const NODES:String 	= "nodes";
-		public static const EDGES:String	= "edges";
-		public static const BLOCKS:String 	= "blocks";
+		public static const NODES:String 			= "nodes";
+		public static const EDGES:String			= "edges";
+		public static const BLOCKS:String 			= "blocks";
+		public static const ATTRIBUTES:String 		= "attributes";
 
 		/** Internal list of NodeSprites. */
 		protected var _root:Person;
-		protected var _nodes:DataList 	= new DataList(NODES);
-		protected var _edges:DataList 	= new DataList(EDGES);
-		protected var _blocks:DataList 	= new DataList(BLOCKS);
+		protected var _nodes:DataList 			= new DataList(NODES);
+		protected var _edges:DataList 			= new DataList(EDGES);
+		protected var _blocks:DataList 			= new DataList(BLOCKS);
+		protected var _attributes:DataList		= new DataList(ATTRIBUTES);
 
+		/** primitive data mappings */
+		protected var _marriages:Dictionary		= new Dictionary();
+		protected var _people:Dictionary		= new Dictionary();//not used now
+		
 		/** The total number of items (nodes and edges) in the data. */
 		public function get length():int { return _nodes.length; }
 		
@@ -66,11 +74,12 @@ package genvis.vis.data
 		protected var _groups:Object;
 		
 		/** The collection of NodeSprites. */
-		public function get nodes():DataList { return _nodes; }
-		public function get edges():DataList { return _edges; }
-		public function get blocks():DataList { return _blocks; }
-		public function get root():Person { return _root; }
-
+		public function get nodes():DataList 			{ return _nodes; }
+		public function get edges():DataList 			{ return _edges; }
+		public function get blocks():DataList 			{ return _blocks; }
+		public function get attributes():DataList 	{ return _attributes; }
+		public function get root():Person 				{ return _root; }
+		
 		// -- Methods ---------------------------------------------------------
 
 		/**
@@ -81,10 +90,11 @@ package genvis.vis.data
 			constructNodes(root);
 			constructEdges(root);
 			constructDOITree(root);	
-			constructBlocks(root);			
+			constructBlocks(root);
+			constructAttributes(root);			
 			
 			_root	= root;
-			_groups = { nodes: _nodes, edges: _edges, blocks: _blocks};
+			_groups = { nodes: _nodes, edges: _edges, blocks: _blocks, attributes:_attributes};
 		}
 		// -- Group Management ---------------------------------
 		
@@ -146,7 +156,7 @@ package genvis.vis.data
 		 */
 		public function contains(d:DataSprite):Boolean
 		{
-			return (_nodes.contains(d));
+			return (_nodes.contains(d) || _edges.contains(d) || _blocks.contains(d) || _attributes.contains(d));
 		}
 		
 		// -- Add ----------------------------------------------
@@ -190,7 +200,8 @@ package genvis.vis.data
 		{
 			_nodes.clear();
 			_edges.clear();
-			_blocks.clear();			
+			_blocks.clear();		
+			_attributes.clear();	
 		}
 		
 		/**
@@ -203,6 +214,7 @@ package genvis.vis.data
 			if (d is NodeSprite) return removeNode(d as NodeSprite);
 			if (d is EdgeSprite) return removeEdge(d as EdgeSprite);
 			if (d is BlockSprite) return removeBlock(d as BlockSprite);
+			if (d is AttributeSprite) return removeUncertainty(d as AttributeSprite);
 			return false;
 		}
 				
@@ -225,6 +237,9 @@ package genvis.vis.data
 		{
 			return _blocks.remove(b);
 		}
+		public function removeUncertainty(u:AttributeSprite) :Boolean{
+			return _attributes.remove(u);
+		} 
 		// -- Visitors -----------------------------------------
 		
 		/**
@@ -250,6 +265,8 @@ package genvis.vis.data
 					return true;
 				if (_edges.length > 0 && _edges.visit(v, filter, reverse))
 					return true;
+				if (_attributes.length > 0 && _attributes.visit(v, filter, reverse))
+					return true;
 			}else {
 				var list:DataList = _groups[group];
 				if (list.length > 0 && list.visit(v, filter, reverse))
@@ -266,9 +283,15 @@ package genvis.vis.data
 				spouse.sprite		= spouse.sprite==null? this.addNode(spouse) : this.addNode(spouse.sprite);
 				spouse.sprite.type  = NodeSprite.SPOUSE;
 			}
+			// add a marriage mapping if necessary
+			for each (var marriage:Marriage in person.marriages){
+				_marriages[marriage.id] = marriage; 
+			}	
 			return ns;
 		}
-		//static methods
+		//******************************************************
+		//   Construction of Sprites
+		//******************************************************
 		/**
 		 * construct display list. this also initializes node types
 		 * node type: ancestor, descendant, root, 
@@ -288,6 +311,7 @@ package genvis.vis.data
 				p.sprite.type = NodeSprite.DESCENDANT; //force the type			
 			});	
 		}
+
 		protected function constructEdge(person:Person):void{
 			//if (person.parents.length != 2) return;
 			var e:EdgeSprite = new EdgeSprite(person.father? person.father.sprite:null, person.mother?person.mother.sprite:null, person.sprite);
@@ -304,6 +328,32 @@ package genvis.vis.data
 			root.visitDecendants(function (p:Person):void{
 				constructEdge(p);							
 			});	
+		}
+		public function addAttribute(attrType:uint, objType:uint, uncertain:Boolean, data:Object):AttributeSprite{
+			var attr:AttributeSprite = new AttributeSprite(attrType, objType, uncertain, data);
+			_attributes.add(attr);
+			return attr;
+		}
+		protected function constructAttribute(person:Person):void{
+			addAttribute(AttributeSprite.DATE_OF_BIRTH, AttributeSprite.PERSON, person.isDobUncertain, person);
+			addAttribute(AttributeSprite.DATE_OF_DEATH, AttributeSprite.PERSON, person.isDodUncertain, person);			
+		}
+		protected function constructAttributes(root:Person):void{
+			//1. root
+			constructAttribute(root);			
+			//2. ancestor side
+			root.visitAncestors(function (p:Person):void{
+				constructAttribute(p);								
+			});
+			//3. descendant side
+			root.visitDecendants(function (p:Person):void{
+				constructAttribute(p);							
+			});	
+			//4. marriages
+			for each (var marriage:Marriage in _marriages){
+				addAttribute(AttributeSprite.MARRIAGE_DATE, AttributeSprite.MARRIAGE, marriage.isStartUncertain, marriage);
+				addAttribute(AttributeSprite.DIVORCE_DATE, AttributeSprite.MARRIAGE, marriage.isEndUncertain, marriage);
+			}
 		}
 		/**
 		 * construct block hierarchy

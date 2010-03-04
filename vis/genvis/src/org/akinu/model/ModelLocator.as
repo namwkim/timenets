@@ -7,6 +7,8 @@ package org.akinu.model
 	import genvis.GenVis;
 	import genvis.data.Person;
 	
+	import org.akinu.view.EditBasicInfo;
+	import org.akinu.view.EditMarriage;
 	import org.akinu.vo.Project;
 	
 	[Bindable]
@@ -34,7 +36,8 @@ package org.akinu.model
 		public static const INDEX:uint					= 0;			
 		public static const PERSON_MAIN:uint			= 0; 
 		public static const PERSON_EDIT:uint			= 1;
-		public static const EDIT_UNSAVED_PERSON:uint	= 2;
+		public static const EDIT_PERSON:uint			= 2;
+		public static const EDIT_MARRIAGE:uint			= 3;
 		public var pageState:uint = PERSON_MAIN; //depends on contextViewType
 		
 		//vis data variables
@@ -47,5 +50,7 @@ package org.akinu.model
 		
 		//temp data between views
 		public var data:*;
+		public var editInfo:EditBasicInfo; //to call init function in some cases /TODO: improve this later
+		public var editMarriage:EditMarriage;
 	}
 }

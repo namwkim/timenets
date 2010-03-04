@@ -15,6 +15,7 @@ package org.akinu.responders
 			//model.pageState = ModelLocator.INDEX;
 			//update vis
 			model.vis.visualize(model.root);
+			Alert.show("Successfully saved!");
 		}
 		
 		public function fault(info:Object):void{

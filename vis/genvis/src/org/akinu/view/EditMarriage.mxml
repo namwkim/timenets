@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml">
 	<mx:Script>
 		<![CDATA[
+			import org.akinu.model.ModelLocator;
 			import org.akinu.helper.Role;
 			import org.akinu.events.AddRelationshipEvent;
 			import genvis.data.Person;
@@ -10,18 +11,22 @@
 			import mx.events.ValidationResultEvent;
 			import genvis.data.Marriage;
 			import org.akinu.helper.Helper;
+			[Bindable]
 			private var marriage:Marriage;
+			private var model:ModelLocator = ModelLocator.getInstance();
 			public function init(marriage:Marriage):void{
 				if (this.initialized==false) this.initialize();
 				this.marriage			= marriage;
 				marMonth.selectedIndex 	= marriage.startDate? (marriage.startDate.getMonth()+1):0;
 				marDay.selectedIndex	= marriage.startDate? marriage.startDate.getDate():0;
 				marYear.text			= marriage.startDate!=null? marriage.startDate.getFullYear().toString():'Year';
+				marCirca.selected		= marriage.isStartUncertain; 
 				divorced.selected		= marriage.divorced;
 				if (marriage.divorced){
 					divMonth.selectedIndex	= marriage.endDate? (marriage.endDate.getMonth()+1):0;
 					divDay.selectedIndex	= marriage.endDate? marriage.endDate.getDate():0;
 					divYear.text			= marriage.endDate!=null? marriage.endDate.getFullYear().toString():'Year';
+					divCirca.selected		= marriage.isEndUncertain;
 				}
 				
 			}
@@ -39,10 +44,13 @@
 				return true;						
 			}
 			private function populateVO():void{
-				marriage.startDate 	= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
+				marriage.startDate 			= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
+				marriage.isStartUncertain	= marCirca.selected;
 				marriage.divorced	= divorced.selected;
-				if (divorced.selected)
-					marriage.endDate = Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
+				if (divorced.selected){
+					marriage.endDate 		= Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
+					marriage.isEndUncertain	= divCirca.selected;
+				}
 			}
 			private function submitMarForm():void{
 				if (validateForm()){
@@ -59,15 +67,21 @@
 						}
 					}
 				}
-				this.parent.removeChild(this);			
+				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);			
 			}
 			private function cancelMarForm():void{
-				this.parent.removeChild(this);
+				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);
+				else {
+					model.page 		= ModelLocator.FRONT_PAGE;
+					model.pageState = ModelLocator.INDEX;
+				}
 			}
 		]]>
 	</mx:Script>
 	<mx:NumberValidator id="marYearValidator" source="{marYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="divYearValidator" source="{divYear}" property="text" domain="int" required="false"/>    
+	<mx:Label text="Marriage Date is uncertain!" styleName="smallTitle" visible="{marriage.isStartUncertain}" includeInLayout="{marriage.isStartUncertain}" paddingLeft="15"/>
+	<mx:Label text="Divorce Date is uncertain!" styleName="smallTitle" visible="{marriage.isEndUncertain}" includeInLayout="{marriage.isEndUncertain}" paddingLeft="15"/>
 	<mx:Form id="marForm" defaultButton="{submit}">
 	    <mx:FormItem direction="vertical" label="Marriage Date">
 	    	<mx:HBox>
@@ -75,7 +89,7 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="marDay"/>
 		    	<mx:TextInput id="marYear" width="40" text=" Year" click="marYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="Divorced?" id="divorced"/>   	   	
+	    	<mx:CheckBox label="circa" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>   	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Divorce Date" visible="{divorced.selected}" includeInLayout="{divorced.selected}">
 	    	<mx:HBox>
@@ -83,10 +97,11 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="divDay"/>
 		    	<mx:TextInput id="divYear" width="40" text=" Year" click="divYear.text=''"/>	
 	    	</mx:HBox>	   	
+	    	<mx:CheckBox label="circa" id="divCirca"/>
 	    </mx:FormItem>	
 	    <mx:FormItem direction="horizontal">
 		        <mx:Button id="submit" label="Save" click="submitMarForm();"/>
 		        <mx:Button id="cancel" label="Cancel" click="cancelMarForm();"/>
 	    </mx:FormItem>	
     </mx:Form>
-</mx:Canvas>
+</mx:VBox>

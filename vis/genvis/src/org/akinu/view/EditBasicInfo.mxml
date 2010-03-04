@@ -23,11 +23,13 @@
 				dobMonth.selectedIndex 	= person.dateOfBirth? (person.dateOfBirth.month+1):0;
 				dobDay.selectedIndex	= person.dateOfBirth? person.dateOfBirth.dateUTC:0;
 				dobYear.text			= person.dateOfBirth!=null? person.dateOfBirth.fullYear.toString():'Year';
+				dobCirca.selected		= person.isDobUncertain;
 				deceased.selected		= person.deceased;
 				if (person.deceased){
 					dodMonth.selectedIndex	= person.dateOfDeath? (person.dateOfDeath.month+1):0;
 					dodDay.selectedIndex	= person.dateOfDeath? person.dateOfDeath.dateUTC:0;
 					dodYear.text			= person.dateOfDeath!=null? person.dateOfDeath.fullYear.toString():'Year';
+					dodCirca.selected		= person.isDodUncertain;
 				}
 			}
 			private function validateForm():Boolean{
@@ -44,14 +46,17 @@
 				return true;
 			}
 			private function populateVO():void{
-				var person:Person = model.selectedPerson;
-				person.firstName 	= firstName.text;
-				person.lastName  	= lastName.text;
-				person.sex			= sex.selectedItem.data;
-				person.dateOfBirth 	= Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
-				person.deceased	= deceased.selected;
-				if (person.deceased)
-					person.dateOfDeath = Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
+				var person:Person 		= model.selectedPerson;
+				person.firstName 		= firstName.text;
+				person.lastName  		= lastName.text;
+				person.sex				= sex.selectedItem.data;
+				person.dateOfBirth 		= Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
+				person.isDobUncertain 	= dobCirca.selected
+				person.deceased			= deceased.selected;
+				if (person.deceased){
+					person.dateOfDeath 		= Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
+					person.isDodUncertain	= dodCirca.selected;
+				}
 			}
 			private function submitForm():void{
 				//validate form data
@@ -81,6 +86,8 @@
 	<mx:NumberValidator id="dobYearValidator" source="{dobYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
 	<mx:Label text="This record is not yet saved!" styleName="smallTitle" visible="{!model.selectedPerson.saved}" includeInLayout="{!model.selectedPerson.saved}" paddingLeft="15"/>
+	<mx:Label text="Date of birth is uncertain!" styleName="smallTitle" visible="{model.selectedPerson.isDobUncertain}" includeInLayout="{model.selectedPerson.isDobUncertain}" paddingLeft="15"/>
+	<mx:Label text="Date of death is uncertain!" styleName="smallTitle" visible="{model.selectedPerson.isDodUncertain}" includeInLayout="{model.selectedPerson.isDodUncertain}" paddingLeft="15"/>
 	<mx:Form id="infoForm" defaultButton="{submit}">
 		<mx:FormItem label="First Name">
 			<mx:TextInput id="firstName"/>		
@@ -97,14 +104,17 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dobDay"/>
 		    	<mx:TextInput id="dobYear" width="40" click="if(dobYear.text=='Year') dobYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="Deceased?" id="deceased"/>   	   	
+	    	<mx:HBox>
+	    		<mx:CheckBox label="circa" id="dobCirca"/><mx:CheckBox label="Deceased?" id="deceased"/>
+	    	</mx:HBox>   	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Death Date" includeInLayout="{deceased.selected}" visible="{deceased.selected}">
 	    	<mx:HBox>
 		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dodMonth" />
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>
 		    	<mx:TextInput id="dodYear" width="40" click="if(dodYear.text=='Year') dodYear.text=''"/>	
-	    	</mx:HBox>	   	
+	    	</mx:HBox>	 
+	    	<mx:CheckBox label="circa" id="dodCirca"/>  	
 	    </mx:FormItem>
 	    <mx:FormItem direction="horizontal">
 	        <mx:Button id="submit" label="Save" click="submitForm();"/>

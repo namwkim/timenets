@@ -85,15 +85,17 @@
 				if (validateForm()){
 					var person:Person = model.selectedPerson;					
 					//populate person
-					var newPerson:Person = new Person();
-					newPerson.firstName = firstName.text;
-					newPerson.lastName	= lastName.text;
-					newPerson.sex		= sex.selectedItem.data;						
-					newPerson.dateOfBirth = Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
-					newPerson.deceased	= deceased.selected;
-					if (newPerson.deceased)
-						newPerson.dateOfDeath = Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
-						
+					var newPerson:Person 		= new Person();
+					newPerson.firstName 		= firstName.text;
+					newPerson.lastName			= lastName.text;
+					newPerson.sex				= sex.selectedItem.data;						
+					newPerson.dateOfBirth 		= Helper.assignDate(parseInt(dobYear.text), parseInt(dobMonth.selectedItem.data), parseInt(dobDay.selectedItem.data));
+					newPerson.isDobUncertain 	= dobCirca.selected;
+					newPerson.deceased			= deceased.selected;
+					if (newPerson.deceased){
+						newPerson.dateOfDeath 		= Helper.assignDate(parseInt(dodYear.text), parseInt(dodMonth.selectedItem.data), parseInt(dodDay.selectedItem.data));
+						newPerson.isDodUncertain	= dodCirca.selected;
+					}
 					//create missing links
 					var newMarriage:Marriage = null;
 					if (role=="Father" || role=="Mother"){
@@ -116,10 +118,13 @@
 						newMarriage = new Marriage(model.selectedPerson, newPerson);
 						model.selectedPerson.addMarriage(newMarriage);
 						newPerson.addMarriage(newMarriage);
-						newMarriage.startDate = Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
-						newMarriage.divorced  = divorced.selected;
-						if (divorced.selected)
-							newMarriage.endDate = Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
+						newMarriage.startDate 			= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
+						newMarriage.isStartUncertain	= marCirca.selected;
+						newMarriage.divorced  			= divorced.selected;
+						if (divorced.selected){
+							newMarriage.endDate 		= Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
+							newMarriage.isEndUncertain	= divCirca.selected;	
+						}
 					}					
 					var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(newPerson, newMarriage, model.selectedPerson.id, role);
 					addRelEvent.dispatch();
@@ -156,14 +161,15 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dobDay"/>
 		    	<mx:TextInput id="dobYear" width="40" text=" Year" click="dobYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="Deceased?" id="deceased"/>   	   	
+	    	<mx:CheckBox label="circa" id="dobCirca"/><mx:CheckBox label="Deceased?" id="deceased"/>  	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Death Date" visible="{deceased.selected}" includeInLayout="{deceased.selected}">
 	    	<mx:HBox>
 		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dodMonth"/>
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>
 		    	<mx:TextInput id="dodYear" width="40" text=" Year" click="dodYear.text=''"/>	
-	    	</mx:HBox>	   	
+	    	</mx:HBox>
+	    	<mx:CheckBox label="circa" id="dodCirca"/>	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Marriage Date" visible="{role=='Spouse'? true:false}" includeInLayout="{role=='Spouse'? true:false}">
 	    	<mx:HBox>
@@ -171,14 +177,15 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="marDay"/>
 		    	<mx:TextInput id="marYear" width="40" text=" Year" click="marYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="Divorced?" id="divorced"/>   	   	
+	    	<mx:CheckBox label="circa" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>   	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Divorce Date" visible="{divorced.selected}" includeInLayout="{divorced.selected}">
 	    	<mx:HBox>
 		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="divMonth"/>
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="divDay"/>
 		    	<mx:TextInput id="divYear" width="40" text=" Year" click="divYear.text=''"/>	
-	    	</mx:HBox>	   	
+	    	</mx:HBox>
+	    	<mx:CheckBox label="circa" id="divCirca"/>	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="horizontal">
 	        <mx:Button id="submit" label="Add" click="submitRelForm();"/>

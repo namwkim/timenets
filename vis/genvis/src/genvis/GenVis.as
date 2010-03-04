@@ -13,7 +13,6 @@ package genvis
 	
 	import genvis.animate.Transitioner;
 	import genvis.data.DataEstimator;
-	import genvis.data.Marriage;
 	import genvis.data.Person;
 	import genvis.data.converters.XMLConverter;
 	import genvis.scale.ScaleType;
@@ -23,13 +22,14 @@ package genvis
 	import genvis.vis.controls.DragControl;
 	import genvis.vis.controls.HoverControl;
 	import genvis.vis.controls.TooltipControl;
+	import genvis.vis.data.AttributeSprite;
 	import genvis.vis.data.BlockSprite;
 	import genvis.vis.data.Data;
 	import genvis.vis.data.EdgeSprite;
 	import genvis.vis.data.NodeSprite;
+	import genvis.vis.data.render.AttributeRenderer;
 	import genvis.vis.data.render.LifelineRenderer;
 	import genvis.vis.events.SelectionEvent;
-	import genvis.vis.events.TooltipEvent;
 	import genvis.vis.lifeline.Lifeline;
 	import genvis.vis.operator.encoder.ColorEncoder;
 	import genvis.vis.operator.filter.FisheyeFilter;
@@ -41,7 +41,6 @@ package genvis
 	import mx.controls.ComboBox;
 	import mx.controls.HSlider;
 	import mx.controls.Label;
-	import mx.controls.Menu;
 	import mx.controls.TextArea;
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
@@ -61,14 +60,15 @@ package genvis
 	public class GenVis extends Canvas
 	{
 		//visualization
-		private var _vis:Visualization 			= null;
-		private var _hoverCtrl:HoverControl 	= null;
-		private var _dragCtrl:DragControl		= null;
-		private var _toolTip:TooltipControl 	= null;
-		private var _colorEncoder:ColorEncoder 	= null;
-		private var _fisheyeFilter:FisheyeFilter= null;
-		private var _renderer:LifelineRenderer 	= null;
-		private var _lifelineLayout:LifelineLayout = null;
+		private var _vis:Visualization 				= null;
+		private var _hoverCtrl:HoverControl 		= null;
+		private var _dragCtrl:DragControl			= null;
+		private var _toolTip:TooltipControl 		= null;
+		private var _colorEncoder:ColorEncoder 		= null;
+		private var _fisheyeFilter:FisheyeFilter	= null;
+		private var _renderer:LifelineRenderer 		= null;
+		private var _attrRenderer:AttributeRenderer	= null;
+		private var _lifelineLayout:LifelineLayout 	= null;
 		private var _root:Person;	
 		private var _focusNodes:Array 			= new Array();
 		private var _selectedNode:NodeSprite		= null;
@@ -238,8 +238,8 @@ package genvis
 			//replace old data
 			_vis.data = data;	
 			//set properties
-			_renderer = new LifelineRenderer(_lifelineType, _layoutMode);
-			
+			_renderer 		= new LifelineRenderer(_lifelineType, _layoutMode);
+			_attrRenderer 	= new AttributeRenderer(); 
 			buildOperators();				
 			_vis.data.edges.setProperties({"renderer":_renderer, lineColor:Colors.setAlpha(_edgeColor, uint(255*_edgeAlpha)%256), 
 					lineWidth:_edgeWidth});
@@ -248,6 +248,7 @@ package genvis
 			_vis.data.blocks.setProperties({"renderer":_renderer, lineWidth:_bLineWidth, 
 					lineColor: Colors.setAlpha(_bLineColor, uint(255*_bLineAlpha)%256), 
 					fillColor: Colors.setAlpha(_bFillColor, uint(255*_bFillAlpha)%256)});
+			_vis.data.attributes.setProperty("renderer", _attrRenderer);
 			//postprocessing after operators added
 			// Format the y-axis.
 		    var axes:CartesianAxes = _vis.axes as CartesianAxes;
@@ -611,6 +612,10 @@ package genvis
 						b.lineColor = Colors.setAlpha(0x73d216, uint(255*_bLineAlpha)%256);
 						b.props.fillColor = b.fillColor;
 						b.fillColor = Colors.setAlpha(0x73d216, uint(255*_bFillAlpha)%256);						
+					}else if (e.item is AttributeSprite){
+						var a:AttributeSprite = e.item as AttributeSprite;
+						a.label.bold  = true;
+						a.label.color = 0x73d216;
 					}
 				},
 				// Return node to previous state
@@ -630,6 +635,10 @@ package genvis
 						b.lineWidth = b.props.lineWidth;
 						b.lineColor = b.props.lineColor;
 						b.fillColor = b.props.fillColor;
+					}else if (e.item is AttributeSprite){
+						var a:AttributeSprite = e.item as AttributeSprite;
+						a.label.bold  = false;
+						a.label.color = 0x000000;
 					}
 				});
 			_vis.controls.add(_hoverCtrl);
@@ -657,6 +666,7 @@ package genvis
 			_vis.controls.add(new ClickControl(null, 1,
 				// set search query to the occupation name
 				function(e:SelectionEvent):void {
+					var selectPerson:SelectEvent;					
 					if (e.object is NodeSprite){
 						if (_selectedNode){
 							_selectedNode.selected = false;
@@ -666,13 +676,34 @@ package genvis
 						_selectedNode.selected = true;
 						
 						//Dispatch Selection Event
-						var selectPerson:SelectEvent = new SelectEvent(SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
+						selectPerson = new SelectEvent(SelectEvent.SELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
 						selectPerson.dispatch();
 						
+					}else if (e.object is AttributeSprite){
+						if (_selectedNode){
+								_selectedNode.selected = false;
+						}			
+						var attr:AttributeSprite = e.object as AttributeSprite;	
+						if (attr.objType == AttributeSprite.PERSON){		
+							_selectedNode = (attr.data as Person).sprite;
+							_selectedNode.selected = true;
+							var selectAttr:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
+							selectAttr.dispatch();	
+						}else if (attr.objType == AttributeSprite.MARRIAGE){
+							if (_selectedNode){
+								_selectedNode.selected = false;
+							}
+							attr = e.object as AttributeSprite;
+							var selectAttr:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
+							selectAttr.dispatch();	
+						}	
+										
 					}else{
 						if (_selectedNode){
 							_selectedNode.selected = false;
-						}						
+							selectPerson = new SelectEvent(SelectEvent.DESELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
+							selectPerson.dispatch();
+						}
 					}
 //					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
 //						|| _doiEnabled==false) return;

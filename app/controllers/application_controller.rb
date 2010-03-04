@@ -2,8 +2,9 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  #before_filter :authenticate, :except => [:login, :intro, :signup, :root, :create_relationship, :update_person] 
-  before_filter :authorize
+  session :session_key => "akinu"
+  before_filter :authenticate, :except => [:login, :intro, :signup] 
+  before_filter :establish_operator
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   layout :determine_layout
@@ -16,7 +17,7 @@ class ApplicationController < ActionController::Base
     'akinu'
   end
 protected
-  def authorize
+  def establish_operator
     @operator = User.find_by_id(session[:operator_id]) if @operator == nil
   end
   def authenticate
@@ -29,12 +30,12 @@ protected
     end
   end
   def log action_verb, record, project
-#    #time = Time.now.strftime("%B %d at %H:%M%p")
-#    html_text = @operator.person.name+" "+action_verb+" "+record.name#+" in "+project.name + ", "+time
-#    activity = Activity.create(:html=>html_text)
-#    project.activities<<activity
-#    @operator.activities<<activity
-#    @operator.save
-#    project.save
+    #time = Time.now.strftime("%B %d at %H:%M%p")
+    html_text = @operator.person.name+" "+action_verb+" "+record.name#+" in "+project.name + ", "+time
+    activity = Activity.create(:html=>html_text)
+    project.activities<<activity
+    @operator.activities<<activity
+    @operator.save
+    project.save
   end  
 end

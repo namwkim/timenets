@@ -26,8 +26,8 @@
 			private var model:ModelLocator = ModelLocator.getInstance();
 			
 			private function init():void{
-				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
-				initializeEvent.dispatch();			
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
+//				initializeEvent.dispatch();			
 			}
 //			private function resultHandler(e:ResultEvent):void {
 //				var str:String = "asdfawrfh239urF iwiuHF289UJ FU 4f4";				

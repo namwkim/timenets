@@ -4,6 +4,7 @@ package genvis.vis.operator.layout
 	import genvis.scale.TimeScale;
 	import genvis.vis.axis.Axis;
 	import genvis.vis.axis.CartesianAxes;
+	import genvis.vis.data.AttributeSprite;
 	import genvis.vis.data.BlockSprite;
 	import genvis.vis.data.EdgeSprite;
 	import genvis.vis.data.NodeSprite;
@@ -43,7 +44,7 @@ package genvis.vis.operator.layout
 		protected var _displayNodeList:Array  = null;
 		protected var _displayBlockList:Array = null;		
 		
-		protected var _fitHorzBound:Boolean = true;	
+		protected var _fitHorzBound:Boolean = false;	
 		
 		public function get curDate():Date			{ return _curDate; 	}
 		public function set curDate(d:Date):void	{ _curDate = d;		}
@@ -115,7 +116,8 @@ package genvis.vis.operator.layout
 					_xscale.min = new Date(minYear, 1, 1);
 					_xscale.max = _curDate;
 				}else{	
-					var median:Number = person.dateOfBirth.fullYear + (person.dateOfDeath.fullYear - person.dateOfBirth.fullYear)/2;
+					var end:Date = person.dateOfDeath!=null? person.dateOfDeath:_curDate;
+					var median:Number = person.dateOfBirth.fullYear + (end.fullYear - person.dateOfBirth.fullYear)/2;
 					_xscale.min = new Date(median-(_xrange/2), 1, 1);
 					_xscale.max = new Date((median+(_xrange/2))>_curDate.fullYear?_curDate.fullYear:(median+(_xrange/2)) , 1 ,1);				
 				}
@@ -141,9 +143,9 @@ package genvis.vis.operator.layout
 //				}
 				//temp for study data
 				_xscale.min = new Date(1900,1,1);				
-				_xscale.max = new Date();
+				_xscale.max = _curDate;
 			}
-			trace("XRANGE-"+_xscale.min.fullYear+","+_xscale.max.fullYear);
+//			trace("XRANGE-"+_xscale.min.fullYear+","+_xscale.max.fullYear);
 //			var people:Array  = new Array();
 //			people.push(person);
 //			person.visitAncestors(function (p:Person):void{
@@ -210,6 +212,10 @@ package genvis.vis.operator.layout
 					
 				});
 			}else{//all nodes are assumed to be visible
+				visualization.data.attributes.visit(function (a:AttributeSprite):void{
+					a.visible = true;
+					a.alpha	  = 1;
+				});
 				visualization.data.edges.visit(function (e:EdgeSprite):void{
 					e.visible = true;
 					e.alpha	  = 1;

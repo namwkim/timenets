@@ -21,21 +21,23 @@ class HomeController < ApplicationController
   def login
     if request.post?
       user = User.authenticate(params[:email], params[:password])
-      if user
-        session[:operator_id] = user.id
+      if user        
         if params[:login_invitation_token]!=''
           @invitation = Invitation.find_by_token(params[:login_invitation_token])
           if @invitation.accepted 
             flash[:notice] = "This invitation was used already."
-            redirect_to(:action => "intro")
+            redirect_to(:action => "intro") and return
           end
           @project    = @invitation.project
           if user.projects.include?(@project) == false
             user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor")  
             user.save
+            @operator = User.find_by_id user.id
+            log "joined", @project, @project
             @invitation.update_attribute(:accepted, true);
           end
         end
+        session[:operator_id] = user.id
         redirect_to(:action => "index")
       else
         flash[:notice] = "Invalid user/password combination"
@@ -59,8 +61,7 @@ class HomeController < ApplicationController
       @user    = User.new(params[:user])
       @person = Person.new(params[:person]) 
       @user.person = @person
-      if @user.save and @person.save
-        session[:operator_id] = @user.id        
+      if @user.save and @person.save               
         #create an initial project associated with the new user
         if params[:signup_invitation_token]==''
           @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")        
@@ -77,6 +78,9 @@ class HomeController < ApplicationController
         @project.people << @person
         @user.main_project = @project 
         @user.save
+        @operator = User.find_by_id @user.id
+        log "joined", @project, @project
+        session[:operator_id] = @user.id 
         redirect_to(:action => "index")
       else
         flash[:user] = @user

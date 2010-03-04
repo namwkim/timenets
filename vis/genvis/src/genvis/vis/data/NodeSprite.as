@@ -60,6 +60,9 @@ package genvis.vis.data
 		private var _expanded:Boolean   = false;
 		private var _visited:Boolean	= false;
 		
+		//attributes
+		private var _attributes:Array = new Array();
+		
 		//birth edges
 		private var _inEdge:EdgeSprite 	= null;
 		private var _outEdges:Array			= null;
@@ -77,12 +80,12 @@ package genvis.vis.data
 		public function get parentNode():NodeSprite { return _parentNode; }
 		public function get expanded():Boolean		{ return _expanded;   }
 		public function get visited():Boolean		{ return _visited;    }
-		public function get selected():Boolean		{ return _selected;	  }
+		public function get selected():Boolean		{ return _selected;	  }		
 		
 		public function set parentNode(p:NodeSprite):void 	{ _parentNode	= p;  }
 		public function set expanded(e:Boolean):void		{ _expanded 	= e;  }
 		public function set visited(v:Boolean):void			{ _visited 		= v;  }
-		public function set selected(s:Boolean):void		{ _selected		= s;  dirty(); }
+		public function set selected(s:Boolean):void		{ _selected		= s;  dirty(); }		
 		
 		public function get label():TextSprite { return _label; }
 		public function get bbox():Box 		{ return _bbox; 	}
@@ -103,6 +106,14 @@ package genvis.vis.data
 		//public function set willVisible(v:Boolean):void { _willVisible = v; }
 		public function set block(b:BlockSprite):void	{ _block	= b; }	
 		
+		public function addAttribute(attr:AttributeSprite):void {
+			 if (_attributes.indexOf(attr)>=0) return;
+			 _attributes.push(attr);
+		}
+		public function removeAttribute(attr:AttributeSprite):void{
+			if (_attributes.indexOf(attr)<0) return;
+			_attributes.splice(_attributes.indexOf(attr), 1);
+		}
 		public function addChildNode(child:NodeSprite):void{
 			if (_childNodes.indexOf(child)<0) childNodes.push(child);
 		}
@@ -218,6 +229,11 @@ package genvis.vis.data
 			visitEdges(function(e:EdgeSprite):void{
 				e.dirty();
 			});
+		}
+		public function dirtyAttributes():void{
+			for each (var attr:AttributeSprite in _attributes){
+				attr.dirty();
+			}
 		}
 		public function visitEdges(f:Function, opt:int=ALL_LINKS):void
 		{

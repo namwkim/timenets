@@ -82,7 +82,7 @@
 		<mx:Button label="Make This Center" width="150" click="changeRoot()" textAlign="left" />
 		<mx:Button label="Edit Info" width="150" click="edit()" textAlign="left"/>
 		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
-		<mx:Button label="See Life Events" width="150" textAlign="left"/>		
+		<!--<mx:Button label="See Life Events" width="150" textAlign="left"/>-->		
 	</mx:VBox>
 
 

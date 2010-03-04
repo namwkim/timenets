@@ -95,6 +95,10 @@ package genvis.vis.data
 			if (_aggregated) dirty();
 			for each (var n:NodeSprite in _primaryNodes){
 				n.dirtyEdges();	
+				n.dirtyAttributes();
+			}
+			for each (var sn:NodeSprite in _secondaryNodes){
+				sn.dirtyAttributes();
 			} 
 		}
 		public override function set y(v:Number):void { 
@@ -102,6 +106,10 @@ package genvis.vis.data
 			if (_aggregated) dirty();
 			for each (var n:NodeSprite in _primaryNodes){
 				n.dirtyEdges();	
+				n.dirtyAttributes();
+			}
+			for each (var sn:NodeSprite in _secondaryNodes){
+				sn.dirtyAttributes();
 			} 
 		}		
 		public function exist(n:NodeSprite):Boolean {

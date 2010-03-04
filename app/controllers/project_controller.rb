@@ -8,7 +8,7 @@ class ProjectController < ApplicationController
   end
   def show_project
     @project = Project.find_by_id(params[:id])
-    @root  = @operator.person #select it more elegantly
+    @root  = @project.people.first #select it more elegantly
   end
   def new_project
     @project = Project.new

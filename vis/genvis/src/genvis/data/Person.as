@@ -79,7 +79,14 @@ package genvis.data
 		public function set deceased(d:Boolean):void { _deceased = d; }
 		
 		public function get estimated():int { return _estimated; }
-		public function set estimated(flag:int):void { _estimated = flag; }
+		public function set estimated(flag:int):void { 
+			_estimated |= flag;
+			if (flag == DOB){
+				_isDobUncertain = true;
+			}else if (flag == DOD){
+				_isDodUncertain = true;				
+			}
+		}
 
 		public function get isDobUncertain():Boolean { return _isDobUncertain; }
 		public function set isDobUncertain(du:Boolean):void { _isDobUncertain = du; }
@@ -138,12 +145,12 @@ package genvis.data
 			}
 		}
 		public function addParent(parent:Person):void { 
-			if (_parents.indexOf(parent)>0) return; //exist
+			if (_parents.indexOf(parent)>=0) return; //exist
 			_isSorted = false; 
 			_parents.push(parent); 
 		}
 		public function addChild(child:Person):void {  
-			if (_children.indexOf(child)>0) return; //exist
+			if (_children.indexOf(child)>=0) return; //exist
 			_isSorted = false; 
 			_children.push(child);
 		}
@@ -194,8 +201,11 @@ package genvis.data
 			spouse.gender		= _gender=="None"? "None" : (_gender=="Male"?"Female":"Male");
 			spouse.name 		= "Add Person";//"copy_of_"+ name;
 			spouse.dateOfBirth	= new Date(this.dateOfBirth);
+			spouse.isDobUncertain = true;			
+			
 			if (this.deceased){
-				spouse.dateOfDeath	= new Date(this.dateOfDeath);
+				spouse.dateOfDeath		= new Date(this.dateOfDeath);
+				spouse.isDodUncertain 	= true;
 			}
 			spouse.saved		= false;
 			return spouse;

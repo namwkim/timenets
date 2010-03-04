@@ -1,7 +1,0 @@
-<div id="<%=dom_id(person)%>">
-	<span class="person_property"><%= link_to person.name, :controller=>"person", :action=>"show_person", :id=>person.id%></span>
-	<span class="person_property"><%=person.sex%></span>
-	<span class="person_property"><%=person.date_of_birth%></span>
-	<span class="person_property"><%= link_to_remote_lightbox "Edit", {:url=>{:controller=>"person", :action=>"edit_person_in_event", :id=>person.id}, :with=>(event!=nil ? "'event_id='+#{event.id}" : nil)} %></span>
-	<span class="person_property"><%=link_to_remote("Remove Link", :url=>{:action=>"delete_person_in_event", :id=>person.id}, :with=>(event!=nil ? "'event_id='+#{event.id}" : nil),:confirm=>"do you really want to delete this link", :complete=>"$('#{dom_id(person)}').remove();")%></span>								
-</div>

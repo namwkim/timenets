@@ -23,7 +23,7 @@ class MessageController < ApplicationController
       KinMailer.deliver_invitation(@invitation, intro_url(@invitation.token))   
       render :partial=>"alert", :locals=>{:msg=>"Thank you, Invitation sent!"}
     else
-      render :partial=>"alert", :locals=>{:msg=>"Invitation NOT sent! Something went wrong..."}
+      render :partial=>"alert", :locals=>{:msg=>@invitation.errors.full_messages.join("\n")}
     end
   end
   

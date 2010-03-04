@@ -6,6 +6,7 @@ class PersonController < ApplicationController
   end
   def visualize
     @person = Person.find_by_id(params[:id])
+    #@session_id = session[:session_id]
   end
   def root #called from flex to get a genealogy root
     @person = Person.find_by_id(params[:id])

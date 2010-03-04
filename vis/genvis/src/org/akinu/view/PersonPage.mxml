@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="org.akinu.view.*">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="org.akinu.view.*" creationComplete="init()">
 
 	<mx:Script>
 	<![CDATA[
+		import genvis.data.Marriage;
 		import mx.events.FlexEvent;
 			import org.akinu.model.ModelLocator;
 			[Bindable]
 			private var model:ModelLocator = ModelLocator.getInstance();
 			public function init():void{
+				if (this.initialized==false) return;
 				initializeState();
+				model.editInfo 		= editInfo;
+				model.editMarriage	= editMarriage;
 			}
 			private function initializeState():void{				
 				if (model.pageState == ModelLocator.PERSON_EDIT){
 					personEdit.init();
 				}else if (model.pageState == ModelLocator.PERSON_MAIN){
 					personMain.init();
-				}else if (model.pageState == ModelLocator.EDIT_UNSAVED_PERSON){
+				}else if (model.pageState == ModelLocator.EDIT_PERSON){
 					editInfo.init();
+				}else if (model.pageState == ModelLocator.EDIT_MARRIAGE){
+					editMarriage.init(model.data as Marriage);
 				}
 			}			
 	]]>
@@ -25,6 +31,7 @@
 		<view:PersonMain id="personMain"/>
 		<view:PersonEdit id="personEdit"/>
 		<view:EditBasicInfo id="editInfo"/>
+		<view:EditMarriage id="editMarriage"/>
 	</mx:ViewStack>
 
 

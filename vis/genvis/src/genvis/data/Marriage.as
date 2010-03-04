@@ -44,7 +44,14 @@ package genvis.data
 //		public function set spouse(p:Person):void { _person2 = p; }
 //		public function get spouse():Person { return _person2; }
 		
-		public function set estimated(flag:int):void{ _estimated |= flag; }
+		public function set estimated(flag:int):void{ 
+			_estimated |= flag;
+			if (flag == STARTDATE){
+				_isStartUncertain = true;
+			}else if (flag == ENDDATE){
+				_isEndUncertain = true;				
+			}
+	 	}
 		public function get estimated():int	{ return _estimated; }
 		
 		public function set isStartUncertain(su:Boolean):void { _isStartUncertain = su; }

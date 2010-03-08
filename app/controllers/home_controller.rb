@@ -34,7 +34,7 @@ class HomeController < ApplicationController
             user.save
             @operator = User.find_by_id user.id
             log "joined", @project, @project
-            @invitation.update_attribute(:accepted, true);
+            #@invitation.update_attribute(:accepted, true);
           end
         end
         session[:operator_id] = user.id
@@ -72,7 +72,7 @@ class HomeController < ApplicationController
             redirect_to(:action => "intro")
           end
           @project    = @invitation.project
-          @invitation.update_attribute(:accepted, true);
+          #@invitation.update_attribute(:accepted, true);
         end
         @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor") 
         @project.people << @person

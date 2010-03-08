@@ -11,10 +11,10 @@ package org.akinu.responders
 		}
 
 		public function result(data:Object):void{
-			model.page = ModelLocator.FRONT_PAGE;
-			model.pageState = ModelLocator.INDEX;
-			//update vis
-			model.vis.visualize(model.root);
+//			model.page = ModelLocator.FRONT_PAGE;
+//			model.pageState = ModelLocator.INDEX;
+//			//update vis
+//			model.vis.visualize(model.root);
 		}
 		
 		public function fault(info:Object):void{

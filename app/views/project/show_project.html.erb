@@ -65,13 +65,13 @@ function flip_dob_field(chk_box){
 	<div class="left_col">
 		<div id="activities" class="project_box_left">
 			<div class="underlined"><%= link_to "See All",{:controller=>"activity",:action=>"show_all", :project_id=>@project.id},{:class=>"right"} %><span class="small_title">Recent Activities</span></div>
-			<% if @project.activities.length == 0%>
+			Temporarily not woring...<!--<% if @project.activities.length == 0%>
 				<span>No activity found!</span>
 			<% else %>
 				<% @project.activities.length.downto(@project.activities.length-4) do |i| %>
 					<%= render :partial=>"activity/activity", :locals=>{:activity=>@project.activities[i-1]} if (i-1)>=0%>				
 				<% end %>
-			<% end %>
+			<% end %>-->
 		</div>
 		<div class="project_box_left">
 			<div class="underlined">

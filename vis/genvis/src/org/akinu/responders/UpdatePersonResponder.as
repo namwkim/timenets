@@ -13,9 +13,8 @@ package org.akinu.responders
 		}
 
 		public function result(data:Object):void{
-			var event:ResultEvent = data as ResultEvent;		
-			model.vis.visualize(model.root);
-			Alert.show("Successfully saved!");
+			//var event:ResultEvent = data as ResultEvent;		
+			//Alert.show("Successfully saved!");
 		}
 		
 		public function fault(info:Object):void	{

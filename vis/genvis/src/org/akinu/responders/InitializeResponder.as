@@ -18,13 +18,11 @@ package org.akinu.responders
 		}
 
 		public function result(e:Object):void{
-			var event:ResultEvent = e as ResultEvent;
-	
+			var event:ResultEvent = e as ResultEvent;	
 			model.root 		= event.result.root;
 			model.project	= event.result.project;
 			model.vis.visualize(model.root);
 			DirtySprite.renderDirty();
-
 						
 		}
 		

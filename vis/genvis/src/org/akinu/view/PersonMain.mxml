@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:view="org.akinu.view.*" paddingTop="10" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
+		import org.akinu.events.UpdatePersonEvent;
+		import genvis.data.DataEstimator;
+		import mx.events.ValidationResultEvent;
+		import mx.containers.Box;
+		import mx.containers.HBox;
+		import genvis.data.Person;
+		import org.akinu.helper.Helper;
 		import mx.events.CloseEvent;
 		import org.akinu.events.RemovePersonEvent;
 		import mx.controls.Alert;
 		import org.akinu.events.RootChangeEvent;
 		import org.akinu.events.StateChangeEvent;
 			import org.akinu.model.ModelLocator;		
+			
+			public static const NONE:uint			= 0;
+			public static const EDIT_PROPERTY:uint	= 1;
+			 
 			[Bindable]
 			private var model:ModelLocator = ModelLocator.getInstance();
-			
+			private var curShowBox:HBox;
+			private var curEditBox:Box;
+			private var propertyType:uint;
+			private var status:uint = NONE;
 			public function init():void{
-				//if (model.selectedPerson.saved==false) edit();				
+				if (this.initialized == false) return;
+				if (model.selectedPerson == null) return;
+				var person:Person = model.selectedPerson;				
+				photo.source = person.photoUrl? model.url+'images/'+person.photoUrl:model.url+'images/person.png';
+				dob.text = Helper.UTCMonthLabels[person.dateOfBirth.getUTCMonth()]+" "+person.dateOfBirth.getUTCDate()+", "+person.dateOfBirth.getUTCFullYear();
+				if (person.deceased) dod.text = Helper.UTCMonthLabels[person.dateOfDeath.getUTCMonth()]+" "+person.dateOfDeath.getUTCDate()+", "+person.dateOfDeath.getUTCFullYear();												
+				else dod.text = "";
 			}
-			private function edit():void{
-				var stateChangeEvent:StateChangeEvent = new StateChangeEvent(ModelLocator.PERSON_EDIT);
-				stateChangeEvent.dispatch();
-			}
+//			private function edit():void{
+//				var stateChangeEvent:StateChangeEvent = new StateChangeEvent(ModelLocator.PERSON_EDIT);
+//				stateChangeEvent.dispatch();
+//			}
 			private function remove():void{
 				if (model.selectedPerson.id != model.root.id){
 					Alert.show("Are you sure you want to remove this person?", "Remove Person", Alert.YES|Alert.NO, this,
@@ -31,8 +51,7 @@
 						});
 				}else{
 					Alert.show("You can not remove the root person. Please change the root beforehand.","Alert",4,this);
-				}
-						
+				}						
 			}
 			private function changeRoot():void{
 				if (model.selectedPerson == model.root) {
@@ -41,50 +60,245 @@
 				var rootChange:RootChangeEvent = new RootChangeEvent(model.selectedPerson);
 				rootChange.dispatch();
 			}
+			private function onRollOver(event:MouseEvent, editBtn:Button):void{
+				var container:HBox = event.currentTarget as HBox;
+				container.styleName="rollOver";
+				editBtn.visible = true;
+			}
+			private function onRollOut(event:MouseEvent, editBtn:Button):void{
+				var container:HBox = event.currentTarget as HBox;
+				container.styleName="";
+				editBtn.visible = false;				
+			}
+			private function editProperty(type:uint, showBox:HBox, editBox:Box):void{	
+				//close open editBox
+				closeEdit();
+				status = EDIT_PROPERTY;
+				var person:Person = model.selectedPerson;
+				curShowBox 		  = showBox;
+				curEditBox        = editBox;
+				showBox.visible = showBox.includeInLayout = false;
+				editBox.visible	= editBox.includeInLayout = true;
+				propertyType 	= type;
+				switch (type){
+					case Person.NAME:
+						firstName.text 	= person.firstName;
+						lastName.text	= person.lastName;
+						break;
+					case Person.SEX:
+						sex.selectedIndex 		= person.sex=='Male'?1:(person.sex=='Female'? 2:0);
+						break;
+					case Person.DOB:
+						dobMonth.selectedIndex 	= person.dateOfBirth? (person.dateOfBirth.month+1):0;
+						dobDay.selectedIndex	= person.dateOfBirth? person.dateOfBirth.dateUTC:0;
+						dobYear.text			= person.dateOfBirth!=null? person.dateOfBirth.fullYear.toString():'Year';
+						dobApprox.selected		= person.isDobUncertain;
+						break;
+					case Person.DOD:
+						deceased.selected		= person.deceased;
+						dodMonth.selectedIndex 	= person.dateOfDeath? (person.dateOfDeath.month+1):0;
+						dodDay.selectedIndex	= person.dateOfDeath? person.dateOfDeath.dateUTC:0;
+						dodYear.text			= person.dateOfDeath!=null? person.dateOfDeath.fullYear.toString():'Year';
+						dodApprox.selected		= person.isDodUncertain;
+						break;
+				}
+			} 
+			private function validateDOB():Boolean{
+				var dobValid:ValidationResultEvent = dobYearValidator.validate();
+				if (dobValid.type == ValidationResultEvent.INVALID) {
+					Alert.show("Birth year should be a number!");
+					return false;
+				}
+				return true;
+			}
+			private function validateDOD():Boolean{
+				var dodValid:ValidationResultEvent = dodYearValidator.validate();
+				if ( dodValid.type == ValidationResultEvent.INVALID){
+					Alert.show("Death year should be a number!");
+					return false;
+				}
+				return true;				
+			}
+			private function saveProperty():void{
+				if (status != EDIT_PROPERTY) return;
+				var person:Person = model.selectedPerson;
+				var save:Boolean = true;
+				var year:Number, date:Number, month:Number;
+				switch (propertyType){
+					case Person.NAME:
+						if (person.firstName == firstName.text && person.lastName == lastName.text) {
+							trace("same name");
+							closeEdit();
+							return;
+						}
+						person.firstName	= firstName.text;
+						person.lastName		= lastName.text;
+						break;
+					case Person.SEX:
+						if (person.sex == sex.selectedItem.data) {
+							closeEdit();
+							return;
+						}
+						person.sex = sex.selectedItem.data;
+						break;
+					case Person.DOB:
+						if (!validateDOB()) return;
+						year 	= parseInt(dobYear.text);
+						month	= parseInt(dobMonth.selectedItem.data);
+						date	= parseInt(dobDay.selectedItem.data);
+						if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDobUncertain == dobApprox.selected && year==person.dateOfBirth.getUTCFullYear() && (month-1)==person.dateOfBirth.getUTCMonth() && 
+								date == person.dateOfBirth.getUTCDate()){
+							closeEdit();
+							return;
+						}
+						if (isNaN(year)==true){
+							if (DataEstimator.estimateDate(person, DataEstimator.DATE_OF_BIRTH)==false){
+								Alert.show("Date of death is not specified and cannot be estimated! Please at least guess it");
+								return;
+							};
+							person.isDobUncertain = true;							
+						}else{
+							person.dateOfBirth 		= Helper.assignDate(year, month, date);
+							person.isDobUncertain 	= dobApprox.selected;	
+						}
+					
+
+						break;
+					case Person.DOD:
+						if (person.deceased==false && person.deceased == deceased.selected){
+							closeEdit();
+							return;
+						}
+						person.deceased	= deceased.selected;
+						if (deceased.selected){
+							if (!validateDOD()) return;
+							year	= parseInt(dodYear.text);
+							month	= parseInt(dodMonth.selectedItem.data);
+							date	= parseInt(dodDay.selectedItem.data);
+							if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDodUncertain == dodApprox.selected && year == person.dateOfDeath.getUTCFullYear() && (month-1)==person.dateOfDeath.getUTCMonth() &&
+									date == person.dateOfDeath.getUTCDate()){
+								closeEdit();
+								return;	
+							}
+							if (isNaN(year)==true) {
+								if (DataEstimator.estimateDate(person, DataEstimator.DATE_OF_DEATH)==false){
+									Alert.show("Date of death is not specified and cannot be estimated! Please at least guess it");
+									return;
+								};
+								person.isDodUncertain = true;
+							}else{
+								person.dateOfDeath 		= Helper.assignDate(year, month, date);
+								person.isDodUncertain	= dodApprox.selected;
+							}
+
+						}else{
+							person.dateOfDeath = null;
+						}						
+						break;
+				}
+				//save person into database
+				var updateEvent:UpdatePersonEvent = new UpdatePersonEvent(person);
+				updateEvent.dispatch();				
+				closeEdit();
+				init();
+				model.vis.visualize(model.root);
+				//model.vis.select(this
+			}
+			private function closeEdit():void{				
+				if (status != EDIT_PROPERTY) return;
+				curShowBox.visible 	= curShowBox.includeInLayout = true;
+				curEditBox.visible	= curEditBox.includeInLayout = false;
+				status = NONE;
+			}
+			private function editKeyDown(event:KeyboardEvent):void{
+				if (event.keyCode == Keyboard.ESCAPE){
+					closeEdit();
+				}else if (event.keyCode == Keyboard.ENTER){
+					saveProperty();
+				}
+			}
+
 	]]>
 	</mx:Script>
-	<mx:Panel paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" width="100%" title="{model.selectedPerson.name}">	
-	<mx:VBox>
-		<mx:HBox>
-			<mx:Label text="Sex:"/> <mx:Label text="{model.selectedPerson.sex}"/>
-		</mx:HBox>
-		<mx:HBox>
-			<mx:Label text="Date of Birth:"/> <mx:Label text="{model.selectedPerson.dateOfBirth.toUTCString()}"/>	
-		</mx:HBox>
-		<mx:HBox>
-			<mx:Label text="Date of Death:"/> <mx:Label text="{model.selectedPerson.dateOfDeath.toUTCString()}"/>	
-		</mx:HBox>	
-		<mx:HBox>
-			<mx:Label text="Father:"/> <mx:Label text="{model.selectedPerson.father.name}"/>
-		</mx:HBox>
-		<mx:HBox>
-			<mx:Label text="Mother:"/> <mx:Label text="{model.selectedPerson.mother.name}"/>
-		</mx:HBox>
-		<mx:HBox>
-			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Spouses:':'Spouse:'}"/> 
-			<mx:VBox>
-				<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
-					<mx:Label text="{spouseRepeater.currentItem.name}"/>				
-				</mx:Repeater>	
-			</mx:VBox>	
-		</mx:HBox>
-		<mx:HBox>
-			<mx:Label text="{model.selectedPerson.children.length>1? 'Children:':'Child:'}"/> 
-			<mx:VBox>
-				<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.children}">
-					<mx:Label text="{childRepeater.currentItem.name}"/>
-				</mx:Repeater>		
-			</mx:VBox>
-		</mx:HBox>
-	</mx:VBox>
-	</mx:Panel>
-	<mx:VBox paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" width="100%" height="100%" styleName="solidBorder" >
+	<mx:NumberValidator id="dobYearValidator" source="{dobYear}" property="text" domain="int" required="false"/>
+	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
+	<mx:Grid width="100%">
+		<mx:GridRow width="100%">
+			<mx:GridItem>
+				<mx:Image id="photo" width="110" height="110"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%">
+				<mx:VBox keyDown="editKeyDown(event)" width="100%">
+					<!-- NAME -->
+					<mx:HBox id="showNameBox" rollOver="onRollOver(event, editName)" rollOut="onRollOut(event, editName)" width="100%">
+						<mx:Label styleName="mediumTitle" text="{model.selectedPerson.firstName+' '+model.selectedPerson.lastName}" width="100%"/>
+						<mx:Button id="editName" label="Edit" visible="false" click="editProperty(Person.NAME, showNameBox, editNameBox)"/>
+					</mx:HBox>
+					<mx:HBox id="editNameBox" visible="false" includeInLayout="false" styleName="solidBorder">
+						<mx:TextInput id="firstName" width="80"/>
+						<mx:TextInput id="lastName" width="80"/>
+						<mx:Button id="saveName" label="Save" click="saveProperty()"/>
+					</mx:HBox>
+					<!-- SEX -->
+					<mx:HBox id="showSexBox" rollOver="onRollOver(event, editSex)" rollOut="onRollOut(event, editSex)" width="100%">
+						<mx:Label styleName="mute"  text="Sex:" width="85"/>
+						<mx:Label text="{model.selectedPerson.sex}" width="100%"/>
+						<mx:Button id="editSex" label="Edit" visible="false" click="editProperty(Person.SEX, showSexBox, editSexBox)"/>
+					</mx:HBox>
+					<mx:HBox id="editSexBox" visible="false" includeInLayout="false" styleName="solidBorder" width="100%">
+						<mx:ComboBox id="sex" dataProvider="{Helper.sexArray}"/><mx:Spacer width="100%"/>
+						<mx:Button id="saveSex" label="Save" click="saveProperty()"/>
+					</mx:HBox>
+					<!-- DOB -->
+					<mx:HBox id="showDOBBox" rollOver="onRollOver(event, editDOB)" rollOut="onRollOut(event, editDOB)" width="100%">
+						<mx:Label styleName="mute"  text="Date of Birth:" width="85"/>
+						<mx:Label id="dob"  width="100%"/>
+						<mx:Button id="editDOB" label="Edit" visible="false" click="editProperty(Person.DOB, showDOBBox, editDOBBox)"/>
+					</mx:HBox>
+					<mx:VBox id="editDOBBox" visible="false" includeInLayout="false" styleName="solidBorder" width="100%">		
+						<mx:HBox width="100%">	    	
+							<mx:TextInput id="dobYear" width="40" click="if(dobYear.text=='Year') dobYear.text=''"/>
+					     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dobMonth"/>
+					    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dobDay"/>				    	
+				    	</mx:HBox>			    	
+	    		    	<mx:HBox width="100%">
+	    					<mx:CheckBox label="approximate" id="dobApprox" width="100%"/>
+	    					<mx:Button id="saveDOB" label="Save" click="saveProperty()"/>
+	    				</mx:HBox> 
+						
+					</mx:VBox>
+					<!-- DOD -->
+					<mx:HBox id="showDODBox" rollOver="onRollOver(event, editDOD)" rollOut="onRollOut(event, editDOD)" width="100%">
+						<mx:Label styleName="mute"  text="Date of Death:" width="85"/>
+						<mx:Label id="dod" width="100%"/>
+						<mx:Button id="editDOD" label="Edit" visible="false" click="editProperty(Person.DOD, showDODBox, editDODBox)"/>
+					</mx:HBox>	
+					<mx:VBox id="editDODBox" visible="false" includeInLayout="false" styleName="solidBorder" width="100%">
+						<mx:HBox width="100%">
+							<mx:CheckBox label="Deceased?" id="deceased" width="100%"/>
+							<mx:Button id="saveDOD" label="Save" click="saveProperty()"/></mx:HBox>
+				    	<mx:HBox includeInLayout="{deceased.selected}" visible="{deceased.selected}" width="100%">
+				    		<mx:TextInput id="dodYear" width="40" click="if(dodYear.text=='Year') dodYear.text=''"/>	
+					     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="dodMonth"/>
+					    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>					    	
+				    	</mx:HBox>	
+				    	<mx:HBox  width="100%">
+				    		<mx:CheckBox label="approximate" id="dodApprox"  includeInLayout="{deceased.selected}" visible="{deceased.selected}"/>				    		
+				    	</mx:HBox>
+					</mx:VBox>
+					
+				</mx:VBox>				
+			</mx:GridItem>
+		</mx:GridRow>
+	</mx:Grid>
+	<view:Relationships id="relationships" width="100%"/>
+	<!--<mx:VBox paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" width="100%" height="100%" styleName="solidBorder" >
 		<mx:Button label="Make This Center" width="150" click="changeRoot()" textAlign="left" />
 		<mx:Button label="Edit Info" width="150" click="edit()" textAlign="left"/>
 		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
-		<!--<mx:Button label="See Life Events" width="150" textAlign="left"/>-->		
-	</mx:VBox>
-
+		<mx:Button label="See Life Events" width="150" textAlign="left"/>		
+	</mx:VBox>-->
+	
 
 <!--		<mx:Button label="Add Mother" width="100" click="addRelationship('Mother')"/>
 	<mx:Button label="Add Spouse" width="100" click="addRelationship('Spouse')"/>

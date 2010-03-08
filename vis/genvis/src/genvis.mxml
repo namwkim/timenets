@@ -26,8 +26,8 @@
 			private var model:ModelLocator = ModelLocator.getInstance();
 			
 			private function init():void{
-//				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
-//				initializeEvent.dispatch();			
+				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
+				initializeEvent.dispatch();			
 			}
 //			private function resultHandler(e:ResultEvent):void {
 //				var str:String = "asdfawrfh239urF iwiuHF289UJ FU 4f4";				
@@ -74,15 +74,15 @@
 	  showBusyCursor="true">
 	  <mx:method name="root" result="resultHandler(event)"/>
 	</mx:RemoteObject>-->
-	<!--<mx:Button label="send" buttonDown="setRoot(1);"></mx:Button>-->
-	
-	
-	<mx:HBox width="100%" height="100%">
-		<genvis:GenVis id="vis" width="100%" height="100%" backgroundColor="#FFFFFF" tabEnabled="false" tabIndex="-1" />
-		<mx:ViewStack id="mainStack" maxWidth="350"  minWidth="350" height="100%" selectedIndex="{model.page}" change="changeHandler()">
-			<view:FrontPage/>
-			<view:PersonPage id="personPage"/>
-			
-		</mx:ViewStack>
-	</mx:HBox>
+	<!--<mx:Button label="send" buttonDown="setRoot(1);"></mx:Button>-->	
+	<mx:VBox width="100%" height="100%">
+		<view:ProjectPage height="60" width="100%"/>
+		<mx:HBox width="100%" height="100%">
+			<genvis:GenVis id="vis" width="100%" height="100%" backgroundColor="#FFFFFF" tabEnabled="false" tabIndex="-1" />
+			<mx:ViewStack id="mainStack" maxWidth="350"  minWidth="350" height="100%" selectedIndex="{model.page}" change="changeHandler()" creationPolicy="all">
+				<view:FrontPage/>
+				<view:PersonPage id="personPage"/>				
+			</mx:ViewStack>
+		</mx:HBox>
+	</mx:VBox>
 </mx:Application>

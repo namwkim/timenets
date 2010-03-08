@@ -9,29 +9,34 @@
 			[Bindable]
 			private var model:ModelLocator = ModelLocator.getInstance();
 			public function init():void{
-				if (this.initialized==false) return;
-				initializeState();
-				model.editInfo 		= editInfo;
+				model.personMain	= personMain;
 				model.editMarriage	= editMarriage;
+				initializeState();
+//				model.editInfo 		= editInfo;
+//				model.editMarriage	= editMarriage;			
 			}
-			private function initializeState():void{				
-				if (model.pageState == ModelLocator.PERSON_EDIT){
-					personEdit.init();
-				}else if (model.pageState == ModelLocator.PERSON_MAIN){
-					personMain.init();
-				}else if (model.pageState == ModelLocator.EDIT_PERSON){
-					editInfo.init();
-				}else if (model.pageState == ModelLocator.EDIT_MARRIAGE){
-					editMarriage.init(model.data as Marriage);
-				}
+			private function initializeState():void{	
+//				if (model.pageState == ModelLocator.PERSON_MAIN){
+//					personMain.init();
+//				}			
+//				if (model.pageState == ModelLocator.PERSON_EDIT){
+//					personEdit.init();
+//				}else if (model.pageState == ModelLocator.PERSON_MAIN){
+//					personMain.init();
+//				}else if (model.pageState == ModelLocator.EDIT_PERSON){
+//					editInfo.init();
+//				}else if (model.pageState == ModelLocator.EDIT_MARRIAGE){
+//					editMarriage.init();
+//				}
 			}			
 	]]>
 	</mx:Script>
-	<mx:ViewStack id="personContext"  selectedIndex="{model.pageState}" width="100%" height="100%" change="initializeState()">
+	<mx:ViewStack id="personContext"  selectedIndex="{model.pageState}" width="100%" height="100%" change="initializeState()" creationPolicy="all">
 		<view:PersonMain id="personMain"/>
-		<view:PersonEdit id="personEdit"/>
-		<view:EditBasicInfo id="editInfo"/>
 		<view:EditMarriage id="editMarriage"/>
+		<!--<view:PersonEdit id="personEdit"/>
+		<view:EditBasicInfo id="editInfo"/>
+		-->
 	</mx:ViewStack>
 
 

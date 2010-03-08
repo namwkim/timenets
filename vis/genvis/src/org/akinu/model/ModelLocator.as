@@ -9,6 +9,7 @@ package org.akinu.model
 	
 	import org.akinu.view.EditBasicInfo;
 	import org.akinu.view.EditMarriage;
+	import org.akinu.view.PersonMain;
 	import org.akinu.vo.Project;
 	
 	[Bindable]
@@ -25,7 +26,8 @@ package org.akinu.model
 			if (_instance==null)	_instance = new ModelLocator();
 			return _instance;
 		}
-		
+		//url
+		public var url:String = "http://localhost:3000/";
 		//context menu variables
 		public static const FRONT_PAGE:uint		= 0;
 		public static const PERSON_PAGE:uint	= 1;
@@ -35,9 +37,9 @@ package org.akinu.model
 		//1. person menu context
 		public static const INDEX:uint					= 0;			
 		public static const PERSON_MAIN:uint			= 0; 
-		public static const PERSON_EDIT:uint			= 1;
-		public static const EDIT_PERSON:uint			= 2;
-		public static const EDIT_MARRIAGE:uint			= 3;
+//		public static const PERSON_EDIT:uint			= 1;
+//		public static const EDIT_PERSON:uint			= 2;
+		public static const EDIT_MARRIAGE:uint			= 1;
 		public var pageState:uint = PERSON_MAIN; //depends on contextViewType
 		
 		//vis data variables
@@ -52,5 +54,6 @@ package org.akinu.model
 		public var data:*;
 		public var editInfo:EditBasicInfo; //to call init function in some cases /TODO: improve this later
 		public var editMarriage:EditMarriage;
+		public var personMain:PersonMain;
 	}
 }

@@ -2,17 +2,32 @@
 
 .smallTitle{
 	fontSize:12;
-	color:#e9b96e;
 	fontWeight:bold;	
 }
+.rollOver{
+	cornerRadius:2;
+	borderStyle:solid;
+	borderThickness:0;
+	backgroundColor:#555753;
+}
+
 .emp{
 	fontWeight:bold;
+}
+
+.mute{
+	color:#888a85;
 }
 .mediumTitle{
 	fontFamily:Verdana, Geneva, Arial, Helvetica, sans-serif;
 	fontWeight:bold;
-	color:#e9b96e;
 	fontSize:16;
+}
+.editBtn{
+	paddingTop:0px;
+	paddingBottom:0px;
+	paddingLeft:0px;
+	paddingRight:0px;
 }
 .solidBorder{
 	borderColor:#555753;
@@ -256,6 +271,10 @@ Button
 	textSelectedColor:#eeeeec;
 	disabledColor:#111111;
 	fontWeight:normal;
+	paddingTop:2px;
+	paddingBottom:2px;
+	paddingLeft:4px;
+	paddingRight:4px;
 }
 
 
@@ -638,8 +657,11 @@ Label
 */
 LinkButton
 {
-	rollOverColor: #222222;
-	selectionColor: #000000;
+	color:#e9b96e;
+	rollOverColor:#2e3436;
+	selectionColor:#2e3436;
+	textRollOverColor:#fcaf3e;
+	textSelectedColor:#fcaf3e;
 	focusAlpha: 0.1;
 	cornerRadius: 0;
 }

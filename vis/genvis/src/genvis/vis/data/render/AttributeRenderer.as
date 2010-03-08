@@ -74,27 +74,27 @@ package genvis.vis.data.render
 					var refPt1:Point;
 					var refPt2:Point;
 					for each (evtPt in node1.points){
-						if (evtPt.date == marriage.startDate  && attr.attrType == AttributeSprite.MARRIAGE_DATE){
+						if (evtPt.date == marriage.startDate  && attr.attrType == AttributeSprite.MARRIAGE_DATE && evtPt.type == EvtPt.MARRIAGE){
 							refPt1 = node1.toGlobal(evtPt.pt);
 						}
-						if (evtPt.date == marriage.endDate  && attr.attrType == AttributeSprite.DIVORCE_DATE){
+						if (evtPt.date == marriage.endDate  && attr.attrType == AttributeSprite.DIVORCE_DATE && evtPt.type == EvtPt.DIVORCE){
 							refPt1 = node1.toGlobal(evtPt.pt);
 						}						
 					}
 					for each (evtPt in node2.points){
-						if (evtPt.date == marriage.startDate  && attr.attrType == AttributeSprite.MARRIAGE_DATE){
+						if (evtPt.date == marriage.startDate  && attr.attrType == AttributeSprite.MARRIAGE_DATE && evtPt.type == EvtPt.MARRIAGE){
 							refPt2 = node2.toGlobal(evtPt.pt);
 						}
-						if (evtPt.date == marriage.endDate  && attr.attrType == AttributeSprite.DIVORCE_DATE){
+						if (evtPt.date == marriage.endDate  && attr.attrType == AttributeSprite.DIVORCE_DATE && evtPt.type == EvtPt.DIVORCE){
 							refPt2 = node2.toGlobal(evtPt.pt);
 						}						
 					}
 					attr.x 	= refPt1.x;
 					attr.y 	= (refPt1.y+refPt2.y)/2;
 					if (attr.attrType == AttributeSprite.MARRIAGE_DATE){
-						label.x = -15;
+						label.x = -20;
 					}else if (attr.attrType == AttributeSprite.DIVORCE_DATE){
-						label.x = 15;
+						label.x = 20;
 					}
 										
 				}

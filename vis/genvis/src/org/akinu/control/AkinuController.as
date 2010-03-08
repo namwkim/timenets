@@ -26,6 +26,10 @@ package org.akinu.control
 			this.addCommand(AddRelationshipEvent.ADD_RELATIONSHIP, PersonCommand);
 			this.addCommand(RemoveRelationshipEvent.REMOVE_RELATIONSHIP, PersonCommand);
 			this.addCommand(UpdateMarriageEvent.UPDATE_MARRIAGE, PersonCommand);
+			this.addCommand(RemoveMarriageEvent.REMOVE_MARRIAGE, PersonCommand);
+			
+			//PROJECT COMMANDS
+			this.addCommand(UpdateProjectEvent.UPDATE_PROJECT, ProjectCommand);
 		}
 		
 	}

@@ -27,7 +27,7 @@ package org.akinu.responders
 
 		public function result(e:Object):void	{
 			var event:ResultEvent = e as ResultEvent;
-			if (create){
+			//if (create){
 				person.id = e.result["person"].id;
 				person.saved = true;
 				if (marriage) {
@@ -35,7 +35,7 @@ package org.akinu.responders
 					marriage.saved = true;
 				}
 				
-			}
+			//}
 			if (nextEvents){
 				for each (var evt:AddRelationshipEvent in nextEvents){
 					if (person.id != evt.person.id) Alert.show("AddRelationshipResponder-validation failed!");

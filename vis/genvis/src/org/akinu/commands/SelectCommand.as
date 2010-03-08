@@ -19,13 +19,15 @@ package org.akinu.commands
 			var select:SelectEvent = event as SelectEvent;
 			if (select.objType == SelectEvent.PERSON){
 				if (select.evtType == SelectEvent.SELECT){
-					model.selectedPerson = select.selected;
-					model.page 	 		 = ModelLocator.PERSON_PAGE;
-					if (model.selectedPerson.saved == true){
-						model.pageState = ModelLocator.PERSON_MAIN;
-					}else{
-						model.pageState	= ModelLocator.EDIT_PERSON;
-					}
+					model.selectedPerson 	= select.selected;
+					model.page 	 		 	= ModelLocator.PERSON_PAGE;
+					model.pageState 		= ModelLocator.PERSON_MAIN;
+					if (model.personMain) model.personMain.init();
+//					if (model.selectedPerson.saved == true){
+//						model.pageState = ModelLocator.PERSON_MAIN;
+//					}else{
+//						model.pageState	= ModelLocator.EDIT_PERSON;
+//					}
 				}else if (select.evtType == SelectEvent.DESELECT){
 					model.selectedPerson 	= null;
 					model.page				= ModelLocator.FRONT_PAGE;
@@ -48,14 +50,14 @@ package org.akinu.commands
 				if (attr.objType == AttributeSprite.PERSON){
 					model.selectedPerson = attr.data as Person;
 					model.page 	 		 = ModelLocator.PERSON_PAGE;
-					model.pageState		 = ModelLocator.EDIT_PERSON;
-					if (model.editInfo) model.editInfo.init();//initialize the edit page
+					model.pageState		 = ModelLocator.PERSON_MAIN;
+					if (model.personMain) model.personMain.init();
 				}else if (attr.objType == AttributeSprite.MARRIAGE){	
 					model.selectedPerson = null;
-					model.page 	 		 = ModelLocator.PERSON_PAGE;
-					model.pageState		 = ModelLocator.EDIT_MARRIAGE;
 					model.data			 = attr.data as Marriage;
-					if (model.editMarriage) model.editMarriage.init(attr.data as Marriage);//initialize the edit page
+					model.page 	 		 = ModelLocator.PERSON_PAGE;
+					model.pageState		 = ModelLocator.EDIT_MARRIAGE;					
+					if (model.editMarriage) model.editMarriage.init(model.data);//initialize the edit page
 				}		
 			}
 

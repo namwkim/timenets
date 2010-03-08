@@ -5,10 +5,12 @@ package genvis.data
 	[Bindable]	
 	public class Person{
 		
-		public static const NONE:int		= 0;
-		public static const DOB:int 		= 1;
-		public static const DOD:int 		= 2;
-		public static const GENDER:int		= 4;
+		public static const NONE:uint		= 0;
+		public static const DOB:uint 		= 1;
+		public static const DOD:uint 		= 2;
+		public static const GENDER:uint		= 4;
+		public static const SEX:uint		= 4;
+		public static const NAME:uint		= 5;
 		
 		public static const MALE:String		= "Male";
 		public static const FEMALE:String   = "Female";
@@ -285,6 +287,11 @@ package genvis.data
 				_marriages.splice(idx, 1);	
 			}			
 			_spouses.splice(sidx,1);
+		}
+		public function removeMarriage(marriage:Marriage):void{
+			var midx:uint = _marriages.indexOf(marriage);
+			if (midx<0) return;
+			_marriages.splice(midx, 1);			
 		}
 		public function removeChild(child:Person):void{
 			var cidx:uint = _children.indexOf(child);

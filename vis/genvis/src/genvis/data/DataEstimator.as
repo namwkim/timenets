@@ -6,7 +6,7 @@ package genvis.data
 	{
 		//offset and threshold for data estimation
 		private static var _threshold:int = 100;//100 years;
-		private static var _offset:int = 20;//20 years	
+		private static var _offset:int = 28;//28 years	
 		private static var _data:Array = null;
 		private static var _curDate:Date;
 		public static const MALE:String 	= "Male";
@@ -45,9 +45,8 @@ package genvis.data
 			}	
 			var dob:Date = person.dateOfBirth;
 			if ((dob.fullYear + _threshold) < _curDate.fullYear){
-				if (estimateDate(person, "dateOfDeath")==false){
-					person.dateOfDeath = new Date(dob.fullYear + _threshold, 0, 1);
-					//Alert.show("Cannot Estimate " + person.name + "'s Date of Death.", 'Data Estimator', mx.controls.Alert.OK);						
+				if (estimateDate(person, "dateOfDeath")==false){					
+					Alert.show("Cannot Estimate " + person.name + "'s Date of Death.", 'Data Estimator', mx.controls.Alert.OK);						
 				}	
 			}
 		}
@@ -160,7 +159,7 @@ package genvis.data
 				return (true);	
 			//use parents' marriage date + offset	
 			if (person.parents.length == 2){	
-				var ms:Array	= person.parents[0].marriageInfoWith(person.parents[1]);	
+				var ms:Array	= person.parents[0].marriageWith(person.parents[1]);	
 				for each (var mar:Marriage in ms){
 					var marDate:Date 	= type=="dateOfBirth"? mar.startDate : mar.endDate;												
 					if (marDate != null){
@@ -208,6 +207,18 @@ package genvis.data
 					return (true);
 				}
 			}
+			if (type == DATE_OF_DEATH){
+				var dob:Date = person.dateOfBirth;
+				if (dob){
+					if ((dob.fullYear + _threshold)>_curDate.fullYear){
+						person.dateOfDeath = new Date(_curDate.fullYear, _curDate.month, _curDate.date);
+					}else{
+						person.dateOfDeath = new Date(dob.fullYear + _threshold, 0, 1);	
+					}
+					
+					return true;
+				}	
+			}
 			return (false);
 		}
 		
@@ -238,7 +249,7 @@ package genvis.data
 				if (father.isSpouseOf(mother)==false){ //means also mother.isSpouseOf(father)==false
 					marriage 					= new Marriage(father, mother);
 					marriage.isStartUncertain 	= true;
-					marriage.isEndUncertain 	= true;
+					if (marriage.divorced) marriage.isEndUncertain 	= true;
 					marriage.saved 				= false;
 					father.addMarriage(marriage);
 					mother.addMarriage(marriage);					
@@ -250,25 +261,25 @@ package genvis.data
 			//if (person.saved==false) return;
 			if (person.parents.length ==1){
 				
-				//2.1 if this parent has no spouse, then create a fake person
-				if (person.parents[0].spouses.length == 0){
-					var spouse:Person 	= person.parents[0].copy();
-					spouse.saved		= false;
-					//construct spouse-relationship
-					var marriage:Marriage		= new Marriage(person.parents[0], spouse);
-					marriage.isStartUncertain 	= true;
-					marriage.isEndUncertain 	= true;
-					marriage.saved				= false;
-					spouse.addMarriage(marriage);
-					person.parents[0].addMarriage(marriage);
-					//construct parent-child relationship
-					spouse.addChild(person);
-					person.addParent(spouse);
-					//if (_data) _data.push(spouse);	
-				}else{
-					//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
-					//(this is done after estimation)
-				}
+//				//2.1 if this parent has no spouse, then create a fake person
+//				if (person.parents[0].spouses.length == 0){
+//					var spouse:Person 	= person.parents[0].copy();
+//					spouse.saved		= false;
+//					//construct spouse-relationship
+//					var marriage:Marriage		= new Marriage(person.parents[0], spouse);
+//					marriage.isStartUncertain 	= true;
+//					if (marriage.divorced) marriage.isEndUncertain 	= true;
+//					marriage.saved				= false;
+//					spouse.addMarriage(marriage);
+//					person.parents[0].addMarriage(marriage);
+//					//construct parent-child relationship
+//					spouse.addChild(person);
+//					person.addParent(spouse);
+//					//if (_data) _data.push(spouse);	
+//				}else{
+//					//2.2. if this parent has one or more spouses, infer which spouse is a parent of this person.
+//					//(this is done after estimation)
+//				}
 			}
 		}
 	}

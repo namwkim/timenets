@@ -34,15 +34,24 @@ class ProjectController < ApplicationController
       format.js { render :layout=>false}
     end
   end
-  def update_project
-    @project = Project.find_by_id(params[:id])
-    if @project.update_attributes(params[:project])
+  def update_project    
+    if is_amf
+      @project   = Project.find_by_id(params[:project].id)      
+      success   = @project.update_attr_from_amf  params[:project]
+    else
+      @project   = Project.find_by_id(params[:id])      
+      success   = update_person_attributes @project, params
+    end  
+    if success
       respond_to do |format|
         format.js { render :partial => "update_project", :locals=>{:project=>@project} }
-      end
-      
+        format.amf { render :amf=>"Success"}
+      end      
     else
-      render :action=>"edit_project"
+      respond_to do |format|
+        format.js {render :action=>"edit_project"}
+        format.amf { render :amf=>FaultObject.new(@project.errors.full_messages.join("\n"))}
+      end
     end
   end
   def delete_project

@@ -93,10 +93,13 @@ class PersonController < ApplicationController
   
   def delete_person
     @person = Person.find_by_id(params[:id])
-    @person.destroy_marriages
-    Person.delete_file(@person.photo_url)    
-    @person.destroy
-    log "deleted", @person, @person.project
+    user    = User.find_by_person_id(@person.id)
+    if (@operator == nil or @person.id != @operator.person.id) and user == nil
+      @person.destroy_marriages
+      Person.delete_file(@person.photo_url)    
+      @person.destroy
+      log "deleted", @person, @person.project
+    end
     respond_to do |format|
       format.html {render :nothing=>true}
       format.js {render :nothing=>true}
@@ -200,8 +203,13 @@ class PersonController < ApplicationController
     end
     
   end
-  def edit_marriage
-
+  def create_marriage
+    @marriage = params[:marriage]
+    if @marriage.save
+      render :amf=>@marriage      
+    else
+      render :amf=>FaultObject.new(@person.errors.full_messages.join("\n"))
+    end
   end
   def update_marriage
     if is_amf
@@ -217,6 +225,11 @@ class PersonController < ApplicationController
         format.amf { render :amf=>"Success"}
       end
     end
+  end
+  def delete_marriage 
+    @marriage = Marriage.find_by_id(params[:id])
+    @marriage.destroy if @marriage!=nil
+    render :amf=>"Success"
   end
   def edit_relationships
     @person =  Person.find_by_id(params[:id])

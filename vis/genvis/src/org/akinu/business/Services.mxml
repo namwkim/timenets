@@ -15,6 +15,13 @@
 	  <mx:method name="update_person"/>	  
 	  <mx:method name="delete_person"/>
 	  <mx:method name="update_marriage"/>
+	  <mx:method name="delete_marriage"/>
 	</mx:RemoteObject>
-
+	<mx:RemoteObject
+		id="projectService"
+		destination="rubyamf"
+		source="ProjectController"
+		showBusyCursor="true">
+		<mx:method name="update_project"/>
+	</mx:RemoteObject>
 </cairngorm:ServiceLocator>

@@ -14,18 +14,23 @@
 			[Bindable]
 			private var marriage:Marriage;
 			private var model:ModelLocator = ModelLocator.getInstance();
-			public function init(marriage:Marriage):void{
+			private var create:Boolean
+			public function init(mar:Marriage, create:Boolean=false):void{
 				if (this.initialized==false) this.initialize();
-				this.marriage			= marriage;
+				this.marriage 	= mar;
+				this.create		= create;
+//				if (mar) 	this.marriage = mar;	
+//				else 		this.marriage = model.data as Marriage;
+				if (this.marriage==null) return;
 				marMonth.selectedIndex 	= marriage.startDate? (marriage.startDate.getMonth()+1):0;
 				marDay.selectedIndex	= marriage.startDate? marriage.startDate.getDate():0;
-				marYear.text			= marriage.startDate!=null? marriage.startDate.getFullYear().toString():'Year';
+				marYear.text			= marriage.startDate? marriage.startDate.getFullYear().toString():'Year';
 				marCirca.selected		= marriage.isStartUncertain; 
 				divorced.selected		= marriage.divorced;
 				if (marriage.divorced){
 					divMonth.selectedIndex	= marriage.endDate? (marriage.endDate.getMonth()+1):0;
 					divDay.selectedIndex	= marriage.endDate? marriage.endDate.getDate():0;
-					divYear.text			= marriage.endDate!=null? marriage.endDate.getFullYear().toString():'Year';
+					divYear.text			= marriage.endDate? marriage.endDate.getFullYear().toString():'Year';
 					divCirca.selected		= marriage.isEndUncertain;
 				}
 				
@@ -64,7 +69,12 @@
 						}else{
 							var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(marriage.person1, marriage, marriage.person2.id, Role.SPOUSE, null, false, true);
 							addRelEvent.dispatch();
+							if (this.create){
+								this.marriage.person1.addMarriage(this.marriage);
+								this.marriage.person2.addMarriage(this.marriage);
+							}
 						}
+						model.vis.visualize(model.root);
 					}
 				}
 				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);			
@@ -80,24 +90,24 @@
 	</mx:Script>
 	<mx:NumberValidator id="marYearValidator" source="{marYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="divYearValidator" source="{divYear}" property="text" domain="int" required="false"/>    
-	<mx:Label text="Marriage Date is uncertain!" styleName="smallTitle" visible="{marriage.isStartUncertain}" includeInLayout="{marriage.isStartUncertain}" paddingLeft="15"/>
-	<mx:Label text="Divorce Date is uncertain!" styleName="smallTitle" visible="{marriage.isEndUncertain}" includeInLayout="{marriage.isEndUncertain}" paddingLeft="15"/>
 	<mx:Form id="marForm" defaultButton="{submit}">
 	    <mx:FormItem direction="vertical" label="Marriage Date">
 	    	<mx:HBox>
 		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="marMonth"/>
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="marDay"/>
-		    	<mx:TextInput id="marYear" width="40" text=" Year" click="marYear.text=''"/>	
+		    	<mx:TextInput id="marYear" width="40" text="Year" click="if (marYear.text=='Year') marYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="circa" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>   	   	
+	    	<mx:HBox>
+	    		<mx:CheckBox label="approximate" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>
+	    	</mx:HBox>   	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Divorce Date" visible="{divorced.selected}" includeInLayout="{divorced.selected}">
 	    	<mx:HBox>
 		     	<mx:ComboBox dataProvider="{Helper.monthArray}" id="divMonth"/>
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="divDay"/>
-		    	<mx:TextInput id="divYear" width="40" text=" Year" click="divYear.text=''"/>	
+		    	<mx:TextInput id="divYear" width="40" text="Year" click="if (divYear.text=='Year') divYear.text=''"/>	
 	    	</mx:HBox>	   	
-	    	<mx:CheckBox label="circa" id="divCirca"/>
+	    	<mx:CheckBox label="approximate" id="divCirca"/>
 	    </mx:FormItem>	
 	    <mx:FormItem direction="horizontal">
 		        <mx:Button id="submit" label="Save" click="submitMarForm();"/>

@@ -6,6 +6,7 @@ package org.akinu.commands
 	import org.akinu.business.PersonDelegate;
 	import org.akinu.events.AddRelationshipEvent;
 	import org.akinu.events.CreatePersonEvent;
+	import org.akinu.events.RemoveMarriageEvent;
 	import org.akinu.events.RemovePersonEvent;
 	import org.akinu.events.RemoveRelationshipEvent;
 	import org.akinu.events.UpdateMarriageEvent;
@@ -13,6 +14,7 @@ package org.akinu.commands
 	import org.akinu.model.ModelLocator;
 	import org.akinu.responders.AddRelationshipResponder;
 	import org.akinu.responders.CreatePersonResponder;
+	import org.akinu.responders.RemoveMarriageResponder;
 	import org.akinu.responders.RemovePersonResponder;
 	import org.akinu.responders.RemoveRelationshipResponder;
 	import org.akinu.responders.UpdateMarriageResponder;
@@ -50,6 +52,10 @@ package org.akinu.commands
 				var upMarEvent:UpdateMarriageEvent = event as UpdateMarriageEvent;
 				delegate = new PersonDelegate( new UpdateMarriageResponder());
 				delegate.updateMarriage(upMarEvent.marriage); 
+			}else if (event is RemoveMarriageEvent){
+				var rmMarEvent:RemoveMarriageEvent = event as RemoveMarriageEvent;
+				delegate = new PersonDelegate( new RemoveMarriageResponder());
+				delegate.removeMarriage(rmMarEvent.mar_id);
 			}
 		}
 		

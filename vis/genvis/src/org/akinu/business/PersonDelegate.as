@@ -54,8 +54,11 @@ package org.akinu.business
 			call.addResponder(_responder);						
 		}
 		public function updateMarriage(marriage:Marriage):void{
-			var call:AsyncToken;
-			call = AsyncToken(_service.update_marriage({marriage:marriage}));
+			var call:AsyncToken = AsyncToken(_service.update_marriage({marriage:marriage}));
+			call.addResponder(_responder);
+		}
+		public function removeMarriage(mar_id:String):void{
+			var call:AsyncToken = AsyncToken(_service.delete_marriage({id:mar_id}));
 			call.addResponder(_responder);
 		}
 

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" keyDown="editKeyDown(event)">
+	<mx:Script>
+		<![CDATA[
+			import org.akinu.events.UpdateProjectEvent;
+			import mx.containers.Box;
+			import org.akinu.vo.Project;
+			import org.akinu.model.ModelLocator;
+			
+			public static const NONE:uint	= 0;
+			public static const EDIT:uint	= 1;
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();			
+			private var curShowBox:Box;
+			private var curEditBox:Box;
+			private var status:uint = NONE;
+			
+			private function onRollOver(event:MouseEvent, editBtn:Button):void{
+				var container:Box = event.currentTarget as Box;
+				container.styleName="rollOver";
+				editBtn.visible = true;
+			}
+			private function onRollOut(event:MouseEvent, editBtn:Button):void{
+				var container:Box = event.currentTarget as Box;
+				container.styleName="";
+				editBtn.visible = false;				
+			}
+			
+			private function closeEdit():void{				
+				if (status != EDIT) return;
+				curShowBox.visible 	= curShowBox.includeInLayout = true;
+				curEditBox.visible	= curEditBox.includeInLayout = false;
+				status = NONE;
+			}
+			private function editProject(showBox:Box, editBox:Box):void{
+				//close open editBox
+				closeEdit();
+				status = EDIT;
+				var project:Project = model.project;
+				curShowBox 		  = showBox;
+				curEditBox        = editBox;
+				showBox.visible = showBox.includeInLayout = false;
+				editBox.visible	= editBox.includeInLayout = true;
+				projName.text	= project.name;
+				projDesc.text	= project.description;
+					
+			}
+			private function saveProject():void{
+				if (status != EDIT) return;
+				var project:Project = model.project;
+				if (project.name == projName.text && project.description == projDesc.text){
+					closeEdit();
+					return;				
+				}
+				project.name = projName.text;
+				project.description = projDesc.text;
+				var updateEvent:UpdateProjectEvent = new UpdateProjectEvent(project);
+				updateEvent.dispatch();
+				closeEdit();
+			}
+			private function editKeyDown(event:KeyboardEvent):void{
+				if (event.keyCode == Keyboard.ESCAPE){
+					closeEdit();
+				}else if (event.keyCode == Keyboard.ENTER){
+					saveProject();
+				}
+			}			
+		]]>
+	</mx:Script>
+	<mx:VBox id="showBox" width="100%" rollOver="onRollOver(event, edit)" rollOut="onRollOut(event, edit)" doubleClickEnabled="true" doubleClick="editProject(showBox, editBox)">
+		<mx:HBox width="100%" backgroundAlpha="0">
+			<mx:Label id="title" text="{model.project.name}" styleName="mediumTitle"/>
+			<mx:Button id="edit" label="Edit" click="editProject(showBox, editBox)" visible="false"/>
+		</mx:HBox>
+		<mx:Text text="{model.project.description}" width="100%"/>		
+	</mx:VBox>
+	<mx:VBox id="editBox" width="100%" visible="false" includeInLayout="false" styleName="solidBorder">
+		<mx:HBox width="100%">
+			<mx:TextInput id="projName" width="{title.width}"/>		
+			<mx:Button id="save" label="Save" click="saveProject()"/>
+		</mx:HBox>
+		<mx:TextInput id="projDesc" width="100%"/>		
+	</mx:VBox>
+
+
+
+		
+	
+			
+</mx:VBox>

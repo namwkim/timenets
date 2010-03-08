@@ -45,8 +45,13 @@ class Person < ActiveRecord::Base
     self.date_of_birth      = new_person.date_of_birth
     self.is_dob_uncertain   = new_person.is_dob_uncertain
     self.deceased           = new_person.deceased
-    self.date_of_death      = new_person.date_of_death if self.deceased
-    self.is_dod_uncertain   = new_person.is_dod_uncertain if self.deceased
+    if (self.deceased)
+      self.date_of_death    = new_person.date_of_death
+      self.is_dod_uncertain = new_person.is_dod_uncertain
+    else
+      self.date_of_death    = nil
+      self.is_dod_uncertain = false
+    end
     self.father_id          = new_person.father_id
     self.mother_id          = new_person.mother_id
     self.save

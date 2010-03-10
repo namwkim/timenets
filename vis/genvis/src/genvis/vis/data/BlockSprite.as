@@ -294,8 +294,7 @@ package genvis.vis.data
 		public function visitInOrder(func:Function, forward:Boolean = true, depth:Number = Infinity):void{
 			if (depth!=Infinity && depth < 0) return;
 			else if (depth!=Infinity && depth >= 0) depth--;
-			if (_childBlocks.length == 2){
-			
+			if (_childBlocks.length == 2){			
 				forward? _childBlocks[0].visitInOrder(func, forward, depth):_childBlocks[1].visitInOrder(func, forward, depth);
 				func(this);
 				forward? _childBlocks[1].visitInOrder(func, forward, depth):_childBlocks[0].visitInOrder(func, forward, depth);

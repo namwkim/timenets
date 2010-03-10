@@ -43,8 +43,8 @@ package org.akinu.responders
 				}
 			}
 			if (visUpdate){//TODD: don't refresh the whole visualization, but update newly added part only.
-				model.pageState = ModelLocator.PERSON_MAIN;			
-				model.vis.visualize(model.root);
+//				model.pageState = ModelLocator.PERSON_MAIN;			
+//				model.vis.visualize(model.root);
 			}
 //			var initEvent:InitializeEvent = new InitializeEvent(model.root.id, model.vis);
 //			initEvent.dispatch();

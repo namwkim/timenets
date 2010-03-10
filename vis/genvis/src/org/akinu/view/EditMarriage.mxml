@@ -51,7 +51,7 @@
 			private function populateVO():void{
 				marriage.startDate 			= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
 				marriage.isStartUncertain	= marCirca.selected;
-				marriage.divorced	= divorced.selected;
+				marriage.divorced			= divorced.selected;
 				if (divorced.selected){
 					marriage.endDate 		= Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
 					marriage.isEndUncertain	= divCirca.selected;
@@ -74,10 +74,14 @@
 								this.marriage.person2.addMarriage(this.marriage);
 							}
 						}
-						model.vis.visualize(model.root);
+						model.vis.update();
 					}
 				}
-				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);			
+				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);
+				else {
+					model.page 		= ModelLocator.FRONT_PAGE;
+					model.pageState = ModelLocator.INDEX;
+				}			
 			}
 			private function cancelMarForm():void{
 				if (model.pageState != ModelLocator.EDIT_MARRIAGE) this.parent.removeChild(this);

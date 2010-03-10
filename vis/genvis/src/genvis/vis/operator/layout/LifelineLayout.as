@@ -43,6 +43,11 @@ package genvis.vis.operator.layout
 		protected var _recentFocus:NodeSprite = null;
 		protected var _displayNodeList:Array  = null;
 		protected var _displayBlockList:Array = null;		
+		protected var _gap:Number	= 5;//gap between blocks
+		protected var _yPan:Number	= 0;
+		protected var _defaultYPan:Number;
+		protected var _yMin:Number;
+		protected var _yMax:Number;
 		
 		protected var _fitHorzBound:Boolean = false;	
 		
@@ -55,7 +60,12 @@ package genvis.vis.operator.layout
 		}
 		public function get doiEnabled():Boolean 		{ return _doiEnabled; 	}
 		public function set doiEnabled(d:Boolean):void 	{ _doiEnabled = d;		}
-		public function get xAxis():Axis{ return (visualization.axes as CartesianAxes).xAxis }
+		public function get xAxis():Axis{ return (visualization.axes as CartesianAxes).xAxis }		
+		public function set yPan(y:Number):void { _yPan = y; }
+		public function get yPan():Number { return _yPan  }
+		public function get yMin():Number { return _yMin; }
+		public function get yMax():Number { return _yMax; }
+		public function get defaultYPan():Number { return _defaultYPan; }
 		/**
 		 * xrange : in years
 		 * 			
@@ -108,19 +118,18 @@ package genvis.vis.operator.layout
 			//find min and max within xrange
 			var min:Date, max:Date;			
 			//temporary : hourglass chart
-
 			var person:Person = recentFocus.data as Person;
 			if (!_fitHorzBound){
-				if (!person.deceased){
-					var minYear:Number = _curDate.fullYear-_xrange;
-					_xscale.min = new Date(minYear, 1, 1);
-					_xscale.max = _curDate;
-				}else{	
+//				if (!person.deceased){
+//					var minYear:Number = _curDate.fullYear-_xrange;
+//					_xscale.min = new Date(minYear, 1, 1);
+//					_xscale.max = _curDate;
+//				}else{	
 					var end:Date = person.dateOfDeath!=null? person.dateOfDeath:_curDate;
 					var median:Number = person.dateOfBirth.fullYear + (end.fullYear - person.dateOfBirth.fullYear)/2;
 					_xscale.min = new Date(median-(_xrange/2), 1, 1);
-					_xscale.max = new Date((median+(_xrange/2))>_curDate.fullYear?_curDate.fullYear:(median+(_xrange/2)) , 1 ,1);				
-				}
+					_xscale.max = new Date(median+(_xrange/2) , 1 ,1);				
+//				}
 			}else{
 				//find xmin and xmax from the whole data
 //				var people:Array  = new Array();
@@ -259,20 +268,26 @@ package genvis.vis.operator.layout
 
 		public function verticalPositioning():void{			
 			//1. calculate initial height
+			var offset:Number;
 			verticalLayout();
-			var top:Number 		= Number.MAX_VALUE;	
 			if (_doiEnabled){
-				top = fitLayoutToScreen();
-			}else{						
+				offset = -fitLayoutToScreen();
+			}else{		
+				var focusBlock:BlockSprite = _recentFocus.block;
+				var vmiddle:Number = visualization.bounds.height/2;
+				_defaultYPan = -(focusBlock.ty-vmiddle);
+				offset =  _defaultYPan + _yPan;
+				_yMin 	= Number.MAX_VALUE;
+				_yMax 	= -Number.MIN_VALUE;
 				visualization.data.blocks.visit(function (b:BlockSprite):void{
 					if (b.visible==false) return;
-					if (b.ty < top) top = b.ty;
+					if (b.ty < _yMin) _yMin = b.ty;
+					if (_yMax < (b.ty + b.bbox.height)) _yMax = b.ty + b.bbox.height;
 				});
 			}
 			
 			//translate layout (use transitionor to set final y position)
-			var offset:Number = -top;
-			trace("OFFSET:"+offset);
+			//trace("OFFSET:"+offset);
 			visualization.data.blocks.visit(function (b:BlockSprite):void{				
 				b.ty = b.ty + offset;
 //				if (!b.aggregated){					
@@ -403,30 +418,56 @@ package genvis.vis.operator.layout
 			for each (childBlock in _root.block.childBlocks){
 				if (childBlock.type == BlockSprite.ANCESTOR){
 					if (childBlock.visited) continue;
-					childBlock.visited = true;
-					y = _root.block.bbox.height;
-					childBlock.ty = y;
-					y = 0;					
-					for (var i:int=childBlock.childBlocks.length-1; i>=0; i--){
-						var db:BlockSprite = childBlock.childBlocks[i];
-						if (db.focus.parentNode.data.gender == Person.FEMALE)
-							db.visitInOrder(function (b:BlockSprite):void{
-								if (b.visible==false || b.visited) return;									
-								b.visited = true;			
-								y 	-= b.bbox.height;
-								b.ty = y;						
-								trace(b.focus.data.name +":"+b.ty);
-							}, true);
-						else 
-							y = childBlock.ty + childBlock.bbox.height;
+					childBlock.visited = true;					
+					y = - (_root.block.bbox.min.y + childBlock.bbox.height + _gap);
+					childBlock.ty = y;							
+					var db:BlockSprite;	
+					var i:int;							
+					for (i=childBlock.childBlocks.length-1; i>=0; i--){
+						db = childBlock.childBlocks[i];
+						if (db.focus.parentNode.data.gender == Person.MALE){
+							var prevBlocks:Array = new Array();
+							prevBlocks.push(childBlock);
+							y = -_root.block.bbox.min.y;
 							db.visitInOrder(function (b:BlockSprite):void{
 								if (b.visible==false || b.visited) return;
 								b.visited = true;
+								prevBlocks.push(b);
 								b.ty = y;
-								y	+= b.bbox.height;
+								if (b.intersect(_root.block)){//back up
+									var ab:BlockSprite = b; 
+									var newY:Number = -_root.block.bbox.min.y;
+									var reversed:Array = prevBlocks.slice();
+									for each (var pb:BlockSprite in reversed.reverse()){
+										newY-= (pb.bbox.height + _gap);
+										pb.ty = newY;
+										trace("ROLLBACK: "+pb.focus.data.name +":"+pb.ty);
+									}
+
+									y = -_root.block.bbox.min.y;
+								}else{
+									y	+= (b.bbox.height+_gap);
+								}
+								
 								trace(b.focus.data.name +":"+b.ty);
 							}, false);
+						}						
 					}
+					for (i=childBlock.childBlocks.length-1; i>=0; i--){
+						db = childBlock.childBlocks[i];
+						if (db.focus.parentNode.data.gender == Person.FEMALE){
+							y = childBlock.ty - _gap;
+							db.visitInOrder(function (b:BlockSprite):void{
+								if (b.visible==false || b.visited) return;									
+								b.visited = true;			
+								y 	-= (b.bbox.height+_gap);
+								b.ty = y;						
+								trace(b.focus.data.name +":"+b.ty);
+							}, true);
+						}
+					}
+
+
 //					if (childBlock.childBlocks.length == 2){
 //						childBlock.childBlocks[1].visitInOrder(forward,true);
 //						y = childBlock.ty + childBlock.bbox.height;
@@ -440,7 +481,7 @@ package genvis.vis.operator.layout
 			//descendant layout without overlaps with ancestors
 			// TODO: construct interval tree of ancestors (assuming that no ancestors whose depths are 
 			// greater than 3 intersect descendants
-			y = _root.block.bbox.height;					
+			y = _root.block.bbox.height + _gap;					
 			var childBlock:BlockSprite;
 			for each (childBlock in _root.block.childBlocks){
 				if (childBlock.type == BlockSprite.DESCENDANT){
@@ -448,16 +489,16 @@ package genvis.vis.operator.layout
 						if (b.visible==false || b.visited) return;
 						b.visited = true;
 						b.ty	= y;//initialize vertical position
-						//find ancestors intersecting with this descendant
-						var ancestors:Array = new Array();
-						_root.block.visit(function (ab:BlockSprite):void{
-							if (ab.type == BlockSprite.ANCESTOR){
-								if (ab.intersect(b)) {
-									//ancestors.push(ab);									
-									if (b.ty < (ab.ty+ab.bbox.height)) b.ty = y = (ab.ty+ab.bbox.height);
-								}
-							}
-						},2);
+//						//find ancestors intersecting with this descendant
+//						var ancestors:Array = new Array();
+//						_root.block.visit(function (ab:BlockSprite):void{
+//							if (ab.type == BlockSprite.ANCESTOR){
+//								if (ab.intersect(b)) {
+//									//ancestors.push(ab);									
+//									if (b.ty < (ab.ty+ab.bbox.height)) b.ty = y = (ab.ty+ab.bbox.height);
+//								}
+//							}
+//						},2);
 //						//calculate aggregated height of those ancestors
 //						if (ancestors.length !=0){
 //							var newY:Number = b.ty;
@@ -466,7 +507,7 @@ package genvis.vis.operator.layout
 //							}
 //							b.ty = y = newY; //update new position
 //						}
-						y += b.bbox.height + 4;						
+						y += b.bbox.height + _gap;						
 					});
 				}
 			}

@@ -7,6 +7,13 @@ package genvis.vis.controls
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import genvis.GenVis;
+	import genvis.scale.LinearScale;
+	import genvis.scale.TimeScale;
+	import genvis.vis.Visualization;
+	import genvis.vis.axis.CartesianAxes;
+	import genvis.vis.operator.layout.LifelineLayout;
+	
 	/**
 	 * Interactive control for panning and zooming a "camera". Any sprite can
 	 * be treated as a camera onto its drawing content and display list
@@ -47,6 +54,8 @@ package genvis.vis.controls
 		private var _hit:InteractiveObject;
 		private var _stage:Stage;
 		
+		//gevis specific
+		private var _layout:LifelineLayout;
 		/** The active hit area over which pan/zoom interactions can be performed. */
 		public function get hitArea():InteractiveObject { return _hit; }
 		public function set hitArea(hitArea:InteractiveObject):void {
@@ -82,6 +91,7 @@ package genvis.vis.controls
 		public override function detach():InteractiveObject
 		{
 			onRemove();
+			_layout = null;
 			_object.removeEventListener(Event.ADDED_TO_STAGE, onAdd);
 			_object.removeEventListener(Event.REMOVED_FROM_STAGE, onRemove);
 			return super.detach();
@@ -124,8 +134,40 @@ package genvis.vis.controls
 			var y:Number = event.stageY;
 			
 			if (!event.ctrlKey) {
-				dx = dy = NaN;
-				Displays.panBy(_object, x-mx, y-my);
+				//X-panning
+				var vis:Visualization = _object as Visualization;
+				_layout = vis.operator("layout") as LifelineLayout;
+				var xscale:TimeScale = _layout.xAxis.axisScale as TimeScale;
+				var curPos:Date 	= _layout.xAxis.value(x, 0, false) as Date;
+				var prevPos:Date 	= _layout.xAxis.value(mx, 0, false) as Date;
+				var dYear:Number	= prevPos.fullYear - curPos.fullYear;
+				var dMon:Number		= prevPos.month - curPos.month;
+				var dDate:Number	= prevPos.date - curPos.date;		
+				var max:Date		= xscale.max as Date;
+				var min:Date		= xscale.min as Date;
+				max = new Date(max.fullYear+dYear, max.month+dMon, max.month+dDate);
+				min = new Date(min.fullYear+dYear, min.month+dMon, min.month+dDate);
+				var update:Boolean = false;
+				if (((vis.data.min.fullYear-_layout.xrange/2)<min.fullYear) && ((vis.data.max.fullYear+_layout.xrange/2)>max.fullYear)){
+					xscale.max = max;
+					xscale.min = min;		
+					update = true;					
+				}
+				//Y-Panning				
+				var dy:Number = (y-my);
+				if ((_layout.yMax+_layout.yPan+dy+_layout.defaultYPan)>=0 && (_layout.yMin+_layout.yPan+dy+_layout.defaultYPan)<=vis.bounds.height){
+					_layout.yPan = _layout.yPan+dy;
+					update = true;
+				}				
+				if (update) vis.update(null, GenVis.OPS);
+				
+				
+				//vis.render();
+				
+				
+				//3. transform nodes along y-axis
+//				dx = dy = NaN;
+//				Displays.panBy(_object, x-mx, y-my);
 			} else {
 				if (isNaN(dx)) {
 					dx = event.stageX;

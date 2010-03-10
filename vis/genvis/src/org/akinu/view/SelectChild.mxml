@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" width="250" title="Select Children">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			import org.akinu.model.ModelLocator;
+			import genvis.data.Person;
+			
+			public static const ADD:uint	= 1;
+			public static const IGNORE:uint	= 2;
+			[Bindable]
+			private var model:ModelLocator = ModelLocator.getInstance();
+			private var person:Person;
+			public var childList:Array;
+			public var result:uint;
+			
+			public function init():void{
+				person = model.selectedPerson;
+				childList = new Array();
+			}
+			private function toggleChild(add:Boolean, child:Person):void{
+				if (add){
+					childList.push(child);
+				}else{
+					childList.splice(childList.indexOf(child), 1);
+				}
+			}
+			private function add():void{
+				result = ADD;
+				PopUpManager.removePopUp(this);				
+				this.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			}
+			private function ignore():void{
+				result = IGNORE;
+				PopUpManager.removePopUp(this);
+				this.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%">
+		<mx:Text text="We've found potential children of this person!" width="100%"/>
+		<mx:VBox>
+			<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.children}">
+				<mx:CheckBox id="chkChild" label="{childRepeater.currentItem.name}" click="toggleChild(chkChild[event.target.instanceIndices[0]].selected, event.target.getRepeaterItem() as Person)"/>
+			</mx:Repeater> 		
+		</mx:VBox>
+		<mx:HBox horizontalAlign="center" width="100%">
+			<mx:Button label="Add" click="add()"/>
+			<mx:Button label="Ignore" click="ignore()"/>
+		</mx:HBox>		
+	</mx:VBox>
+</mx:TitleWindow>

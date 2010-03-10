@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" styleName="padding5">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" styleName="padding5" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
 			import org.akinu.events.RemoveMarriageEvent;
@@ -24,6 +24,8 @@
 			private var removePopup:RemovePerson 	= new RemovePerson();	
 			public function init():void{
 				if (this.initialized==false) return;
+				if (marForm.parent) marForm.parent.removeChild(marForm);
+				if (relForm.parent) relForm.parent.removeChild(relForm);
 			}							
 			private function newRelationship(role:String, indices:Array=null, refParent:Person=null):void{	
 //				PopUpManager.addPopUp(relForm, this.parent, true);
@@ -68,7 +70,7 @@
 					default:
 					
 				}
-				Alert.show("This will only remove the relationship, not the actuall record. Are you sure you want proceed?",
+				Alert.show("This will only remove the relationship, not the actual person record. Are you sure you want proceed?",
 					"Remove Relationship", Alert.YES|Alert.NO, this, function removeHandler(evt:CloseEvent):void{
 					if (evt.detail == Alert.YES){
 						var refPerson:Person = model.selectedPerson;
@@ -131,21 +133,21 @@
 							//remove marriage link
 							refPerson.removeMarriages(person);
 							person.removeMarriages(refPerson);
-							//create unsaved spouse if there exist at least child belongs to the marriage
-							//create a dummy parent
-							if (children.length > 0){
-								var spouse:Person = refPerson.copy();
-								//add parent-child link
-								for each (child in children){
-									spouse.addChild(child);
-									child.addParent(spouse);
-								}
-								//add marriage link
-								marriage		= new Marriage(refPerson, spouse);
-								marriage.saved	= false;
-								spouse.addMarriage(marriage);
-								refPerson.addMarriage(marriage);	
-							}	
+//							//create unsaved spouse if there exist at least child belongs to the marriage
+//							//create a dummy parent
+//							if (children.length > 0){
+//								var spouse:Person = refPerson.copy();
+//								//add parent-child link
+//								for each (child in children){
+//									spouse.addChild(child);
+//									child.addParent(spouse);
+//								}
+//								//add marriage link
+//								marriage		= new Marriage(refPerson, spouse);
+//								marriage.saved	= false;
+//								spouse.addMarriage(marriage);
+//								refPerson.addMarriage(marriage);	
+//							}	
 							var rmRelEvent:RemoveRelationshipEvent = new RemoveRelationshipEvent(person.id, refPerson.id, Role.SPOUSE);
 							rmRelEvent.dispatch();										
 							break;
@@ -159,13 +161,14 @@
 							person.removeParent(father);
 							person.removeParent(mother);
 							
-							//if this is only child and, one of parent is unsaved person, remove the parent
-							if (children.length == 1){
-								if (father.saved == false || mother.saved == false){
-									father.removeMarriages(mother);
-									mother.removeMarriages(father);
-								}
-							}
+//							//if this is only child and, one of parent is unsaved person, remove the parent
+//							if (children.length == 1){
+//								if (father.saved == false || mother.saved == false){
+//									father.removeMarriages(mother);
+//									mother.removeMarriages(father);
+//								}
+//							}
+							
 //							//create a dummy parent
 //							newParent = person.parents[0].copy();
 //							//add parent-child link
@@ -216,8 +219,15 @@
 		<!--<mx:HBox width="100%">
 			<mx:Label text="Parents"  styleName="emp"/> <mx:Button label="Remove Parents" click="remove(null, Role.PARENT)" visible="{model.selectedPerson.father!=null}" includeInLayout="{model.selectedPerson.father!=null}"/>
 		</mx:HBox>-->	 
-		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="1" width="100%"/> 	
-		<mx:Grid width="100%">
+		
+		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="2" width="100%"/>
+		 	
+		<mx:Grid width="100%" verticalGap="0">
+			<mx:GridRow width="100%">
+				<mx:GridItem width="100%">
+					<mx:Label text="Parents" styleName="smallTitle"/>
+				</mx:GridItem>
+			</mx:GridRow>
 			<mx:GridRow width="100%">
 				<mx:GridItem width="100%">
 					<mx:HBox width="100%" rollOver="onRollOver(event, fBtn)" rollOut="onRollOut(event, fBtn)" visible="{model.selectedPerson.father==null}" includeInLayout="{model.selectedPerson.father==null}">
@@ -247,23 +257,23 @@
 			</mx:GridRow>
 			<mx:GridRow><mx:GridItem id="mother"/></mx:GridRow>
 		</mx:Grid>	
-		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="1" width="100%"/>
+		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="2" width="100%"/>
 		<mx:HBox width="100%" rollOver="onRollOver(event, addMarBtn)" rollOut="onRollOut(event, addMarBtn)" >
-			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Marriages:':'Marriage:'}" styleName="mute" width="100%"/>
+			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Marriages':'Marriage'}" styleName="smallTitle" width="100%"/>
 			<mx:Button id="addMarBtn" label="Add Marriage" click="newRelationship(Role.SPOUSE)" visible="false"/>	
 		</mx:HBox>
 		<mx:Box id="spouse"/>
 		<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
-			<mx:Grid styleName="contentBox" width="100%">
+			<mx:Grid styleName="contentBox" width="100%" verticalGap="0">
 				<mx:GridRow width="100%">	
 					<mx:GridItem width="100%">
-						<mx:VBox width="100%">						
+						<mx:VBox width="100%" verticalGap="0">						
 							<mx:HBox width="100%" rollOver="onRollOver(event, rmSpBtn[event.target.instanceIndices[0]])" rollOut="onRollOut(event, rmSpBtn[event.target.instanceIndices[0]])">
 								<mx:Label text="With:" styleName="mute"/>
 								<mx:Label text="{spouseRepeater.currentItem.name}" width="100%"/>
 								<mx:Button id="rmSpBtn" label="Remove" click="remove(event.currentTarget.getRepeaterItem() as Person, Role.SPOUSE)" visible="false"/>							
 							</mx:HBox>
-							<mx:VBox width="100%">
+							<mx:VBox width="100%" verticalGap="0">
 								<mx:HBox width="100%" rollOver="onRollOver(event, addPeriodBtn[event.target.instanceIndices[0]])" rollOut="onRollOut(event, addPeriodBtn[event.target.instanceIndices[0]])">
 									<mx:Label text="Period:" styleName="mute" width="100%"/>
 									<mx:Button id="addPeriodBtn" label="Add Period" click="addPeriod(event.currentTarget.getRepeaterItem() as Person, event.target.instanceIndices)" visible="false"/>
@@ -272,8 +282,8 @@
 								<mx:VBox width="100%">
 								<mx:Repeater id="marriageRepeater" dataProvider="{model.selectedPerson.marriageWith(spouseRepeater.currentItem as Person)}">
 									<mx:HBox width="100%" rollOver="onRollOver(event, marMenu[event.target.instanceIndices[0]][event.target.instanceIndices[1]])" rollOut="onRollOut(event, marMenu[event.target.instanceIndices[0]][event.target.instanceIndices[1]])">
-										<mx:Label text="{(marriageRepeater.currentItem as Marriage).startDate.getFullYear()}"/><mx:Label text="-"/>
-										<mx:Label text="{marriageRepeater.currentItem.divorced? ((marriageRepeater.currentItem as Marriage).endDate as Date).getFullYear():''}"/>
+										<mx:Label text="{marriageRepeater.currentItem.startDate.fullYear}"/><mx:Label text="-"/>
+										<mx:Label text="{marriageRepeater.currentItem.divorced? marriageRepeater.currentItem.endDate.fullYear:''}"/>
 										<mx:Spacer width="100%"/>
 										<mx:HBox id="marMenu" visible="false" backgroundColor="0x555753">
 											<mx:Button label="Edit" click="editMarriage(event.currentTarget.getRepeaterItem() as Marriage, event.target.instanceIndices)"/>
@@ -297,14 +307,16 @@
 				</mx:GridRow>
 				<mx:GridRow><mx:GridItem id="child"/></mx:GridRow>
 				<mx:GridRow width="100%">
-					<mx:GridItem width="100%">			
-						<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.childrenWith(spouseRepeater.currentItem as Person)}">						
-							<mx:HBox width="100%" rollOver="onRollOver(event, rmChildBtn[event.target.instanceIndices[0]][event.target.instanceIndices[1]])" rollOut="onRollOut(event, rmChildBtn[event.target.instanceIndices[0]][event.target.instanceIndices[1]])">
-								<mx:Label text="{childRepeater.currentItem.name}"/>
-								<mx:Label text="{childRepeater.currentItem.sex}" width="100%"/>
-								<mx:Button id="rmChildBtn" label="Remove" click="remove(event.target.getRepeaterItem() as Person, Role.CHILD)" visible="false"/>
-							</mx:HBox>								
-						</mx:Repeater>
+					<mx:GridItem width="100%">	
+						<mx:VBox width="100%" verticalGap="0">
+							<mx:Repeater id="childRepeater" dataProvider="{model.selectedPerson.childrenWith(spouseRepeater.currentItem as Person)}">						
+								<mx:HBox width="100%" rollOver="onRollOver(event, rmChildBtn[event.target.instanceIndices[0]][event.target.instanceIndices[1]])" rollOut="onRollOut(event, rmChildBtn[event.target.instanceIndices[0]][event.target.instanceIndices[1]])">
+									<mx:Label text="{childRepeater.currentItem.name}"/>
+									<mx:Label text="{childRepeater.currentItem.sex == Person.MALE? 'Son':'Daughter'}" width="100%"/>
+									<mx:Button id="rmChildBtn" label="Remove" click="remove(event.target.getRepeaterItem() as Person, Role.CHILD)" visible="false"/>
+								</mx:HBox>								
+							</mx:Repeater>							
+						</mx:VBox>	
 					</mx:GridItem>
 				</mx:GridRow>							
 			</mx:Grid>						

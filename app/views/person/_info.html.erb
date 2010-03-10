@@ -18,7 +18,7 @@
 		<td class="mute">Father:</td><td><%=link_to person.father.name, :controller=>"person", :action=>"show_person", :id=>person.father.id if person.father!=nil%></td>
 	</tr>
 	<tr>
-		<td class="mute">Mother:</td><td><%=link_to person.father, :controller=>"person", :action=>"show_person", :id=>person.father.id if person.mother=nil%></td>
+		<td class="mute">Mother:</td><td><%=link_to person.mother.name, :controller=>"person", :action=>"show_person", :id=>person.mother.id if person.mother!=nil%></td>
 	</tr>
 	<tr>
 		<td class="mute">Spouse:</td>

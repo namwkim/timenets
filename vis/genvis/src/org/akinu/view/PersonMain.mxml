@@ -30,9 +30,12 @@
 				if (model.selectedPerson == null) return;
 				var person:Person = model.selectedPerson;				
 				photo.source = person.photoUrl? model.url+'images/'+person.photoUrl:model.url+'images/person.png';
-				dob.text = Helper.UTCMonthLabels[person.dateOfBirth.getUTCMonth()]+" "+person.dateOfBirth.getUTCDate()+", "+person.dateOfBirth.getUTCFullYear();
-				if (person.deceased) dod.text = Helper.UTCMonthLabels[person.dateOfDeath.getUTCMonth()]+" "+person.dateOfDeath.getUTCDate()+", "+person.dateOfDeath.getUTCFullYear();												
+				dob.text = Helper.MonthLabels[person.dateOfBirth.month]+" "+person.dateOfBirth.date+", "+person.dateOfBirth.fullYear;
+				if (person.deceased) dod.text = Helper.MonthLabels[person.dateOfDeath.month]+" "+person.dateOfDeath.date+", "+person.dateOfDeath.fullYear;												
 				else dod.text = "";
+				//close all open child windows
+				closeEdit();
+				relationships.init();
 			}
 //			private function edit():void{
 //				var stateChangeEvent:StateChangeEvent = new StateChangeEvent(ModelLocator.PERSON_EDIT);
@@ -50,7 +53,7 @@
 						 	}
 						});
 				}else{
-					Alert.show("You can not remove the root person. Please change the root beforehand.","Alert",4,this);
+					Alert.show("You can not remove the root. Please change the root beforehand.","Alert",4,this);
 				}						
 			}
 			private function changeRoot():void{
@@ -90,14 +93,14 @@
 						break;
 					case Person.DOB:
 						dobMonth.selectedIndex 	= person.dateOfBirth? (person.dateOfBirth.month+1):0;
-						dobDay.selectedIndex	= person.dateOfBirth? person.dateOfBirth.dateUTC:0;
+						dobDay.selectedIndex	= person.dateOfBirth? person.dateOfBirth.date:0;
 						dobYear.text			= person.dateOfBirth!=null? person.dateOfBirth.fullYear.toString():'Year';
 						dobApprox.selected		= person.isDobUncertain;
 						break;
 					case Person.DOD:
 						deceased.selected		= person.deceased;
 						dodMonth.selectedIndex 	= person.dateOfDeath? (person.dateOfDeath.month+1):0;
-						dodDay.selectedIndex	= person.dateOfDeath? person.dateOfDeath.dateUTC:0;
+						dodDay.selectedIndex	= person.dateOfDeath? person.dateOfDeath.date:0;
 						dodYear.text			= person.dateOfDeath!=null? person.dateOfDeath.fullYear.toString():'Year';
 						dodApprox.selected		= person.isDodUncertain;
 						break;
@@ -146,8 +149,8 @@
 						year 	= parseInt(dobYear.text);
 						month	= parseInt(dobMonth.selectedItem.data);
 						date	= parseInt(dobDay.selectedItem.data);
-						if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDobUncertain == dobApprox.selected && year==person.dateOfBirth.getUTCFullYear() && (month-1)==person.dateOfBirth.getUTCMonth() && 
-								date == person.dateOfBirth.getUTCDate()){
+						if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDobUncertain == dobApprox.selected && year==person.dateOfBirth.fullYear && (month-1)==person.dateOfBirth.month && 
+								date == person.dateOfBirth.date){
 							closeEdit();
 							return;
 						}
@@ -160,9 +163,7 @@
 						}else{
 							person.dateOfBirth 		= Helper.assignDate(year, month, date);
 							person.isDobUncertain 	= dobApprox.selected;	
-						}
-					
-
+						}		
 						break;
 					case Person.DOD:
 						if (person.deceased==false && person.deceased == deceased.selected){
@@ -175,8 +176,8 @@
 							year	= parseInt(dodYear.text);
 							month	= parseInt(dodMonth.selectedItem.data);
 							date	= parseInt(dodDay.selectedItem.data);
-							if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDodUncertain == dodApprox.selected && year == person.dateOfDeath.getUTCFullYear() && (month-1)==person.dateOfDeath.getUTCMonth() &&
-									date == person.dateOfDeath.getUTCDate()){
+							if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDodUncertain == dodApprox.selected && year == person.dateOfDeath.fullYear && (month-1)==person.dateOfDeath.month &&
+									date == person.dateOfDeath.date){
 								closeEdit();
 								return;	
 							}
@@ -192,17 +193,18 @@
 							}
 
 						}else{
-							person.dateOfDeath = null;
+							person.dateOfDeath 		= null;
+							person.isDodUncertain	= false;
 						}						
 						break;
 				}
 				//save person into database
 				var updateEvent:UpdatePersonEvent = new UpdatePersonEvent(person);
-				updateEvent.dispatch();				
+				updateEvent.dispatch();	
 				closeEdit();
 				init();
-				model.vis.visualize(model.root);
-				//model.vis.select(this
+				model.vis.update();
+
 			}
 			private function closeEdit():void{				
 				if (status != EDIT_PROPERTY) return;
@@ -222,15 +224,19 @@
 	</mx:Script>
 	<mx:NumberValidator id="dobYearValidator" source="{dobYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
+	<mx:HBox>
+	<mx:Button label="Use This As The Root" width="150" click="changeRoot()" textAlign="left" />
+		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
+	</mx:HBox>
 	<mx:Grid width="100%">
 		<mx:GridRow width="100%">
 			<mx:GridItem>
 				<mx:Image id="photo" width="110" height="110"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%">
-				<mx:VBox keyDown="editKeyDown(event)" width="100%">
+				<mx:VBox keyDown="editKeyDown(event)" width="100%" verticalGap="0">
 					<!-- NAME -->
-					<mx:HBox id="showNameBox" rollOver="onRollOver(event, editName)" rollOut="onRollOut(event, editName)" width="100%">
+					<mx:HBox id="showNameBox" rollOver="onRollOver(event, editName)" rollOut="onRollOut(event, editName)" width="100%" doubleClickEnabled="true" doubleClick="editProperty(Person.NAME, showNameBox, editNameBox)">
 						<mx:Label styleName="mediumTitle" text="{model.selectedPerson.firstName+' '+model.selectedPerson.lastName}" width="100%"/>
 						<mx:Button id="editName" label="Edit" visible="false" click="editProperty(Person.NAME, showNameBox, editNameBox)"/>
 					</mx:HBox>
@@ -240,7 +246,7 @@
 						<mx:Button id="saveName" label="Save" click="saveProperty()"/>
 					</mx:HBox>
 					<!-- SEX -->
-					<mx:HBox id="showSexBox" rollOver="onRollOver(event, editSex)" rollOut="onRollOut(event, editSex)" width="100%">
+					<mx:HBox id="showSexBox" rollOver="onRollOver(event, editSex)" rollOut="onRollOut(event, editSex)" width="100%" doubleClickEnabled="true" doubleClick="editProperty(Person.SEX, showSexBox, editSexBox)">
 						<mx:Label styleName="mute"  text="Sex:" width="85"/>
 						<mx:Label text="{model.selectedPerson.sex}" width="100%"/>
 						<mx:Button id="editSex" label="Edit" visible="false" click="editProperty(Person.SEX, showSexBox, editSexBox)"/>
@@ -250,7 +256,7 @@
 						<mx:Button id="saveSex" label="Save" click="saveProperty()"/>
 					</mx:HBox>
 					<!-- DOB -->
-					<mx:HBox id="showDOBBox" rollOver="onRollOver(event, editDOB)" rollOut="onRollOut(event, editDOB)" width="100%">
+					<mx:HBox id="showDOBBox" rollOver="onRollOver(event, editDOB)" rollOut="onRollOut(event, editDOB)" width="100%" doubleClickEnabled="true" doubleClick="editProperty(Person.DOB, showDOBBox, editDOBBox)">
 						<mx:Label styleName="mute"  text="Date of Birth:" width="85"/>
 						<mx:Label id="dob"  width="100%"/>
 						<mx:Button id="editDOB" label="Edit" visible="false" click="editProperty(Person.DOB, showDOBBox, editDOBBox)"/>
@@ -268,7 +274,7 @@
 						
 					</mx:VBox>
 					<!-- DOD -->
-					<mx:HBox id="showDODBox" rollOver="onRollOver(event, editDOD)" rollOut="onRollOut(event, editDOD)" width="100%">
+					<mx:HBox id="showDODBox" rollOver="onRollOver(event, editDOD)" rollOut="onRollOut(event, editDOD)" width="100%" doubleClickEnabled="true" doubleClick="editProperty(Person.DOD, showDODBox, editDODBox)">
 						<mx:Label styleName="mute"  text="Date of Death:" width="85"/>
 						<mx:Label id="dod" width="100%"/>
 						<mx:Button id="editDOD" label="Edit" visible="false" click="editProperty(Person.DOD, showDODBox, editDODBox)"/>
@@ -283,7 +289,7 @@
 					    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>					    	
 				    	</mx:HBox>	
 				    	<mx:HBox  width="100%">
-				    		<mx:CheckBox label="approximate" id="dodApprox"  includeInLayout="{deceased.selected}" visible="{deceased.selected}"/>				    		
+				    		<mx:CheckBox label="approximate" id="dodApprox" includeInLayout="{deceased.selected}" visible="{deceased.selected}"/>				    		
 				    	</mx:HBox>
 					</mx:VBox>
 					
@@ -294,6 +300,7 @@
 	<view:Relationships id="relationships" width="100%"/>
 	<!--<mx:VBox paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5" width="100%" height="100%" styleName="solidBorder" >
 		<mx:Button label="Make This Center" width="150" click="changeRoot()" textAlign="left" />
+		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
 		<mx:Button label="Edit Info" width="150" click="edit()" textAlign="left"/>
 		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
 		<mx:Button label="See Life Events" width="150" textAlign="left"/>		

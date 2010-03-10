@@ -24,7 +24,7 @@ package org.akinu.helper
 			}
 			return null;
 		}
-		public static const UTCMonthLabels:Array = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		public static const MonthLabels:Array = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
 	}
 }

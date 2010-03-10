@@ -2,8 +2,10 @@
 
 .smallTitle{
 	fontSize:12;
-	fontWeight:bold;	
+	fontWeight:bold;
+	color:#b49159;		
 }
+
 .rollOver{
 	cornerRadius:2;
 	borderStyle:solid;
@@ -21,6 +23,7 @@
 .mediumTitle{
 	fontFamily:Verdana, Geneva, Arial, Helvetica, sans-serif;
 	fontWeight:bold;
+	color:#e9b96e;
 	fontSize:16;
 }
 .editBtn{

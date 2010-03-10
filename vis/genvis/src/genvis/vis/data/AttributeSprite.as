@@ -15,17 +15,15 @@ package genvis.vis.data
 		public static const PERSON:uint		= 1;
 		public static const MARRIAGE:uint	= 2;
 		private var _label:TextSprite	= null;
-		private var _uncertain:Boolean;
 		private var _attrType:uint;
 		private var _objType:uint;
 		/**
 		 * uncertain: indicates which attribute is uncertain
 		 * data		: it could be Person or Marriage object.
 		 */
-		public function AttributeSprite(attrType:uint, objType:uint, uncertain:Boolean, data:Object){
+		public function AttributeSprite(attrType:uint, objType:uint, data:Object){
 			_attrType 	= attrType;
 			_objType	= objType;
-			_uncertain	= uncertain;
 			_data		= data;
 			if (_objType == PERSON){
 				var person:Person = data as Person;
@@ -39,7 +37,24 @@ package genvis.vis.data
 		public function get label():TextSprite { return _label; }
 		public function set label(l:TextSprite):void{ _label	= l;}
 		
-		public function get uncertain():Boolean { return _uncertain; }
+		public function get uncertain():Boolean { 
+			if (objType == PERSON){
+				var person:Person = data as Person;
+				if (attrType == PERSON){
+					return person.isDobUncertain;
+				}else{
+					return person.isDodUncertain;
+				}
+			}else if (objType == MARRIAGE){
+				var marriage:Marriage = data as Marriage;
+				if (attrType == MARRIAGE_DATE){
+					return marriage.isStartUncertain
+				}else if (attrType == DIVORCE_DATE){
+					return marriage.isEndUncertain;
+				}
+			}
+			return true;
+		}
 		public function get attrType():uint		{ return _attrType;	 }
 		public function get objType():uint		{ return _objType;	 }
 		

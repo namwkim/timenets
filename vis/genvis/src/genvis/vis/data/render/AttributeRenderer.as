@@ -20,6 +20,7 @@ package genvis.vis.data.render
 		}
 
 		public function render(d:DataSprite):void{
+			if (!d.visible) return;
 			var attr:AttributeSprite = d as AttributeSprite;
 			if (attr.uncertain){
 				var label:TextSprite = attr.label;				
@@ -100,6 +101,8 @@ package genvis.vis.data.render
 				}
 				
 				label.render();
+			}else{
+				if (attr.label) attr.label.visible = false;
 			}
 		}
 		

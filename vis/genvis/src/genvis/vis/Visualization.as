@@ -5,6 +5,7 @@ package genvis.vis
 	import fl.core.UIComponent;
 	import fl.events.ScrollEvent;
 	
+	import flare.display.DirtySprite;
 	import flare.display.RectSprite;
 	import flare.util.Displays;
 	import flare.vis.data.DataSprite;
@@ -87,8 +88,8 @@ package genvis.vis
 		private var _vscrollbar:ScrollBar;
 		//internal use
 		private var _maskEnabled:Boolean 	= true;
-		private var _scrollEnabled:Boolean 	= true;
-		private var _fitVertBound:Boolean	= true;
+		private var _scrollEnabled:Boolean 	= false;
+		private var _fitVertBound:Boolean	= false;
 		/** An object storing extra properties for the visualziation. */
 		public var props:Object = {};
 		
@@ -215,9 +216,9 @@ package genvis.vis
 			
 		}
 		public function setMask():void{
-			_vismask.x = bounds.x;
-			_vismask.y = bounds.y-15;
-			_vismask.w = bounds.width+15;//+_vscrollbar.width;
+			_vismask.x = bounds.x-15;
+			_vismask.y = bounds.y;
+			_vismask.w = bounds.width+30;//+_vscrollbar.width;
 			_vismask.h = bounds.height+30;//+_hscrollbar.height;
 			_vismask.fillColor = 0xff000000;
 		}
@@ -267,6 +268,14 @@ package genvis.vis
 		public function vscrollHandler(se:ScrollEvent):void{
 			_layers.y -= se.delta;
 		}
+//		public function translate(dx:Number, dy:Number):void{
+//			_data.visit(function(b:BlockSprite):void{
+//				b.x += dx;
+//				b.y += dy;
+//			}, Data.BLOCKS);
+//			this.render();
+//			DirtySprite.renderDirty();
+//		}
 		/**
 		 * Update this visualization, re-calculating axis layout and running
 		 * the operator chain. The input transitioner is used to actually
@@ -342,7 +351,7 @@ package genvis.vis
 		 	g.clear();
 		 	g.lineStyle(1, 0x2e3436, 0.3);
 		 	g.beginFill(0xff0000, 0);			
-			g.drawRect(_bounds.x, bounds.y, _bounds.width, _bounds.height);
+			g.drawRect(_bounds.x-15, bounds.y, _bounds.width+29, _bounds.height);
 			g.endFill();
 		 }
 		public function updateLater(...operators):Function
@@ -529,7 +538,7 @@ package genvis.vis
 			for each (var d:DisplayObject in evt.items)
 				_marks.removeChild(d);
 		}
-
+		
 	} // end of class Visualization
 }
 

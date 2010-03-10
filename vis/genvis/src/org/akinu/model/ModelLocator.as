@@ -27,7 +27,7 @@ package org.akinu.model
 			return _instance;
 		}
 		//url
-		public var url:String = "http://localhost:3000/";
+		public var url:String = "http://akinu.org/";
 		//context menu variables
 		public static const FRONT_PAGE:uint		= 0;
 		public static const PERSON_PAGE:uint	= 1;

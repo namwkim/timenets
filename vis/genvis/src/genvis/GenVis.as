@@ -21,6 +21,7 @@ package genvis
 	import genvis.vis.controls.ClickControl;
 	import genvis.vis.controls.DragControl;
 	import genvis.vis.controls.HoverControl;
+	import genvis.vis.controls.PanZoomControl;
 	import genvis.vis.controls.TooltipControl;
 	import genvis.vis.data.AttributeSprite;
 	import genvis.vis.data.BlockSprite;
@@ -92,14 +93,14 @@ package genvis
 		private static const FILTER:String		= "fisheyeFilter";
 		private static const LAYOUT:String		= "layout";
 		private static const LABLER:String		= "labler";
-		private static const OPS:Array			= [ENCODER, FILTER, LAYOUT, LABLER];
+		public static const OPS:Array			= [ENCODER, FILTER, LAYOUT, LABLER];
 				
 		private var _labelStyle:int = Lifeline.LABELINSIDE;
 		private var _layoutMode:int	= AUTOMATIC;
 		private var _layoutType:int = LifelineLayout.HOURGLASSCHART;
 		private var _lifelineType:int				= Lifeline.LINESPLINE;
 		private var _doiEnabled:Boolean				= false;
-		private var _xrange:Number					= 100;
+		private var _xrange:Number					= 90;
 		private var _selectedBlock:BlockSprite		= null;
 		//node config
 		private var _nColors:Array 		= [0x3465a4, 0xcc0000, 0x555753];
@@ -169,6 +170,24 @@ package genvis
 			//#5. enable vis controls
 			_uiCtrls.enabled = false;
 			
+			DirtySprite.renderDirty();
+		}
+		public function update():void{
+			_vis.update(null, OPS);
+		}
+		public function select(person:Person):void{
+			if (person.sprite==null) return;
+			_lifelineLayout.buildScale(person.sprite);
+			if (_selectedNode){
+				_selectedNode.selected = false;
+			}
+			_selectedNode = person.sprite;
+			_selectedNode.selected = true;
+			
+			//Dispatch Selection Event
+			var selectPerson:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.PERSON, person, null);
+			selectPerson.dispatch();
+			_vis.update(null, OPS);
 			DirtySprite.renderDirty();
 		}
 		private function clear():void{
@@ -737,7 +756,7 @@ package genvis
 //					
 //				}
 //			));
-//			_vis.controls.add( new PanZoomControl());
+			_vis.controls.add(new PanZoomControl(this));
 			
 		}
 	}

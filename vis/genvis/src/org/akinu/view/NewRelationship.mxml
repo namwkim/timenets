@@ -2,6 +2,7 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
 		<mx:Script>
 		<![CDATA[
+			import mx.events.CloseEvent;
 			import org.akinu.helper.Role;
 			import mx.managers.PopUpManager;
 			import org.akinu.helper.Helper;
@@ -115,7 +116,7 @@
 						refParent.addChild(newPerson);
 						
 					}else if (role=="Spouse"){
-						newMarriage = new Marriage(model.selectedPerson, newPerson);
+						newMarriage = new Marriage(person, newPerson);
 						model.selectedPerson.addMarriage(newMarriage);
 						newPerson.addMarriage(newMarriage);
 						newMarriage.startDate 			= Helper.assignDate(parseInt(marYear.text), parseInt(marMonth.selectedItem.data), parseInt(marDay.selectedItem.data));
@@ -125,11 +126,53 @@
 							newMarriage.endDate 		= Helper.assignDate(parseInt(divYear.text), parseInt(divMonth.selectedItem.data), parseInt(divDay.selectedItem.data));
 							newMarriage.isEndUncertain	= divCirca.selected;	
 						}
-					}					
+						//check if potential children exist
+						var open:Boolean = false;
+						for each (var child:Person in person.children){
+							if (child.parents.length == 1){
+								open = true;
+								break;
+							}
+						}
+						if (open){
+							var selectChild:SelectChild = PopUpManager.createPopUp(this, SelectChild, true) as SelectChild;
+							PopUpManager.centerPopUp(selectChild);
+							selectChild.addEventListener(CloseEvent.CLOSE, function (event:CloseEvent):void{
+								if (selectChild.result == SelectChild.ADD){
+									//add chiildren to new spouse
+									var nextEvents:Array = new Array();
+									for each (var newChild:Person in selectChild.childList){
+										newChild.addParent(newPerson);
+										newPerson.addChild(newChild);
+										nextEvents.push(new AddRelationshipEvent(newPerson, null, newChild.id, newPerson.sex==Person.MALE?"Father":"Mother", null, false, false));
+									}
+									var addSpEvent:AddRelationshipEvent = new AddRelationshipEvent(newPerson, newMarriage, person.id, role, nextEvents);
+									addSpEvent.dispatch();
+									model.vis.visualize(model.root);	
+									model.vis.select(newPerson);								
+								}
+							});
+							this.parent.removeChild(this);
+							return;
+						}						
+					}										
 					var addRelEvent:AddRelationshipEvent = new AddRelationshipEvent(newPerson, newMarriage, model.selectedPerson.id, role);
 					addRelEvent.dispatch();
-					model.vis.visualize(model.root);
 					this.parent.removeChild(this);
+					switch (role){
+						case Role.FATHER:
+						case Role.MOTHER:
+							model.root = newPerson; //parent of the currently selected person
+						break;
+						case Role.CHILD:
+							model.root = person;//parent of the new child (= currently selected person);
+						break;
+						case Role.SPOUSE: //no root change required...
+						break;
+					}
+					model.vis.visualize(model.root);
+					model.vis.select(newPerson);
+					
 				}
 					
 			}

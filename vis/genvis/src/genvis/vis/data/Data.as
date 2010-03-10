@@ -5,7 +5,6 @@ package genvis.vis.data
 	import flare.vis.events.DataEvent;
 	
 	import flash.events.EventDispatcher;
-	import flash.utils.Dictionary;
 	
 	import genvis.data.Marriage;
 	import genvis.data.Person;
@@ -64,8 +63,10 @@ package genvis.vis.data
 		protected var _attributes:DataList		= new DataList(ATTRIBUTES);
 
 		/** primitive data mappings */
-		protected var _marriages:Dictionary		= new Dictionary();
-		protected var _people:Dictionary		= new Dictionary();//not used now
+		protected var _marriages:Array	= new Array();
+		protected var _people:Array		= new Array();
+		protected var _min:Date;
+		protected var _max:Date;
 		
 		/** The total number of items (nodes and edges) in the data. */
 		public function get length():int { return _nodes.length; }
@@ -91,8 +92,9 @@ package genvis.vis.data
 			constructEdges(root);
 			constructDOITree(root);	
 			constructBlocks(root);
-			constructAttributes(root);			
-			
+			constructAttributes(root);		
+			//stats			
+			calcStats();
 			_root	= root;
 			_groups = { nodes: _nodes, edges: _edges, blocks: _blocks, attributes:_attributes};
 		}
@@ -274,7 +276,27 @@ package genvis.vis.data
 			}
 			return false;
 		}
-		public function constructNode(person:Person, type:int):NodeSprite{
+		private static const curDate:Date = new Date();
+		protected function calcStats():void{
+			//find xmin and xmax from the whole data
+			var allDead:Boolean = true;
+			var dod:Date;			
+			for each (var person:Person in _people){
+				if (_min==null || (person.dateOfBirth!=null && person.dateOfBirth < _min)){
+					_min = person.dateOfBirth;
+				}
+				dod = person.deceased? person.dateOfDeath : curDate;
+				if (_max==null || (dod>_max)){
+					_max = dod;
+				}
+			}	
+		}
+		public function get min():Date { return _min; }
+		public function get max():Date { return _max; }
+		//******************************************************
+		//   Construction of Sprites
+		//******************************************************
+		protected function constructNode(person:Person, type:int):NodeSprite{
 			var ns:NodeSprite  = person.sprite == null? this.addNode(person) : this.addNode(person.sprite);
 			ns.type = type;
 			person.sprite = ns;
@@ -285,13 +307,11 @@ package genvis.vis.data
 			}
 			// add a marriage mapping if necessary
 			for each (var marriage:Marriage in person.marriages){
-				_marriages[marriage.id] = marriage; 
+				_marriages.push(marriage); 
 			}	
+			_people.push(person);
 			return ns;
 		}
-		//******************************************************
-		//   Construction of Sprites
-		//******************************************************
 		/**
 		 * construct display list. this also initializes node types
 		 * node type: ancestor, descendant, root, 
@@ -329,30 +349,33 @@ package genvis.vis.data
 				constructEdge(p);							
 			});	
 		}
-		public function addAttribute(attrType:uint, objType:uint, uncertain:Boolean, data:Object):AttributeSprite{
-			var attr:AttributeSprite = new AttributeSprite(attrType, objType, uncertain, data);
+		protected function addAttribute(attrType:uint, objType:uint, data:Object):AttributeSprite{
+			var attr:AttributeSprite = new AttributeSprite(attrType, objType, data);
 			_attributes.add(attr);
 			return attr;
 		}
 		protected function constructAttribute(person:Person):void{
-			addAttribute(AttributeSprite.DATE_OF_BIRTH, AttributeSprite.PERSON, person.isDobUncertain, person);
-			addAttribute(AttributeSprite.DATE_OF_DEATH, AttributeSprite.PERSON, person.isDodUncertain, person);			
+			addAttribute(AttributeSprite.DATE_OF_BIRTH, AttributeSprite.PERSON, person);
+			addAttribute(AttributeSprite.DATE_OF_DEATH, AttributeSprite.PERSON, person);			
 		}
 		protected function constructAttributes(root:Person):void{
-			//1. root
-			constructAttribute(root);			
-			//2. ancestor side
-			root.visitAncestors(function (p:Person):void{
-				constructAttribute(p);								
-			});
-			//3. descendant side
-			root.visitDecendants(function (p:Person):void{
-				constructAttribute(p);							
-			});	
+//			//1. root
+//			constructAttribute(root);			
+//			//2. ancestor side
+//			root.visitAncestors(function (p:Person):void{
+//				constructAttribute(p);								
+//			});
+//			//3. descendant side
+//			root.visitDecendants(function (p:Person):void{
+//				constructAttribute(p);							
+//			});	
+			for each (var person:Person in _people){
+				constructAttribute(person);
+			}
 			//4. marriages
 			for each (var marriage:Marriage in _marriages){
-				addAttribute(AttributeSprite.MARRIAGE_DATE, AttributeSprite.MARRIAGE, marriage.isStartUncertain, marriage);
-				addAttribute(AttributeSprite.DIVORCE_DATE, AttributeSprite.MARRIAGE, marriage.isEndUncertain, marriage);
+				addAttribute(AttributeSprite.MARRIAGE_DATE, AttributeSprite.MARRIAGE, marriage);
+				addAttribute(AttributeSprite.DIVORCE_DATE, AttributeSprite.MARRIAGE, marriage);
 			}
 		}
 		/**

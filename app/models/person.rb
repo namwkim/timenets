@@ -78,13 +78,13 @@ class Person < ActiveRecord::Base
     @spouses
   end
   def children_with spouse
-    @children =  Array.new
-    children.each do |child|
+    childList =  Array.new
+    self.children.each do |child|
       if child.father.id == spouse.id or child.mother_id == spouse.id
-        @children << child
+        childList << child
       end
     end
-    @children
+    childList
   end
   def destroy_marriages
     marriages.each do |marriage|

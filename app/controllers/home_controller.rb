@@ -22,6 +22,7 @@ class HomeController < ApplicationController
     if request.post?
       user = User.authenticate(params[:email], params[:password])
       if user        
+        
         if params[:login_invitation_token]!=''
           @invitation = Invitation.find_by_token(params[:login_invitation_token])
           if @invitation.accepted 
@@ -34,10 +35,11 @@ class HomeController < ApplicationController
             user.save
             @operator = User.find_by_id user.id
             log "joined", @project, @project
-            #@invitation.update_attribute(:accepted, true);
+            @invitation.update_attribute(:accepted, true);
           end
-        end
+        end        
         session[:operator_id] = user.id
+        log "logged in", nil, nil
         redirect_to(:action => "index")
       else
         flash[:notice] = "Invalid user/password combination"
@@ -51,6 +53,7 @@ class HomeController < ApplicationController
     flash[:notice]=""
     if (@operator!=nil)
       @operator = nil
+      log "logged out", nil, nil
       session[:operator_id] = nil
     end
     #flash[:notice]=""
@@ -72,13 +75,14 @@ class HomeController < ApplicationController
             redirect_to(:action => "intro")
           end
           @project    = @invitation.project
-          #@invitation.update_attribute(:accepted, true);
+          @invitation.update_attribute(:accepted, true);
         end
         @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor") 
         @project.people << @person
         @user.main_project = @project 
         @user.save
         @operator = User.find_by_id @user.id
+        log "signed up for Akinu", nil, nil
         log "joined", @project, @project
         session[:operator_id] = @user.id 
         redirect_to(:action => "index")
@@ -90,6 +94,22 @@ class HomeController < ApplicationController
     else
       redirect_to(:action => "intro")
     end
+  end
+  def stats
+    @users = User.find(:all, :conditions=>"id>=#{28}")
+    @total = 0
+    @max   = 0
+    @min   = 2000
+    @users.each do |user|
+      @subtotal = 0
+      user.projects.each do |proj|
+        @subtotal = @subtotal + proj.people.length
+      end
+      @total = @total + @subtotal
+      @min = @subtotal if @min > @subtotal
+      @max = @subtotal if @max < @subtotal
+    end
+    @average = @total/@users.length
   end
 
 end

@@ -27,7 +27,7 @@
 		</tr>
 		<tr>
 			<td><%= f.label :date_of_birth%></td>
-			<td><%= f.date_select :date_of_birth, :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td><%= f.date_select :date_of_birth, :start_year =>Time.now.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
 			<td>Deceased? <%= f.check_box(:deceased, { :onchange=>"flip_dob_field(this)"},true, false)%></td>
 		</tr>
 		

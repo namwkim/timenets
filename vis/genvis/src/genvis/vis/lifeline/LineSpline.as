@@ -72,14 +72,18 @@ package genvis.vis.lifeline
 			points.sortOn("date", Array.NUMERIC);
 			//filter redundant event points (necessary for overlaps)
 			node.points = new Array();
-			var numMar:int = 0;			
+			numMar = 0;			
 			var evtPt:EvtPt = null;
 			points.reverse();
 			trace("prev len:"+points.length);
 			while (evtPt = points.pop()){
 				switch(evtPt.type){
-					case EvtPt.MARRIAGE: numMar++; if(numMar==1) node.points.push(evtPt); break;
-					case EvtPt.DIVORCE:	 numMar--; if(numMar==0) node.points.push(evtPt); break;
+					case EvtPt.MARRIAGE: numMar++; 
+						if(numMar==1) node.points.push(evtPt); 
+						break;
+					case EvtPt.DIVORCE:	 numMar--; 
+						if(numMar==0) node.points.push(evtPt); 
+						break;
 					default:	node.points.push(evtPt);
 					 
 				}				
@@ -137,7 +141,10 @@ package genvis.vis.lifeline
 			//add marriage and divorce points
 			//assume that multiple marriages with a single person shouldn't be overlapping
 			for each (var marriage:Marriage in marriages){
+				if (marriage.spouseOf(person) != refPerson) return;
 				var prevEvt:EvtPt=null;
+				var marSkipped:Boolean = true;
+				var divSkipped:Boolean = true;
 				for each (evt in refNode.points){
 					if (evt.date == marriage.startDate){					
 						if (evt.type == EvtPt.DATING){
@@ -146,6 +153,7 @@ package genvis.vis.lifeline
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), mergeY, EvtPt.MARRIAGE, marriage.startDate, refPerson));
 							deathY = mergeY;
 						}
+						marSkipped = false;
 					}else if (evt.date == marriage.endDate){
 						if (evt.type == EvtPt.DIVORCE){
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), mergeY, EvtPt.DIVORCE, marriage.endDate, refPerson));
@@ -157,8 +165,28 @@ package genvis.vis.lifeline
 							points.push(new EvtPt(node.toLocalX(refNode.toGlobalX(evt.x)), 0, EvtPt.RESTING, marriage.endDate, refPerson));
 							deathY = 0;
 						}
+						divSkipped = false;
 					}
 					prevEvt = evt;
+				}
+				
+				if (marSkipped){//if true, this marriage is skipped in refPerson's render point generations 
+					//it is still assuming no polygamy
+					//points.push(new EvtPt(node.toLocalX(axes.xAxis.X(marriage.startDate)), 0, EvtPt.DATING, marriage.startDate, refPerson));
+					var marEvt:EvtPt = new EvtPt(node.toLocalX(axes.xAxis.X(marriage.startDate)), mergeY, EvtPt.MARRIAGE, marriage.startDate, refPerson);
+					
+					var datX:Number = marEvt.x - (axes.xAxis.X(marEvt.date) - axes.xAxis.X(Dates.addYears(marEvt.date, -ALPHA)));
+					var datY:Number = 0;
+					//var marThreshold:Number = (prevPt.x+(evtPt.x-prevPt.x)/2);			
+					//if (datX<marThreshold)	datX = evtPt.isEstimated? (evtPt.x-EPSILON):marThreshold;
+					points.push(new EvtPt(datX, datY, EvtPt.DATING, marEvt.date, marEvt.data));
+					points.push(marEvt);
+					deathY = mergeY;
+				}
+				if (divSkipped && marriage.divorced){
+					points.push(new EvtPt(node.toLocalX(axes.xAxis.X(marriage.endDate)), mergeY, EvtPt.MARRIAGE, marriage.endDate, refPerson));
+					points.push(new EvtPt(node.toLocalX(axes.xAxis.X(marriage.endDate)), 0, EvtPt.RESTING, marriage.endDate, refPerson));
+					deathY = 0;					
 				}
 			}
 			

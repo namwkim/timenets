@@ -1,11 +1,6 @@
 package genvis.vis.axis
 {
-	import genvis.animate.Transitioner;
 	import flare.display.TextSprite;
-	import genvis.scale.IScaleMap;
-	import genvis.scale.LinearScale;
-	import genvis.scale.Scale;
-	import genvis.scale.ScaleType;
 	import flare.util.Arrays;
 	import flare.util.Stats;
 	import flare.util.Strings;
@@ -15,6 +10,13 @@ package genvis.vis.axis
 	import flash.geom.Point;
 	import flash.text.TextFormat;
 	import flash.utils.Dictionary;
+	
+	import genvis.animate.Transitioner;
+	import genvis.scale.IScaleMap;
+	import genvis.scale.LinearScale;
+	import genvis.scale.Scale;
+	import genvis.scale.ScaleType;
+	import genvis.scale.TimeScale;
 
 	/**
 	 * A metric data axis consisting of axis labels and gridlines.
@@ -328,7 +330,8 @@ package genvis.vis.axis
 			var keepLabels:Array = new Array(nl);
 			var keepLines:Array = new Array(ng);
 			var values:Array = axisScale.values(numLabels);
-			
+			//trace('fmin:'+(axisScale as TimeScale).scaleMin);
+			//trace('fmax:'+(axisScale as TimeScale).scaleMax);	
 			if (showLabels) { // process labels
 				for (i=0, ordinal=0; i<values.length; ++i) {
 					val = values[i];
@@ -383,6 +386,8 @@ package genvis.vis.axis
 			var _lab:Sprite = this.labels;
 			var _gls:Sprite = this.gridLines;
 			var o:Object;
+//			trace('lmin:'+(axisScale as TimeScale).scaleMin);
+//			trace('lmax:'+(axisScale as TimeScale).scaleMax);
 			
 			// layout labels
 			for (i=0; i<_lab.numChildren; ++i) {

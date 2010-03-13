@@ -4,7 +4,7 @@
 		<tr>
 			<td width="30%">Name</td>
 			<td width="50%">Description</td>
-			<td width="20%"><%=link_to_remote_lightbox "Create a New Project", {:url=>{:action=>"new_project"}}%></td>
+			<td width="20%"><%=button_to_remote_lightbox "Create a New Project", {:url=>{:action=>"new_project"}}, {:class=>"ui_small_button"}%></td>
 		</tr>
 		<tr><td colspan="3" class="dotted_line"></td></tr>
 		<% @user.projects.each do |project|%>

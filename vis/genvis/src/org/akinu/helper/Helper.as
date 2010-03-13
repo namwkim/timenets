@@ -20,7 +20,9 @@ package org.akinu.helper
 		
 		public static function assignDate(year:Number, month:Number, day:Number):Date{
 			if (isNaN(year)==false){
-				return new Date(year, isNaN(month)? 0:(month-1), isNaN(day)? 1:day);
+				var newDate:Date = new Date();
+				newDate.setFullYear(year, isNaN(month)? 0:(month-1), isNaN(day)? 1:day);
+				return newDate;
 			}
 			return null;
 		}

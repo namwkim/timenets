@@ -28,7 +28,7 @@ class EventController < ApplicationController
     @event = Event.find_by_id(params[:id])
     save_attachments_in_event @event
     if @event.update_attributes(params[:event])
-      log "edited", @event, @event.project
+      log "updated", @event, @event.project
       flash[:notice] = 'Event was successfully updated.'
       redirect_to(:controller=>"project", :action =>"show_project", :id=>@event.project.id) 
     else
@@ -42,7 +42,8 @@ class EventController < ApplicationController
 #      Document.delete_file(doc.file_url)
 #      Document.destroy(doc)
 #    end
-    Event.destroy(@event)
+    @event.destory
+    log "deleted", @event, @event.project
     render :nothing=>true
   end
   def show_event
@@ -56,10 +57,12 @@ private
     session[:documents].each do |doc_id|
       doc = Document.find_by_id(doc_id);
       event.documents <<  doc unless event.documents.include?(doc)
+      log "added, in event,", doc, doc.project
     end
-    session[:people].each do |prof_id|
-      prof = Person.find_by_id(prof_id)
-      event.people << prof unless event.people.include?(prof)
+    session[:people].each do |person_id|
+      person = Person.find_by_id(person_id)
+      event.people << person unless event.people.include?(person)
+      log "added, in event,", person, person.project
     end
     session[:documents] = nil
     session[:people]  = nil

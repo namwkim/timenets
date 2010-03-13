@@ -143,6 +143,8 @@ package genvis.scale
 				_smin = Dates.roundTime(_dmin, span, false);
 				_smax = Dates.roundTime(_dmax, span, true);
 			}
+			trace(_smin);
+			trace(_smax);
 			if (_autofmt) {
 				super.labelFormat = formatString(span);
 			}
@@ -182,7 +184,7 @@ package genvis.scale
             var step:Number = Dates.timeStep(span);
 			var max:Number = _smax.time;
             var d:Date = _flush ? Dates.roundTime(scaleMin, span, true) : scaleMin;
-
+			//trace('before:'+scaleMin);
             if (span < Dates.MONTHS) {
             	for (var x:Number = _smin.time; x <= max; x += step) {
             		a.push(new Date(x));
@@ -193,6 +195,13 @@ package genvis.scale
             	}
             } else {
             	var y:int = int(step);
+            	var fy:int;
+            	if (d.fullYear%y==0){
+            		fy = d.fullYear;
+            	}else{
+            		fy = (int(int(d.fullYear)/y))*y + y;
+            	}
+            	d = new Date(fy, d.month, d.date);
             	for (; d.time <= max; d = Dates.addYears(d,y)) {
             		a.push(d);
             	}

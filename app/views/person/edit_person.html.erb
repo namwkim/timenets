@@ -27,7 +27,7 @@
 		</tr>
 		<tr>
 			<td><%= f.label :date_of_birth%></td>
-			<td><%= f.date_select :date_of_birth, :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td><%= f.date_select :date_of_birth, :start_year =>Time.now.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
 			<td>Deceased? <%= f.check_box(:deceased, { :onchange=>"flip_dob_field(this)"},true, false)%></td>
 		</tr>
 		
@@ -42,9 +42,12 @@
 		</tr>	
 		<tr><td colspan="3" align="right" style="border-top:1px dotted #d3d7cf;">
 		<% if @html_format!=nil%>
-			<%= link_to "Update", "javascript:$('prof_update_form').submit()"%> <%=link_to "Cancel", :back %>
+			<table><tr>
+				<td><%= submit_tag "Update", :class=>"ui_small_button right_margined_5"%></td>			
+				<td><%=button_to "Cancel", :back, :class=>"ui_small_button" %></td>
+			</tr></table>			
 		<% else %>
-			<%= link_to_close_lightbox "Update",  {:onclick=>"$('prof_update_form').submit();"} %> <%=link_to_close_lightbox "Cancel" %>
+			<%= button_to_close_lightbox "Update", {:onclick=>"$('prof_update_form').submit();", :class=>"ui_small_button"} %> <%=button_to_close_lightbox "Cancel", {:class=>"ui_small_button"} %>
 		<% end %>
 		</td></tr>
 	</table>

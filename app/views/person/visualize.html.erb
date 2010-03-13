@@ -8,11 +8,10 @@ document.observe("dom:loaded", function() {
 
 var initCallback = function() {  
    flex = FABridge.flex.root();  
-   flex.setRoot(<%=@person.id%>);
+   flex.setRoot(<%=@person.id if @person!=nil%>);
 }  
 
 <% end %>
-<!--<a onclick="flex.show_msg('<%=@person.name%>');">Flex-Ajax bridge test</a>-->
 <div class="flexvis" style="z-index: ">
 	<object type="application/x-shockwave-flash" data="/vis/genvis.swf" width="950" height="500">
   		<param name="vis" value="/vis/genvis.swf" />

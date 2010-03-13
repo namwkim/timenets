@@ -1,6 +1,6 @@
 package genvis.vis.controls
 {
-	import flare.util.Displays;
+	import genvis.util.Displays;
 	
 	import flash.display.InteractiveObject;
 	import flash.display.Stage;
@@ -8,10 +8,8 @@ package genvis.vis.controls
 	import flash.events.MouseEvent;
 	
 	import genvis.GenVis;
-	import genvis.scale.LinearScale;
 	import genvis.scale.TimeScale;
 	import genvis.vis.Visualization;
-	import genvis.vis.axis.CartesianAxes;
 	import genvis.vis.operator.layout.LifelineLayout;
 	
 	/**
@@ -132,50 +130,54 @@ package genvis.vis.controls
 			
 			var x:Number = event.stageX;
 			var y:Number = event.stageY;
-			
+			var vis:Visualization = _object as Visualization;
+			_layout = vis.operator("layout") as LifelineLayout;
+			var xscale:TimeScale = _layout.xAxis.axisScale as TimeScale;	
+			var max:Date		= xscale.max as Date;
+			var min:Date		= xscale.min as Date;		
 			if (!event.ctrlKey) {
 				//X-panning
-				var vis:Visualization = _object as Visualization;
-				_layout = vis.operator("layout") as LifelineLayout;
-				var xscale:TimeScale = _layout.xAxis.axisScale as TimeScale;
 				var curPos:Date 	= _layout.xAxis.value(x, 0, false) as Date;
 				var prevPos:Date 	= _layout.xAxis.value(mx, 0, false) as Date;
 				var dYear:Number	= prevPos.fullYear - curPos.fullYear;
 				var dMon:Number		= prevPos.month - curPos.month;
 				var dDate:Number	= prevPos.date - curPos.date;		
-				var max:Date		= xscale.max as Date;
-				var min:Date		= xscale.min as Date;
-				max = new Date(max.fullYear+dYear, max.month+dMon, max.month+dDate);
-				min = new Date(min.fullYear+dYear, min.month+dMon, min.month+dDate);
-				var update:Boolean = false;
-				if (((vis.data.min.fullYear-_layout.xrange/2)<min.fullYear) && ((vis.data.max.fullYear+_layout.xrange/2)>max.fullYear)){
+				trace("yyyy:"+dYear);
+				trace("mm"+dMon);
+				trace("dd"+dDate);
+				max = new Date(max.fullYear+dYear, max.month+dMon, max.date+dDate);
+				min = new Date(min.fullYear+dYear, min.month+dMon, min.date+dDate);
+//				var update:Boolean = false;
+//				if (((vis.data.min.fullYear-_layout.xrange/2)<min.fullYear) && ((vis.data.max.fullYear+_layout.xrange/2)>max.fullYear)){
 					xscale.max = max;
 					xscale.min = min;		
-					update = true;					
-				}
+//					update = true;					
+//				}
 				//Y-Panning				
 				var dy:Number = (y-my);
-				if ((_layout.yMax+_layout.yPan+dy+_layout.defaultYPan)>=0 && (_layout.yMin+_layout.yPan+dy+_layout.defaultYPan)<=vis.bounds.height){
+//				if ((_layout.yMax+_layout.yPan+dy+_layout.defaultYPan)>=0 && (_layout.yMin+_layout.yPan+dy+_layout.defaultYPan)<=vis.bounds.height){
 					_layout.yPan = _layout.yPan+dy;
-					update = true;
-				}				
-				if (update) vis.update(null, GenVis.OPS);
-				
-				
-				//vis.render();
-				
-				
-				//3. transform nodes along y-axis
-//				dx = dy = NaN;
-//				Displays.panBy(_object, x-mx, y-my);
+//					update = true;
+//				}				
+//				if (update) {
+					vis.update(null, GenVis.OPS);
+					//DirtySprite.renderDirty();
+//				}
+
 			} else {
 				if (isNaN(dx)) {
 					dx = event.stageX;
 					dy = event.stageY;
 				}
-				var dz:Number = 1 + (y-my)/100;
-				Displays.zoomBy(_object, dz, dx, dy);
+				var dz:Number = 1 + (y-my)/500;
+				var start:Date = _layout.xAxis.value(my, 0, false) as Date;
+				var end:Date = _layout.xAxis.value(y, 0, false) as Date;
+				xscale.max = new Date(max.fullYear+(start.fullYear-end.fullYear), max.month+(start.month-end.month), max.date+(start.date-end.date));
+				xscale.min = new Date(min.fullYear-(start.fullYear-end.fullYear), min.month-(start.month-end.month), min.date-(start.date-end.date));
+				vis.update(null, GenVis.OPS);
+				Displays.zoomY(vis.marks, dz, dx, dy);
 			}
+			//xscale.flush=false;
 			mx = x;
 			my = y;
 		}

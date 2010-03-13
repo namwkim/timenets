@@ -303,7 +303,8 @@ package genvis.data
 			if (pidx<0) return;
 			_parents.splice(pidx, 1);
 		}
-		public function remove():void{
+		public function remove():Person{
+			var closePerson:Person = null;
 			for each (var spouse:Person in _spouses){
 				spouse.removeMarriages(this);	
 				if (spouse.saved == false){
@@ -311,14 +312,18 @@ package genvis.data
 					 	for each (var ch:Person in chs) {
 					 		ch.removeParent(spouse);
 					 	}
-				}			
+				}
+				closePerson = spouse;			
 			}
 			for each (var parent:Person in _parents){
 				parent.removeChild(this);
+				closePerson = parent;
 			}
 			for each (var child:Person in _children){
 				child.removeParent(this);
+				closePerson = child;
 			}
+			return closePerson;
 					
 		}
 		

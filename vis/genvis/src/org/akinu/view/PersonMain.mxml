@@ -49,7 +49,9 @@
 								var rmEvent:RemovePersonEvent = new RemovePersonEvent(model.selectedPerson.id);
 								rmEvent.dispatch();
 								//remove links
-								model.selectedPerson.remove();	
+								var closePerson:Person = model.selectedPerson.remove();
+								model.vis.visualize(model.root);
+								model.vis.select(closePerson);		
 						 	}
 						});
 				}else{
@@ -226,7 +228,7 @@
 	<mx:NumberValidator id="dodYearValidator" source="{dodYear}" property="text" domain="int" required="false"/>
 	<mx:HBox>
 	<mx:Button label="Use This As The Root" width="150" click="changeRoot()" textAlign="left" />
-		<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
+	<mx:Button label="Remove This Person" width="150" click="remove()" textAlign="left"/>
 	</mx:HBox>
 	<mx:Grid width="100%">
 		<mx:GridRow width="100%">

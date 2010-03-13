@@ -42,18 +42,18 @@
 				showBox.visible = showBox.includeInLayout = false;
 				editBox.visible	= editBox.includeInLayout = true;
 				projName.text	= project.name;
-				projDesc.text	= project.description;
+				//projDesc.text	= project.description;
 					
 			}
 			private function saveProject():void{
 				if (status != EDIT) return;
 				var project:Project = model.project;
-				if (project.name == projName.text && project.description == projDesc.text){
+				if (project.name == projName.text){ //&& project.description == projDesc.text){
 					closeEdit();
 					return;				
 				}
 				project.name = projName.text;
-				project.description = projDesc.text;
+				//project.description = projDesc.text;
 				var updateEvent:UpdateProjectEvent = new UpdateProjectEvent(project);
 				updateEvent.dispatch();
 				closeEdit();
@@ -67,24 +67,15 @@
 			}			
 		]]>
 	</mx:Script>
-	<mx:VBox id="showBox" width="100%" rollOver="onRollOver(event, edit)" rollOut="onRollOut(event, edit)" doubleClickEnabled="true" doubleClick="editProject(showBox, editBox)">
-		<mx:HBox width="100%" backgroundAlpha="0">
-			<mx:Label id="title" text="{model.project.name}" styleName="mediumTitle"/>
-			<mx:Button id="edit" label="Edit" click="editProject(showBox, editBox)" visible="false"/>
-		</mx:HBox>
-		<mx:Text text="{model.project.description}" width="100%"/>		
-	</mx:VBox>
-	<mx:VBox id="editBox" width="100%" visible="false" includeInLayout="false" styleName="solidBorder">
-		<mx:HBox width="100%">
-			<mx:TextInput id="projName" width="{title.width}"/>		
-			<mx:Button id="save" label="Save" click="saveProject()"/>
-		</mx:HBox>
-		<mx:TextInput id="projDesc" width="100%"/>		
-	</mx:VBox>
-
-
-
-		
 	
-			
+	<mx:HBox id="showBox" width="100%" rollOver="onRollOver(event, edit)" rollOut="onRollOut(event, edit)" doubleClickEnabled="true" doubleClick="editProject(showBox, editBox)">
+		<mx:Label id="title" text="{model.project.name}" styleName="mediumTitle"/>
+		<mx:Button id="edit" label="Edit" click="editProject(showBox, editBox)" visible="false"/>
+	</mx:HBox>
+		<!--<mx:Text text="{model.project.description}" width="100%"/>-->			
+	<mx:HBox id="editBox" width="100%" visible="false" includeInLayout="false" styleName="solidBorder">
+		<mx:TextInput id="projName" width="{title.width}"/>		
+		<mx:Button id="save" label="Save" click="saveProject()"/>
+	</mx:HBox>
+		<!--<mx:TextInput id="projDesc" width="100%"/>-->			
 </mx:VBox>

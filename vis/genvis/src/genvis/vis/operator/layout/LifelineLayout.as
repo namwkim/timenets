@@ -12,6 +12,8 @@ package genvis.vis.operator.layout
 	import genvis.vis.lifeline.Line;
 	import genvis.vis.lifeline.LineSpline;
 	import genvis.vis.lifeline.Spline;
+	
+	import org.akinu.helper.Helper;
 
 	public class LifelineLayout extends Layout
 	{
@@ -127,8 +129,8 @@ package genvis.vis.operator.layout
 //				}else{	
 					var end:Date = person.dateOfDeath!=null? person.dateOfDeath:_curDate;
 					var median:Number = person.dateOfBirth.fullYear + (end.fullYear - person.dateOfBirth.fullYear)/2;
-					_xscale.min = new Date(median-(_xrange/2), 1, 1);
-					_xscale.max = new Date(median+(_xrange/2) , 1 ,1);				
+					_xscale.min = Helper.assignDate(median-(_xrange/2), 1, 1);
+					_xscale.max = Helper.assignDate(median+(_xrange/2) , 1 ,1);				
 //				}
 			}else{
 				//find xmin and xmax from the whole data

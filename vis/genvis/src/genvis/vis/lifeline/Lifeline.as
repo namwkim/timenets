@@ -21,18 +21,18 @@ package genvis.vis.lifeline
 		public static const EPSILON:int		= 2; //threshold for ensuring no overlaps between marriage and divorce
 		
 		//lifeline type
-		public static const LINE:int 		= 0;
-		public static const SPLINE:int 		= 1;
-		public static const LINESPLINE:int	= 2;	
+		public static const LINE:uint 		= 0;
+		public static const SPLINE:uint 	= 1;
+		public static const LINESPLINE:uint	= 2;	
 		
 		//lifeline style
-		public static const LABELINSIDE:int		= 0;
-		public static const LABELOUTSIDE:int 	= 1;
+		public static const LABELINSIDE:uint	= 0;
+		public static const LABELOUTSIDE:uint 	= 1;
 		//default linewidth
 		private static const LINEWIDTH:int	= 2;
 		
-		protected static const UP:int	 = 0;
-		protected static const DOWN:int = 1;
+		protected static const UP:uint	 = 0;
+		protected static const DOWN:uint = 1;
 		
 		protected var _lineWidth:int;
 		protected var _style:int;

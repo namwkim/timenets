@@ -34,13 +34,15 @@ protected
   def log action_verb, record, project
     #time = Time.now.strftime("%B %d at %H:%M%p")
     if @operator.nil?
-      return
+      @operator = User.find_by_id(session[:operator_id])
+      return if @operator.nil?
     end
-    html_text = @operator.person.name+" "+action_verb+" "+record.name#+" in "+project.name + ", "+time
+    html_text = (@operator.person.name==nil ? "": @operator.person.name)+" "+action_verb+" "
+    html_text = html_text + record.name if record!=nil    
     activity = Activity.create(:html=>html_text)
-    project.activities<<activity
+    project.activities<<activity if project!=nil
     @operator.activities<<activity
     @operator.save
-    project.save
+    project.save if project!=nil
   end  
 end

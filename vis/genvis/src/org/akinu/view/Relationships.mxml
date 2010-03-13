@@ -183,7 +183,8 @@
 							update.dispatch();						
 							break;
 						}
-						model.vis.visualize(model.root);						
+						model.vis.visualize(model.root);
+						model.vis.select(model.selectedPerson);						
 					}				
 				});
 			}
@@ -259,8 +260,8 @@
 		</mx:Grid>	
 		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="2" width="100%"/>
 		<mx:HBox width="100%" rollOver="onRollOver(event, addMarBtn)" rollOut="onRollOut(event, addMarBtn)" >
-			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Marriages':'Marriage'}" styleName="smallTitle" width="100%"/>
-			<mx:Button id="addMarBtn" label="Add Marriage" click="newRelationship(Role.SPOUSE)" visible="false"/>	
+			<mx:Label text="{model.selectedPerson.spouses.length>1? 'Spouses':'Spouse'}" styleName="smallTitle" width="100%"/>
+			<mx:Button id="addMarBtn" label="Add Spouse" click="newRelationship(Role.SPOUSE)" visible="false"/>	
 		</mx:HBox>
 		<mx:Box id="spouse"/>
 		<mx:Repeater id="spouseRepeater" dataProvider="{model.selectedPerson.spouses}">	
@@ -269,7 +270,7 @@
 					<mx:GridItem width="100%">
 						<mx:VBox width="100%" verticalGap="0">						
 							<mx:HBox width="100%" rollOver="onRollOver(event, rmSpBtn[event.target.instanceIndices[0]])" rollOut="onRollOut(event, rmSpBtn[event.target.instanceIndices[0]])">
-								<mx:Label text="With:" styleName="mute"/>
+								<mx:Label text="Wife:" styleName="mute"/>
 								<mx:Label text="{spouseRepeater.currentItem.name}" width="100%"/>
 								<mx:Button id="rmSpBtn" label="Remove" click="remove(event.currentTarget.getRepeaterItem() as Person, Role.SPOUSE)" visible="false"/>							
 							</mx:HBox>

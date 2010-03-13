@@ -5,7 +5,13 @@ class PersonController < ApplicationController
     @person = @operator.person
   end
   def visualize
-    @person = Person.find_by_id(params[:id])
+    log "uses visualization", nil, nil
+    if params[:id]!=nil
+      @person = Person.find_by_id(params[:id]) 
+    else
+      @person = nil
+    end
+    
     #@session_id = session[:session_id]
   end
   def root #called from flex to get a genealogy root
@@ -67,7 +73,7 @@ class PersonController < ApplicationController
       success   = update_person_attributes @person, params
     end  
     if success
-      log "edited", @person, @project
+      log "updated", @person, @project
       respond_to do |format|
         format.html {redirect_to(:action=>"show_person", :id=>@person.id)}
         format.js { 
@@ -109,9 +115,6 @@ class PersonController < ApplicationController
   end
   ############################## Relationship ##############################
   def new_relationship
-    @action = params[:action]
-  end
-  def new_relationship
     @person  = Person.new
     @ref_id   = params[:ref_id]
     @role     = params[:role]
@@ -121,7 +124,8 @@ class PersonController < ApplicationController
     if params[:person_id]!=nil
       @person = Person.find_by_id(params[:person_id]) # create a relationship from existing person
     else      
-      @person = is_amf ? params[:person] : Person.new(params[:person])
+      @person = is_amf ? params[:person] : Person.new(params[:person])      
+      log "created", @person, Person.find_by_id(params[:ref_id]).project
     end
     @ref_person = Person.find_by_id(params[:ref_id])
     @person.project = @ref_person.project # inherit project
@@ -129,15 +133,20 @@ class PersonController < ApplicationController
     case @role #spouse is automatically handled
       when "Father"
         @ref_person.father = @person
+        log "created Father-Child Relationship("+@person.name+","+@ref_person.name+")", nil, @person.project
       when "Mother"
         @ref_person.mother = @person
-      when "Spouse"             
+        log "created Mother-Child Relationship("+@person.name+","+@ref_person.name+")", nil, @person.project
+      when "Spouse"
+        log "created Marriage Relationship("+@person.name+","+@ref_person.name+")", nil, @person.project
       when "Child"
         case @ref_person.sex  #TODO: what if sex is nil
           when "Male"
             @person.father = @ref_person
+            log "created Father-Child Relationship("+@ref_person.name+","+@person.name+")", nil, @person.project
           else "Female"
             @person.mother = @ref_person
+            log "created Mother-Child Relationship("+@ref_person.name+","+@person.name+")", nil, @person.project
         end              
     end
     if @person.save and @ref_person.save
@@ -175,10 +184,8 @@ class PersonController < ApplicationController
     case params[:role]
       when "Father" #remove father and a marriage record with mother
         @ref_person.father = nil
-        @ref_person.mother = nil
       when "Mother" #remove mother and a marriage record with mother
         @ref_person.mother = nil
-        @ref_person.father = nil
       when "Spouse" 
         #remove parent-child link
         @children = @ref_person.children_with @person
@@ -186,10 +193,12 @@ class PersonController < ApplicationController
           child.father = nil if child.father!=nil and child.father.id == @person.id
           child.mother = nil if child.mother!=nil and child.mother.id == @person.id
         end
+        #remove marriage links
         @marriages = @ref_person.marriage_with @person.id
         @marriages.each do |marriage|
           marriage.destroy  
-        end        
+        end       
+        log "deleted Marriage Relationship("+@person.name+","+@ref_person.name+")", nil, @person.project
       when "Child"
         @person.father = nil
         @person.mother = nil   
@@ -205,10 +214,11 @@ class PersonController < ApplicationController
   end
   def create_marriage
     @marriage = params[:marriage]
+    log "created Marriage Relationship("+@marriage.person1.name+","+@marriage.person2.name+")", nil, @marriage.person2.project
     if @marriage.save
       render :amf=>@marriage      
     else
-      render :amf=>FaultObject.new(@person.errors.full_messages.join("\n"))
+      render :amf=>FaultObject.new(@marriage.errors.full_messages.join("\n"))
     end
   end
   def update_marriage
@@ -220,6 +230,7 @@ class PersonController < ApplicationController
       success   = @marriage.update_attributes params[:marriage]
     end    
     if success
+      log "updated Marriage Relationship("+@marriage.person1.name+","+@marriage.person2.name+")", nil, @marriage.person2.project
       respond_to do |format|
         format.html 
         format.amf { render :amf=>"Success"}
@@ -229,6 +240,7 @@ class PersonController < ApplicationController
   def delete_marriage 
     @marriage = Marriage.find_by_id(params[:id])
     @marriage.destroy if @marriage!=nil
+    log "deleted Marriage Relationship("+@marriage.person1.name+","+@marriage.person2.name+")", nil, @marriage.person2.project
     render :amf=>"Success"
   end
   def edit_relationships
@@ -261,8 +273,9 @@ class PersonController < ApplicationController
       else #edit event or show event
         @event = Event.find_by_id(params[:event_id])
         @event.people << @person
+        log "added, in event,", @person, @person.project
       end      
-      log "created", @person, @person.project
+      log "created", @person, @person.project      
       responds_to_parent do 
         render :partial=>"add_person_in_event", :locals=>{:person=>@person, :event=>@event}  
       end
@@ -280,7 +293,7 @@ class PersonController < ApplicationController
     @person = Person.find_by_id(params[:id])
     if update_person_attributes @person, params
       @event = Event.find_by_id(params[:event_id]) if params[:event_id]!=nil
-      log "edited", @person, @person.project
+      log "updated", @person, @person.project
       responds_to_parent do
         render :partial=>"update_person_in_event", :locals=>{:person=>@person, :event=>@event}
       end      
@@ -293,6 +306,7 @@ class PersonController < ApplicationController
     if params[:event_id]!=nil
       @event  = Event.find_by_id(params[:event_id])      
       @event.people.delete(@person)
+      log "removed, from event,", @person, @person.project
     else
       session[:people].delete(@person.id)
     end
@@ -303,6 +317,7 @@ class PersonController < ApplicationController
     if params[:event_id]!=nil
       @event = Event.find_by_id([params[:event_id]])
       @event.people << @person
+      log "added, in event,", @person, @person.project
     else
       session[:people] << @person.id
     end    

@@ -2,8 +2,8 @@
 	<td><%= link_to project.name, :action=>"show_project", :id=>project.id%></td>
 	<td><%= project.description%></td>
 	<td>
-		<%= link_to_remote "Set", :url=>{:action=>"set_main_project", :id=>project.id}, :complete=>"alert('This project will be the front page!');"%>
-		<%= link_to_remote_lightbox "Edit", :url=>{:action=>"edit_project", :id=>project.id}%> 
-		<%= link_to_remote "Remove", :url=>{:action=>"delete_project", :id=>project.id}, :confirm=>"Do you really want to delete this project?", :complete=>"$('project_#{project.id}').remove();"%>
+		<%= button_to_remote "Set Home", {:url=>{:action=>"set_main_project", :id=>project.id}, :complete=>"alert('This project will be the front page!');"}, {:class=>"ui_small_button"}%>
+		<%= button_to_remote_lightbox "Edit", {:url=>{:action=>"edit_project", :id=>project.id}}, {:class=>"ui_small_button"}%> 
+		<%= button_to_remote "Remove", {:url=>{:action=>"delete_project", :id=>project.id}, :confirm=>"Do you really want to delete this project?", :complete=>"$('project_#{project.id}').remove();"}, {:class=>"ui_small_button"}%>
 	</td>
 </tr>

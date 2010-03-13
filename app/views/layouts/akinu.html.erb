@@ -10,14 +10,30 @@
 	<%= javascript_include_tag 'lightbox' %>
 	<%= stylesheet_link_tag 'lytebox' %> 
 	<%= javascript_include_tag "lytebox" %>
-</head>
+	
+
+<% javascript_tag do%>
+  var is_ssl = ("https:" == document.location.protocol);
+  var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
+  document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
+<% end %>
+<% javascript_tag do%>
+  var feedback_widget_options = {};
+
+  feedback_widget_options.display = "overlay";  
+  feedback_widget_options.company = "akinu";
+  feedback_widget_options.placement = "left";
+  feedback_widget_options.color = "#2e3436";
+  feedback_widget_options.style = "problem";
+  var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+<% end %>
 
 <body>
 <div class="header_wrapper">
 <div class="header"> 
-    <span class="submenu">		
-        <span class="submenuitem"><%= link_to "Profile", {:controller=>"person", :action=>"index"}%></span>
-		<span class="submenuitem"><%= link_to "Projects", {:controller=>"project", :action=>"index"}%></span>
+    <span class="submenu">	
+		<span class="submenuitem"><%= link_to "Projects", {:controller=>"project", :action=>"index"}%></span>	
+        <span class="submenuitem"><%= link_to "Profile", {:controller=>"person", :action=>"index"}%></span>		
         <span class="submenuitem"><%= link_to("Logout", {:controller=>"home", :action=>"logout"})%></span>
     </span>
 	<%= link_to(image_tag("/images/title.png", :width=>90, :class=>"image_title"), {:controller=> "home", :action=>"index"}, :class=>"title")%>

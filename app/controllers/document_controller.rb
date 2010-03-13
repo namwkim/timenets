@@ -35,7 +35,7 @@ class DocumentController < ApplicationController
   def update_document
     @document = Document.find_by_id(params[:id])
     if update_document_attributes @document, params
-      log "edited", @document, @document.project
+      log "updated", @document, @document.project
       responds_to_parent do render :partial => "update_document", :locals=>{:document=>@document} end
     else
       render :action=>"edit_document"
@@ -45,7 +45,8 @@ class DocumentController < ApplicationController
     @document = Document.find_by_id(params[:id])
     #delete file if exists
     Document.delete_file(@document.file_url)
-    Document.destroy(@document)    
+    Document.destroy(@document)  
+    log "deleted", @document, @document.project
     render :nothing=>true
   end
   def show_document
@@ -80,6 +81,7 @@ class DocumentController < ApplicationController
       else
         @event = Event.find_by_id(params[:event_id])
         @event.documents << @document
+        log "added, in event,", @document, @document.project
       end
       log "created", @document, @document.project
       respond_to_parent do 
@@ -99,7 +101,7 @@ class DocumentController < ApplicationController
      @document = Document.find_by_id(params[:id])
     if update_document_attributes @document, params
       @event = Event.find_by_id(params[:event_id]) if params[:event_id]!=nil
-      log "edited", @document, @document.project
+      log "updated", @document, @document.project
       responds_to_parent do 
         render :partial => "update_document_in_event", :locals=>{:document=>@document, :event=>@event}
       end 
@@ -112,6 +114,7 @@ class DocumentController < ApplicationController
     if params[:event_id]!=nil
       @event  = Event.find_by_id(params[:event_id])       
       @event.documents.delete(@document)
+      log "removed, in event,", @document, @document.project
     else
       session[:documents].delete(@document.id)
     end
@@ -122,6 +125,7 @@ class DocumentController < ApplicationController
     if params[:event_id]!=nil
       @event = Event.find_by_id(params[:event_id])
       @event.documents << @document
+      log "added, in event,", @document, @document.project
     else
       session[:documents] << @document.id
     end

@@ -8,6 +8,7 @@ package genvis
 	
 	import flash.display.StageDisplayState;
 	import flash.events.Event;
+	import flash.filters.GlowFilter;
 	import flash.geom.Rectangle;
 	import flash.text.TextFormat;
 	
@@ -80,6 +81,7 @@ package genvis
 //		private var _visScroll:ScrollBar	= null;
 		private var _uiCtrls:Canvas			= null;
 		private var _spanSlider:HSlider		= null;
+		private var _glowFilter:GlowFilter	= new GlowFilter(0xcc0000, 0.5, 18, 18);
 		//****************//
 		//configuration   //
 		//****************//
@@ -189,6 +191,10 @@ package genvis
 			selectPerson.dispatch();
 			_vis.update(null, OPS);
 			DirtySprite.renderDirty();
+		}
+		public function setLabelStyle(lbStyle:uint):void{
+			_lifelineLayout.lifeline.style = lbStyle;
+			_vis.update(_t, OPS);
 		}
 		private function clear():void{
 			if (_vis.data == null) return;
@@ -621,8 +627,10 @@ package genvis
 //						edge.child.lineColor = 0xff73d216;
 					}else if (e.item is NodeSprite){//node sprite
 						var node:NodeSprite = e.node;
-						node.props.lineColor = node.lineColor;
-						node.lineColor = 0xff73d216;
+						_glowFilter.color = node.lineColor;
+						node.filters = [_glowFilter];
+//						node.props.lineColor = node.lineColor;
+//						node.lineColor = 0xff73d216;
 					}else if (e.item is BlockSprite){
 						var b:BlockSprite = e.item as BlockSprite;
 						b.props.lineWidth = b.lineWidth;
@@ -648,7 +656,8 @@ package genvis
 //						}
 //						edge.child.lineColor = edge.child.props.lineColor;
 					}else if (e.item is NodeSprite){
-						e.node.lineColor = e.node.props.lineColor;
+//						e.node.lineColor = e.node.props.lineColor;
+						if (e.node.selected==false) e.node.filters = null;
 					}else if (e.item is BlockSprite){
 						var b:BlockSprite = e.item as BlockSprite;
 						b.lineWidth = b.props.lineWidth;
@@ -689,11 +698,13 @@ package genvis
 					if (e.object is NodeSprite){
 						if (_selectedNode){
 							_selectedNode.selected = false;
+							_selectedNode.filters  = null;//[_glowFilter];
 						}
 						
 						_selectedNode = e.node;
 						_selectedNode.selected = true;
-						
+						_glowFilter.color = _selectedNode.lineColor;
+						_selectedNode.filters = [_glowFilter];
 						//Dispatch Selection Event
 						selectPerson = new SelectEvent(SelectEvent.SELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
 						selectPerson.dispatch();
@@ -720,6 +731,7 @@ package genvis
 					}else{
 						if (_selectedNode){
 							_selectedNode.selected = false;
+							_selectedNode.filters  = null;
 							selectPerson = new SelectEvent(SelectEvent.DESELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
 							selectPerson.dispatch();
 						}

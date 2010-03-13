@@ -43,6 +43,7 @@ package genvis.vis.data.render
 				if (attr.objType == AttributeSprite.PERSON){					
 					var person:Person = attr.data as Person;
 					var node:NodeSprite	= person.sprite;
+					if (node.simplified) return;
 					lifeline = node.block.gbLayout.lifeline;
 					for each (evtPt in node.points){
 						var refPt:Point;
@@ -72,6 +73,7 @@ package genvis.vis.data.render
 					var marriage:Marriage 	= attr.data as Marriage;
 					var node1:NodeSprite	= marriage.person1.sprite;
 					var node2:NodeSprite	= marriage.person2.sprite;
+					if (node1.simplified || node2.simplified) return;
 					var refPt1:Point;
 					var refPt2:Point;
 					for each (evtPt in node1.points){
@@ -90,6 +92,7 @@ package genvis.vis.data.render
 							refPt2 = node2.toGlobal(evtPt.pt);
 						}						
 					}
+					if (refPt1 == null || refPt2 == null) return;
 					attr.x 	= refPt1.x;
 					attr.y 	= (refPt1.y+refPt2.y)/2;
 					if (attr.attrType == AttributeSprite.MARRIAGE_DATE){

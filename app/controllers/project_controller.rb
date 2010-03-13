@@ -40,7 +40,7 @@ class ProjectController < ApplicationController
       success   = @project.update_attr_from_amf  params[:project]
     else
       @project   = Project.find_by_id(params[:id])      
-      success   = update_person_attributes @project, params
+      success   = @project.update_attributes(params[:project])
     end  
     if success
       respond_to do |format|

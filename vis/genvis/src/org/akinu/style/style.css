@@ -661,12 +661,10 @@ Label
 LinkButton
 {
 	color:#e9b96e;
-	rollOverColor:#2e3436;
-	selectionColor:#2e3436;
+	rollOverColor:#555753;
+	selectionColor:#555753;
 	textRollOverColor:#fcaf3e;
 	textSelectedColor:#fcaf3e;
-	focusAlpha: 0.1;
-	cornerRadius: 0;
 }
 
 
@@ -1029,7 +1027,6 @@ TextInput
 {
 	backgroundAlpha: 1.0;
 	borderColor: #B7BABC;
-	color: #FFFFFF;
 	borderSkin: Embed(source="kingnarestyle.swf", symbol="TextInput_borderSkin");
 	borderStyle: none;
 	paddingTop: 2;

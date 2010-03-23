@@ -5,7 +5,6 @@ package genvis.vis
 	import fl.core.UIComponent;
 	import fl.events.ScrollEvent;
 	
-	import flare.display.DirtySprite;
 	import flare.display.RectSprite;
 	import flare.util.Displays;
 	import flare.vis.data.DataSprite;
@@ -74,6 +73,7 @@ package genvis.vis
 		
 		private var _layers:Sprite; // sprite for all layers in visualization
 		private var _marks:Sprite;  // sprite for all visualized data items
+		private var _histMarks:Sprite;
 		private var _labels:Sprite; // (optional) sprite for labels
 		private var _axes:Axes;     // (optional) axes, lines, and axis labels
 		
@@ -150,6 +150,8 @@ package genvis.vis
 				_data.visit(_marks.removeChild, Data.BLOCKS);
 				_data.visit(_marks.removeChild, Data.EDGES);
 				_data.visit(_marks.removeChild, Data.ATTRIBUTES);
+				_data.visit(_marks.removeChild, Data.EVENTS);
+				_data.visit(_histMarks.removeChild, Data.HISTORICAL_EVENTS);
 				_data.removeEventListener(DataEvent.ADD, dataAdded);
 				_data.removeEventListener(DataEvent.REMOVE, dataRemoved);
 			}
@@ -158,7 +160,8 @@ package genvis.vis
 				_data.visit(_marks.addChild, Data.EDGES);
 				_data.visit(_marks.addChild, Data.BLOCKS);
 				_data.visit(_marks.addChild, Data.ATTRIBUTES);
-				
+				_data.visit(_marks.addChild, Data.EVENTS);
+				_data.visit(_histMarks.addChild, Data.HISTORICAL_EVENTS);
 				_data.addEventListener(DataEvent.ADD, dataAdded);
 				_data.addEventListener(DataEvent.REMOVE, dataRemoved);
 			}
@@ -186,6 +189,7 @@ package genvis.vis
 			addChild(_layers = new Sprite());
 			_layers.name = "_layers";
 			
+			_layers.addChild(_histMarks = new Sprite());
 			_layers.addChild(_marks = new Sprite()); 
 			_marks.name = "_marks";
 			

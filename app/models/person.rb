@@ -20,10 +20,12 @@ class Person < ActiveRecord::Base
   def name
     if self.first_name!=nil and self.last_name!=nil
       self.first_name+" "+self.last_name
-    elsif self.first_name.nil?
+    elsif self.last_name!=nil
       self.last_name      
-    else
+    elsif self.first_name!=nil
       self.first_name
+    else
+      ""
     end
   end
   def self.upload_file uploader, file

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100303044343) do
+ActiveRecord::Schema.define(:version => 20100315103202) do
 
   create_table "activities", :force => true do |t|
     t.integer  "user_id"
@@ -43,12 +43,13 @@ ActiveRecord::Schema.define(:version => 20100303044343) do
     t.integer  "project_id"
     t.string   "name"
     t.string   "location"
-    t.date     "from"
-    t.date     "to"
-    t.boolean  "isRange",     :default => false
+    t.date     "start"
+    t.date     "end"
+    t.boolean  "is_range",    :default => false
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "historical",  :default => false
   end
 
   create_table "events_people", :id => false, :force => true do |t|

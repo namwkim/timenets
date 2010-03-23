@@ -98,7 +98,13 @@ module RubyAMF
       :type         => 'active_record',
       :attributes   => ["id", "name", "description"]
     )
-
+    ClassMappings.register(
+      :actionscript => 'Event',
+      :ruby         => 'Event',
+      :type         => 'active_record',
+      :associations => ['people'],
+      :attributes   => ["id", "name", "location", "start", "end", "is_range", "description", "historical"]
+    )    
     # Now, to call the class mapping scope of editing (you are sending objects to the editing application), your controller call would look like this:
     # EX: render :amf => book, :class_mapping_scope => :editing
     #

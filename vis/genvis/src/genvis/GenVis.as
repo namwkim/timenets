@@ -28,10 +28,13 @@ package genvis
 	import genvis.vis.data.BlockSprite;
 	import genvis.vis.data.Data;
 	import genvis.vis.data.EdgeSprite;
+	import genvis.vis.data.EventSprite;
 	import genvis.vis.data.NodeSprite;
 	import genvis.vis.data.render.AttributeRenderer;
+	import genvis.vis.data.render.EventRenderer;
 	import genvis.vis.data.render.LifelineRenderer;
 	import genvis.vis.events.SelectionEvent;
+	import genvis.vis.events.TooltipEvent;
 	import genvis.vis.lifeline.Lifeline;
 	import genvis.vis.operator.encoder.ColorEncoder;
 	import genvis.vis.operator.filter.FisheyeFilter;
@@ -51,7 +54,9 @@ package genvis
 	import mx.events.SliderEvent;
 	import mx.styles.CSSStyleDeclaration;
 	
+	import org.akinu.events.RootChangeEvent;
 	import org.akinu.events.SelectEvent;
+	import org.akinu.helper.Helper;
 	
 //	import org.alivepdf.display.Display;
 //	import org.alivepdf.layout.Orientation;
@@ -70,8 +75,10 @@ package genvis
 		private var _fisheyeFilter:FisheyeFilter	= null;
 		private var _renderer:LifelineRenderer 		= null;
 		private var _attrRenderer:AttributeRenderer	= null;
+		private var _evtRenderer:EventRenderer		= null;
 		private var _lifelineLayout:LifelineLayout 	= null;
 		private var _root:Person;	
+		private var _events:Array;
 		private var _focusNodes:Array 			= new Array();
 		private var _selectedNode:NodeSprite		= null;
  		private var _range:TextArea				= null;
@@ -81,7 +88,14 @@ package genvis
 //		private var _visScroll:ScrollBar	= null;
 		private var _uiCtrls:Canvas			= null;
 		private var _spanSlider:HSlider		= null;
-		private var _glowFilter:GlowFilter	= new GlowFilter(0xcc0000, 0.5, 18, 18);
+		private var _tmp:*;
+//		var colors:Array = [0xffffff, 0xe8d138, 0xffffff, 0xffffff];
+// var alphas:Array = [0.0, 1, 1, 1];
+// var ratios:Array = [0, 64, 86, 128];
+// var _glowFilter:GradientGlowFilter = new GradientGlowFilter(0, 0, colors, alphas, ratios, 16, 16, 1, 2, BitmapFilterType.OUTER, false);
+
+		
+		
 		//****************//
 		//configuration   //
 		//****************//
@@ -106,22 +120,32 @@ package genvis
 		private var _selectedBlock:BlockSprite		= null;
 		//node config
 		private var _nColors:Array 		= [0x3465a4, 0xcc0000, 0x555753];
-		private var _nLineAlpha:Number	= 1.0;
-		private var _nFillAlpha:Number	= 0.1;
+		private var _nLineAlpha:Number	= 0.8;
+		private var _nFillAlpha:Number	= 0.5;
+		private var _nodeGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.7, 24, 24, 5);
 		//block config
 		private var _bLineWidth:Number  = 2;
 		private var _bFillColor:Number 	= 0x888a85;
 		private var _bFillAlpha:Number	= 0.5;
 		private var _bLineColor:Number	= 0x2e3436;
 		private var _bLineAlpha:Number	= 0.5;
-		
+		//edge config
 		private var _edgeColor:Number  	= 0x4e9a06;//0xbabdb6;
 		private var _edgeWidth:Number	= 2;	
-		private var _edgeAlpha:Number	= 0.6;	
-		
+		private var _edgeAlpha:Number	= 0.6;
+		//historical event
+		private var _histColor:Number	= 0xd3d7cf;
+		private var _histAlpha:Number	= 0.8;
+		//event
+		private var _evtColor:Number	= 0xfcaf3e;
+		private var _evtAlpha:Number	= 0.8;
+		private var _evtGlow:GlowFilter 	= new GlowFilter(0xfcaf3e, 0.8, 16, 16, 7);
+			
+		private var _this:GenVis;
 		public function GenVis()
 		{
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
+			_this = this;
 			
 		}
 		public function addRelationship(person:Person, role:String, ref_id:String):void{
@@ -152,15 +176,15 @@ package genvis
 			//#5. enable vis controls
 			_uiCtrls.enabled = true;
 		}
-		public function visualize(root:Person):void{
+		public function visualize(root:Person, events:Array = null):void{
 			//#1. clear sprites if reusing data
 			clear();
-			_root = root;
-
+			_root 	= root;
+			_events	= events;
 			//#2. estimate missing data
 			DataEstimator.estimate(_root, null);	
 			//#3. construct display list
-			var data:Data = new Data(_root);		
+			var data:Data = new Data(_root, events);		
 
 			//#3. set initial focus
 			_root.sprite.status = NodeSprite.FOCUSED;
@@ -177,20 +201,33 @@ package genvis
 		public function update():void{
 			_vis.update(null, OPS);
 		}
-		public function select(person:Person):void{
-			if (person.sprite==null) return;
-			_lifelineLayout.buildScale(person.sprite);
-			if (_selectedNode){
-				_selectedNode.selected = false;
-			}
+		public function select(person:Person, update:Boolean=true):void{
+			if (person.sprite==null || (_selectedNode && _selectedNode==person.sprite)) return;
+			deselect();
 			_selectedNode = person.sprite;
 			_selectedNode.selected = true;
+			_selectedNode.filters  = [_nodeGlow];
 			
+
 			//Dispatch Selection Event
 			var selectPerson:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.PERSON, person, null);
 			selectPerson.dispatch();
-			_vis.update(null, OPS);
-			DirtySprite.renderDirty();
+			if (update){
+				_lifelineLayout.buildScale(person.sprite);
+				_vis.update(null, OPS);
+			}
+			//DirtySprite.renderDirty();
+		}
+		public function deselect(dispatchEvent:Boolean=false):void{
+			if (_selectedNode){
+				_selectedNode.selected = false;
+				_selectedNode.filters  = null;
+				_selectedNode = null;
+				if (dispatchEvent){
+					var evt:SelectEvent = new SelectEvent(SelectEvent.DESELECT, SelectEvent.PERSON);
+					evt.dispatch();
+				}
+			}
 		}
 		public function setLabelStyle(lbStyle:uint):void{
 			_lifelineLayout.lifeline.style = lbStyle;
@@ -265,6 +302,7 @@ package genvis
 			//set properties
 			_renderer 		= new LifelineRenderer(_lifelineType, _layoutMode);
 			_attrRenderer 	= new AttributeRenderer(); 
+			_evtRenderer	= new EventRenderer();
 			buildOperators();				
 			_vis.data.edges.setProperties({"renderer":_renderer, lineColor:Colors.setAlpha(_edgeColor, uint(255*_edgeAlpha)%256), 
 					lineWidth:_edgeWidth});
@@ -274,6 +312,8 @@ package genvis
 					lineColor: Colors.setAlpha(_bLineColor, uint(255*_bLineAlpha)%256), 
 					fillColor: Colors.setAlpha(_bFillColor, uint(255*_bFillAlpha)%256)});
 			_vis.data.attributes.setProperty("renderer", _attrRenderer);
+			_vis.data.histEvents.setProperties({"renderer": _evtRenderer, fillColor:Colors.setAlpha(_histColor, uint(255*_histAlpha)%256)});
+			_vis.data.events.setProperties({"renderer": _evtRenderer, fillColor:Colors.setAlpha(_evtColor, uint(255*_evtAlpha)%256)});
 			//postprocessing after operators added
 			// Format the y-axis.
 		    var axes:CartesianAxes = _vis.axes as CartesianAxes;
@@ -615,7 +655,7 @@ package genvis
 						var edge:EdgeSprite = e.edge;
 						//edge highlight
 						edge.props.lineWidth = edge.lineWidth;
-						edge.lineWidth = 3;
+						edge.lineWidth = 4;
 						edge.props.lineColor = edge.lineColor;
 						edge.lineColor = 0xff73d216;
 //						//parents highlight
@@ -627,8 +667,14 @@ package genvis
 //						edge.child.lineColor = 0xff73d216;
 					}else if (e.item is NodeSprite){//node sprite
 						var node:NodeSprite = e.node;
-						_glowFilter.color = node.lineColor;
-						node.filters = [_glowFilter];
+						node.filters = [_nodeGlow];
+						//highlight connected edges
+						node.visitEdges(function (edge:EdgeSprite):void{
+							edge.props.lineWidth = edge.lineWidth;
+							edge.lineWidth = 4;
+							edge.props.lineColor = edge.lineColor;
+							edge.lineColor = 0xff73d216;
+						});						
 //						node.props.lineColor = node.lineColor;
 //						node.lineColor = 0xff73d216;
 					}else if (e.item is BlockSprite){
@@ -643,6 +689,17 @@ package genvis
 						var a:AttributeSprite = e.item as AttributeSprite;
 						a.label.bold  = true;
 						a.label.color = 0x73d216;
+					}else if (e.item is EventSprite){
+						var evt:EventSprite = e.item as EventSprite;
+						if (evt.event.historical){
+							evt.props.fillAlpha = evt.fillAlpha;
+							evt.fillAlpha = 1.0;
+						}else{
+							evt.props.fillColor = evt.fillColor;
+							evt.fillColor		= Colors.setAlpha(0xffffff, uint(255*_evtAlpha)%256);
+							evt.filters 		= [_evtGlow];
+						}			
+						//_tmp = ToolTipManager.createToolTip("test", e.cause.stageX, e.cause.stageY, "errorTipAbove") as ToolTip;			
 					}
 				},
 				// Return node to previous state
@@ -658,6 +715,10 @@ package genvis
 					}else if (e.item is NodeSprite){
 //						e.node.lineColor = e.node.props.lineColor;
 						if (e.node.selected==false) e.node.filters = null;
+						e.node.visitEdges(function (edge:EdgeSprite):void{							
+							edge.lineWidth = edge.props.lineWidth;
+							edge.lineColor = edge.props.lineColor;	
+						})
 					}else if (e.item is BlockSprite){
 						var b:BlockSprite = e.item as BlockSprite;
 						b.lineWidth = b.props.lineWidth;
@@ -667,6 +728,15 @@ package genvis
 						var a:AttributeSprite = e.item as AttributeSprite;
 						a.label.bold  = false;
 						a.label.color = 0x000000;
+					}else if (e.item is EventSprite){
+						var evt:EventSprite = e.item as EventSprite;
+						if (evt.event.historical){
+							evt.fillAlpha = evt.props.fillAlpha;
+						}else{
+							evt.fillColor	= evt.props.fillColor;
+							evt.filters 	= null;
+						}			
+						//ToolTipManager.destroyToolTip(_tmp);			
 					}
 				});
 			_vis.controls.add(_hoverCtrl);
@@ -690,51 +760,51 @@ package genvis
 //						if (person.mother) toolTip += "mother:" + person.mother.name;
 //						TextSprite( evt.tooltip ).htmlText = toolTip;
 //    	    		});
-//			_vis.controls.add(_toolTip);			
+//			_vis.controls.add(_toolTip);	
+			var toolTipCtrl:TooltipControl = new TooltipControl(EventSprite, null, function (te:TooltipEvent):void{
+				var e:EventSprite = te.object as EventSprite;
+				var text:String = "<b><font color='#e9b96e;'>"+e.event.name+"</font></b><br/>";								
+				if (e.event.isRange){
+					text += Helper.dateToString(e.event.start) + " to "+Helper.dateToString(e.event.end);
+				}else{
+					text += Helper.dateToString(e.event.start);
+				}
+				text += "<br/>"+e.event.location+"<br/>";
+				var lineLen:Number = 60;
+				var curIdx:Number = 0;
+				while (curIdx < e.event.description.length){
+					text += e.event.description.substr(curIdx, lineLen) + "<br/>";
+					curIdx += lineLen;
+				}
+				
+				var toolTip:TextSprite = te.tooltip as TextSprite;
+				toolTip.htmlText = text;			
+			})
+			toolTipCtrl.tipBounds = _vis.bounds;
+			_vis.controls.add(toolTipCtrl);	
+
 			_vis.controls.add(new ClickControl(null, 1,
 				// set search query to the occupation name
 				function(e:SelectionEvent):void {
 					var selectPerson:SelectEvent;					
 					if (e.object is NodeSprite){
-						if (_selectedNode){
-							_selectedNode.selected = false;
-							_selectedNode.filters  = null;//[_glowFilter];
-						}
-						
-						_selectedNode = e.node;
-						_selectedNode.selected = true;
-						_glowFilter.color = _selectedNode.lineColor;
-						_selectedNode.filters = [_glowFilter];
-						//Dispatch Selection Event
-						selectPerson = new SelectEvent(SelectEvent.SELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
-						selectPerson.dispatch();
-						
+						_this.select(e.node.data as Person, false);						
 					}else if (e.object is AttributeSprite){
-						if (_selectedNode){
-								_selectedNode.selected = false;
-						}			
+						_this.deselect();		
 						var attr:AttributeSprite = e.object as AttributeSprite;	
+						var selectAttr:SelectEvent;
 						if (attr.objType == AttributeSprite.PERSON){		
 							_selectedNode = (attr.data as Person).sprite;
 							_selectedNode.selected = true;
-							var selectAttr:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
+							selectAttr = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
 							selectAttr.dispatch();	
-						}else if (attr.objType == AttributeSprite.MARRIAGE){
-							if (_selectedNode){
-								_selectedNode.selected = false;
-							}
+						}else if (attr.objType == AttributeSprite.MARRIAGE){							
 							attr = e.object as AttributeSprite;
-							var selectAttr:SelectEvent = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
+							selectAttr = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
 							selectAttr.dispatch();	
-						}	
-										
+						}											
 					}else{
-						if (_selectedNode){
-							_selectedNode.selected = false;
-							_selectedNode.filters  = null;
-							selectPerson = new SelectEvent(SelectEvent.DESELECT, SelectEvent.PERSON, _selectedNode.data as Person, e.cause);
-							selectPerson.dispatch();
-						}
+						deselect(true);
 					}
 //					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
 //						|| _doiEnabled==false) return;
@@ -757,6 +827,14 @@ package genvis
 					//DirtySprite.renderDirty();
 				}
 			));
+			_vis.controls.add( new ClickControl(NodeSprite, 2,
+				function (e:SelectionEvent):void{
+					//chante root
+					var newRoot:Person = e.node.data as Person;
+					var rootChange:RootChangeEvent = new RootChangeEvent(newRoot);
+					rootChange.dispatch();
+					_this.select(newRoot, false);
+				}));
 //			_vis.controls.add(new ClickControl(BlockSprite, 1,
 //				// set search query to the occupation name
 //				function(e:SelectionEvent):void {

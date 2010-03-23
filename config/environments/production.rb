@@ -24,5 +24,19 @@ config.action_view.cache_template_loading            = true
 # Disable delivery errors, bad email addresses will be ignored
 # config.action_mailer.raise_delivery_errors = false
 
+# Don't care if the mailer can't send
+config.action_mailer.raise_delivery_errors = true
+config.action_mailer.delivery_method = :smtp
+
+config.action_mailer.smtp_settings = {
+ :enable_starttls_auto => true,
+  :address    => "smtp.gmail.com",
+  :port       => "587",
+  :domain     => "www.akinu.org",
+  :authentication =>  :plain,
+  :user_name      => 'namwkim85@gmail.com',
+  :password       => 'knwd2695'
+  
+}
 # Enable threaded mode
 # config.threadsafe!

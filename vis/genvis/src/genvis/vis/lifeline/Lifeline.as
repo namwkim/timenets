@@ -99,12 +99,12 @@ package genvis.vis.lifeline
 			var person:Person = n.data as Person;
 			n.points = new Array();
 			for each (var spouse:Person in person.spouses){
-				if (spouse.sprite.type != NodeSprite.SPOUSE && spouse.sprite.simplified == false){
+				if (spouse.sprite!=null && spouse.sprite.type != NodeSprite.SPOUSE && spouse.sprite.simplified == false){
 					//add evtpt at marriage
 					var marriages:Array = person.marriageWith(spouse);
 					for each (var marriage:Marriage in marriages){
 						var x:Number = n.toLocalX(_axes.xAxis.X(marriage.startDate));
-						//fix this or move this function to render
+						//TODO: fix this or move this function to render
 						var y:Number = spouse.sprite.toLocalY(spouse.sprite.Y(n.toGlobalX(x)))+spouse.sprite.y-n.y;
 						n.points.push(new EvtPt(x, y, EvtPt.MARRIAGE, marriage.startDate, spouse));
 					}

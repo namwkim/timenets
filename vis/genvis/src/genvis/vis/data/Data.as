@@ -6,6 +6,7 @@ package genvis.vis.data
 	
 	import flash.events.EventDispatcher;
 	
+	import genvis.data.Event;
 	import genvis.data.Marriage;
 	import genvis.data.Person;
 	
@@ -50,10 +51,12 @@ package genvis.vis.data
 	public class Data extends EventDispatcher
 	{
 		/** Constant indicating the nodes in a Data object. */
-		public static const NODES:String 			= "nodes";
-		public static const EDGES:String			= "edges";
-		public static const BLOCKS:String 			= "blocks";
-		public static const ATTRIBUTES:String 		= "attributes";
+		public static const NODES:String 				= "nodes";
+		public static const EDGES:String				= "edges";
+		public static const BLOCKS:String 				= "blocks";
+		public static const ATTRIBUTES:String 			= "attributes";
+		public static const EVENTS:String 				= "events";
+		public static const HISTORICAL_EVENTS:String	= "historicalEvents";
 
 		/** Internal list of NodeSprites. */
 		protected var _root:Person;
@@ -61,6 +64,8 @@ package genvis.vis.data
 		protected var _edges:DataList 			= new DataList(EDGES);
 		protected var _blocks:DataList 			= new DataList(BLOCKS);
 		protected var _attributes:DataList		= new DataList(ATTRIBUTES);
+		protected var _events:DataList			= new DataList(EVENTS);
+		protected var _histEvents:DataList		= new DataList(HISTORICAL_EVENTS);
 
 		/** primitive data mappings */
 		protected var _marriages:Array	= new Array();
@@ -78,7 +83,9 @@ package genvis.vis.data
 		public function get nodes():DataList 			{ return _nodes; }
 		public function get edges():DataList 			{ return _edges; }
 		public function get blocks():DataList 			{ return _blocks; }
-		public function get attributes():DataList 	{ return _attributes; }
+		public function get attributes():DataList 		{ return _attributes; }
+		public function get events():DataList			{ return _events; }
+		public function get histEvents():DataList		{ return _histEvents; }
 		public function get root():Person 				{ return _root; }
 		
 		// -- Methods ---------------------------------------------------------
@@ -87,16 +94,17 @@ package genvis.vis.data
 		 * Creates a new Data instance.
 		 * @param directedEdges the default directedness of new edges
 		 */
-		public function Data(root:Person) {
+		public function Data(root:Person, events:Array=null) {
 			constructNodes(root);
 			constructEdges(root);
 			constructDOITree(root);	
 			constructBlocks(root);
-			constructAttributes(root);		
+			constructAttributes(root);
+			constructEvents(events);//tmp		
 			//stats			
 			calcStats();
 			_root	= root;
-			_groups = { nodes: _nodes, edges: _edges, blocks: _blocks, attributes:_attributes};
+			_groups = { nodes: _nodes, edges: _edges, blocks: _blocks, attributes:_attributes, events:_events, historicalEvents:_histEvents};
 		}
 		// -- Group Management ---------------------------------
 		
@@ -158,7 +166,7 @@ package genvis.vis.data
 		 */
 		public function contains(d:DataSprite):Boolean
 		{
-			return (_nodes.contains(d) || _edges.contains(d) || _blocks.contains(d) || _attributes.contains(d));
+			return (_nodes.contains(d) || _edges.contains(d) || _blocks.contains(d) || _attributes.contains(d) || _events.contains(d) || _histEvents.contains(d));
 		}
 		
 		// -- Add ----------------------------------------------
@@ -203,7 +211,9 @@ package genvis.vis.data
 			_nodes.clear();
 			_edges.clear();
 			_blocks.clear();		
-			_attributes.clear();	
+			_attributes.clear();
+			_events.clear();	
+			_histEvents.clear();
 		}
 		
 		/**
@@ -216,7 +226,11 @@ package genvis.vis.data
 			if (d is NodeSprite) return removeNode(d as NodeSprite);
 			if (d is EdgeSprite) return removeEdge(d as EdgeSprite);
 			if (d is BlockSprite) return removeBlock(d as BlockSprite);
-			if (d is AttributeSprite) return removeUncertainty(d as AttributeSprite);
+			if (d is AttributeSprite) return removeAttribute(d as AttributeSprite);
+			if (d is EventSprite) {
+				var evt:Event = d.data as Event;				
+				return evt.historical? removeHistoricalEvent(d as EventSprite): removeEvent(d as EventSprite);
+			}
 			return false;
 		}
 				
@@ -239,9 +253,15 @@ package genvis.vis.data
 		{
 			return _blocks.remove(b);
 		}
-		public function removeUncertainty(u:AttributeSprite) :Boolean{
+		public function removeAttribute(u:AttributeSprite) :Boolean{
 			return _attributes.remove(u);
 		} 
+		public function removeEvent(e:EventSprite):Boolean{
+			return _events.remove(e);
+		}
+		public function removeHistoricalEvent(h:EventSprite):Boolean{
+			return _histEvents.remove(h);
+		}
 		// -- Visitors -----------------------------------------
 		
 		/**
@@ -269,6 +289,8 @@ package genvis.vis.data
 					return true;
 				if (_attributes.length > 0 && _attributes.visit(v, filter, reverse))
 					return true;
+				if (_events.length > 0 && _events.visit(v, filter, reverse))
+					return true;
 			}else {
 				var list:DataList = _groups[group];
 				if (list.length > 0 && list.visit(v, filter, reverse))
@@ -276,7 +298,7 @@ package genvis.vis.data
 			}
 			return false;
 		}
-		private static const curDate:Date = new Date();
+		public static const curDate:Date = new Date();
 		protected function calcStats():void{
 			//find xmin and xmax from the whole data
 			var allDead:Boolean = true;
@@ -471,6 +493,30 @@ package genvis.vis.data
 					if (child.sprite.pseudoParents.length >0) trace("pseudo:"+child.sprite.data.name);							
 				}
 			});
+		}
+		protected function constructEvents(events:Array):void{			
+			//default event (current time)
+			var current:Event 	= new Event();
+			current.name 		= "Current Time";
+			current.start		= curDate;
+			current.historical	= true;
+			constructHistoricalEvent(current);	
+			
+			if (events==null) return;		
+			for each (var evt:Event in events){
+				evt.historical? constructHistoricalEvent(evt) : constructEvent(evt);
+			}
+					
+		} 
+		protected function constructEvent(evt:Event):EventSprite{
+			var spr:EventSprite = new EventSprite(evt);						
+			_events.add(spr);
+			return spr;
+		}
+		protected function constructHistoricalEvent(evt:Event):EventSprite{
+			var spr:EventSprite = new EventSprite(evt);	
+			_histEvents.add(spr);
+			return spr;
 		}
 	} // end of class Data
 }

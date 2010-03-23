@@ -19,7 +19,7 @@ package org.akinu.events
 		public var objType:uint;
 		public var evt:MouseEvent;
 		public var evtType:uint;
-		public function SelectEvent(evtType:uint, objType:uint, selected:*, evt:MouseEvent)
+		public function SelectEvent(evtType:uint, objType:uint, selected:*=null, evt:MouseEvent = null)
 		{
 			super(SELECTION);
 			this.objType 	= objType;

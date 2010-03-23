@@ -26,7 +26,7 @@
 			public function init(role:String, refParent:Person):void{
 				this.role = role;
 				this.refParent = refParent;
-				formHeader.label=role == Role.SPOUSE? "Add Marriage" : "Add "+role;									
+				formHeader.label= "Add "+role;									
 				clearForm();
 				switch (role){
 					case "Father":
@@ -112,8 +112,10 @@
 					}else if (role=="Child"){
 						newPerson.addParent(person);
 						person.addChild(newPerson);
-						newPerson.addParent(refParent);
-						refParent.addChild(newPerson);
+						if (refParent){
+							newPerson.addParent(refParent);
+							refParent.addChild(newPerson);
+						}
 						
 					}else if (role=="Spouse"){
 						newMarriage = new Marriage(person, newPerson);
@@ -148,8 +150,8 @@
 									}
 									var addSpEvent:AddRelationshipEvent = new AddRelationshipEvent(newPerson, newMarriage, person.id, role, nextEvents);
 									addSpEvent.dispatch();
-									model.vis.visualize(model.root);	
-									model.vis.select(newPerson);								
+									model.vis.visualize(model.root, model.events);	
+									model.vis.select(person);								
 								}
 							});
 							this.parent.removeChild(this);
@@ -170,8 +172,8 @@
 						case Role.SPOUSE: //no root change required...
 						break;
 					}
-					model.vis.visualize(model.root);
-					model.vis.select(newPerson);
+					model.vis.visualize(model.root, model.events);
+					model.vis.select(person);
 					
 				}
 					
@@ -205,7 +207,7 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dobDay"/>
 		    	<mx:TextInput id="dobYear" width="40" text=" Year" click="if(dobYear.text=='Year') dobYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="approximate" id="dobCirca"/><mx:CheckBox label="Deceased?" id="deceased"/>  	   	
+	    	<mx:HBox><mx:CheckBox label="Approximate" id="dobCirca"/><mx:CheckBox label="Deceased?" id="deceased"/></mx:HBox>  	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Death Date" visible="{deceased.selected}" includeInLayout="{deceased.selected}">
 	    	<mx:HBox>
@@ -213,7 +215,7 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="dodDay"/>
 		    	<mx:TextInput id="dodYear" width="40" text=" Year" click="if(dodYear.text=='Year') dodYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="approximate" id="dodCirca"/>	   	
+	    	<mx:CheckBox label="Approximate" id="dodCirca"/>	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Marriage Date" visible="{role=='Spouse'? true:false}" includeInLayout="{role=='Spouse'? true:false}">
 	    	<mx:HBox>
@@ -222,7 +224,7 @@
 		    	<mx:TextInput id="marYear" width="40" text=" Year" click="if (marYear.text=='Year') marYear.text=''"/>	
 	    	</mx:HBox>
 	    	<mx:HBox>
-	    		<mx:CheckBox label="approximate" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>
+	    		<mx:CheckBox label="Approximate" id="marCirca"/><mx:CheckBox label="Divorced?" id="divorced"/>
 	    	</mx:HBox>   	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="vertical" label="Divorce Date" visible="{divorced.selected}" includeInLayout="{divorced.selected}">
@@ -231,7 +233,7 @@
 		    	<mx:ComboBox dataProvider="{Helper.dayArray}" id="divDay"/>
 		    	<mx:TextInput id="divYear" width="40" text=" Year" click="if (divYear.text=='Year') divYear.text=''"/>	
 	    	</mx:HBox>
-	    	<mx:CheckBox label="approximate" id="divCirca"/>	   	
+	    	<mx:CheckBox label="Approximate" id="divCirca"/>	   	
 	    </mx:FormItem>
 	    <mx:FormItem direction="horizontal">
 	        <mx:Button id="submit" label="Add" click="submitRelForm();"/>

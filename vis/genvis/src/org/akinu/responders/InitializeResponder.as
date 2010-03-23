@@ -20,8 +20,9 @@ package org.akinu.responders
 		public function result(e:Object):void{
 			var event:ResultEvent = e as ResultEvent;	
 			model.root 		= event.result.root;
+			model.events	= event.result.events;
 			model.project	= event.result.project;
-			model.vis.visualize(model.root);
+			model.vis.visualize(model.root, model.events);
 			DirtySprite.renderDirty();
 						
 		}

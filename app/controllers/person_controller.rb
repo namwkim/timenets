@@ -16,7 +16,7 @@ class PersonController < ApplicationController
   end
   def root #called from flex to get a genealogy root
     @person = Person.find_by_id(params[:id])
-    render :amf=>{:root=>@person, :project=>@person.project}
+    render :amf=>{:root=>@person, :project=>@person.project, :events=>@person.project.events}
   end
   def new_person
     @person = Person.new

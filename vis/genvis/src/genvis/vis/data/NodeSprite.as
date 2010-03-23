@@ -38,9 +38,9 @@ package genvis.vis.data
 		public static const SPOUSE:int			= 3; //is there better name for this ?
 		public static const UNDETERMINED:int	= 4; 
 		//birth edges
-		public static const IN_LINKS:int    = 1;
-		public static const OUT_LINKS:int   = 2;
-		public static const ALL_LINKS:int   = 3;
+		public static const IN_EDGE:int    = 1;
+		public static const OUT_EDGES:int   = 2;
+		public static const ALL_EDGES:int   = 3;
 		
 		private var _bbox:Box 			= null;// bounding box;
 		private var _lines:Array 		= null;// line segments approximating lifeline
@@ -65,15 +65,16 @@ package genvis.vis.data
 		
 		//birth edges
 		private var _inEdge:EdgeSprite 	= null;
-		private var _outEdges:Array			= null;
+		private var _outEdges:Array		= null;
 		
-		public function get inEdge():EdgeSprite 	{ return _inEdge; }
+		public function get inEdge():EdgeSprite 	{ return _inEdge; 	}
+		public function get outEdges():Array		{ return _outEdges; }
+		
 		public function addOutEdge(oe:EdgeSprite):void	{ 
 			if (_outEdges == null) _outEdges = new Array();
 			_outEdges.push(oe);	
-		}
-		
-		public function set inEdge(e:EdgeSprite):void { _inEdge = e; }
+		}		
+		public function set inEdge(e:EdgeSprite):void { _inEdge = e; }		
 		
 		public function get childNodes():Array 		{ return _childNodes; }
 		public function get pseudoParents():Array	{ return _pseudoParents;	}
@@ -235,10 +236,10 @@ package genvis.vis.data
 				attr.dirty();
 			}
 		}
-		public function visitEdges(f:Function, opt:int=ALL_LINKS):void
+		public function visitEdges(f:Function, opt:int=ALL_EDGES):void
 		{
-			if (_inEdge) f(_inEdge);
-			if (_outEdges){
+			if (_inEdge && opt!=OUT_EDGES) f(_inEdge);
+			if (_outEdges && opt!=IN_EDGE){
 				for each (var e:EdgeSprite in _outEdges){
 					f(e);
 				}

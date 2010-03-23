@@ -19,6 +19,7 @@ package org.akinu.commands
 			var select:SelectEvent = event as SelectEvent;
 			if (select.objType == SelectEvent.PERSON){
 				if (select.evtType == SelectEvent.SELECT){
+					model.selectedPerson	= null;
 					model.selectedPerson 	= select.selected;
 					model.page 	 		 	= ModelLocator.PERSON_PAGE;
 					model.pageState 		= ModelLocator.PERSON_MAIN;

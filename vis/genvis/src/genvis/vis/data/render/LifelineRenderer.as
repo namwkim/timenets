@@ -49,6 +49,14 @@ package genvis.vis.data.render
 			}
 
 		}
+//		public function test(n:NodeSprite):void{
+//			var g:Graphics = n.graphics;
+//			var points:Array = new Array();
+//			for each (var evtPt:EvtPt in n.points){
+//				points.push(evtPt.pt);
+//			}
+//			CubicBezier.curveThroughPoints(g, points);
+//		}
 		public function renderLineSpline(n:NodeSprite):void{
 			//trace("RENDERER:"+n.data.name+", "+n.visible);
 			
@@ -68,7 +76,7 @@ package genvis.vis.data.render
 					break;
 				case EvtPt.MARRIAGE:
 					var datEvt:EvtPt = n.points[i-1];
-					g.lineStyle( width, color, n.lineAlpha);
+					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 					Shapes.drawCubic(g, datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, 
 							(datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
 					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);		
@@ -77,7 +85,7 @@ package genvis.vis.data.render
 				case EvtPt.DIVORCE:
 					g.lineTo(evt.x, evt.y);
 					var resEvt:EvtPt = n.points[i+1];
-					g.lineStyle( width, color, n.lineAlpha);
+					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 					Shapes.drawCubic(g, resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, 
 							(resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
 					break;					
@@ -177,7 +185,8 @@ package genvis.vis.data.render
 			g.clear();		
 			if (e.draw == false) return;
 			//1. draw edge	
-			var child:Person = e.child.data as Person;		
+			var child:Person = e.child.data as Person;
+			if (child == null) return;		
 			if (child.gender == Person.MALE){
 				g.lineStyle(e.lineWidth, 0x3465a4, 0.6, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 				g.beginFill(0x3465a4, 0.6);

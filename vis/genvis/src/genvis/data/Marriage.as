@@ -95,7 +95,9 @@ package genvis.data
 			_endDate	= endDate;
 			
 		}
-		
+		public function toString():String{
+			return person1.name + " and "+person2.name+"'s marriage";
+		}
 		
 
 	}

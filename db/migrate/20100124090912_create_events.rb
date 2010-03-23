@@ -23,5 +23,6 @@ class CreateEvents < ActiveRecord::Migration
   def self.down
     drop_table :events
     drop_table :documents_events
+    drop_table :events_people
   end
 end

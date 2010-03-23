@@ -1,12 +1,18 @@
 package genvis.vis.operator.layout
 {
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	
+	import genvis.data.Event;
 	import genvis.data.Person;
 	import genvis.scale.TimeScale;
 	import genvis.vis.axis.Axis;
 	import genvis.vis.axis.CartesianAxes;
 	import genvis.vis.data.AttributeSprite;
 	import genvis.vis.data.BlockSprite;
+	import genvis.vis.data.Data;
 	import genvis.vis.data.EdgeSprite;
+	import genvis.vis.data.EventSprite;
 	import genvis.vis.data.NodeSprite;
 	import genvis.vis.lifeline.Lifeline;
 	import genvis.vis.lifeline.Line;
@@ -249,6 +255,7 @@ package genvis.vis.operator.layout
 			//construct interval tree
 			//constructIntervalTree(_root.block);
 			verticalPositioning();
+			layoutEvents();
 		}
 		public function horizontalPositioning():void{
 			var axes:CartesianAxes = super.xyAxes;
@@ -298,7 +305,7 @@ package genvis.vis.operator.layout
 //					b.y = b.ty;
 //				}
 				_t.$(b).y = b.ty;
-				trace("FINAL:"+b.focus.data.name +":"+b.y);
+				//trace("FINAL:"+b.focus.data.name +":"+b.y);
 			});	
 		}
 		public function fitLayoutToScreen():Number{
@@ -517,173 +524,39 @@ package genvis.vis.operator.layout
 	 			
 		}
 		
-		
-//		
-//		public function LifelineLayout(focus:Person, xAxisField:String=null, yAxisField:String=null, nodeType:Number=Lifeline.LINEBSPLINE)
-//		{
-//			super();
-//			
-//			layoutType = CARTESIAN;
-//			
-//			_xBinding = new ScaleBinding();
-//			_xBinding.group = Data.NODES;
-//			_xBinding.property = xAxisField;
-//			
-//			_yBinding = new ScaleBinding();
-//			_yBinding.group = Data.NODES;
-//			_yBinding.property = yAxisField;
-//			
-//			_focus		= focus;
-//			_nodeType 	= nodeType;
-//			switch (_nodeType){
-//				case Lifeline.LINE:
-//					_lifeline = new Line();
-//					break;
-//				case Lifeline.BSPLINE:
-//					_lifeline = new BSpline();
-//					break;
-//				case Lifeline.LINEBSPLINE:
-//					_lifeline = new LineBSpline();
-//					break;
-//			}			
-//		}
-//		/** The x-axis source property. */
-//		public function get xField():String { return _xBinding.property; }
-//		public function set xField(f:String):void { _xBinding.property = f; }
-//		
-//		/** The y-axis source property. */
-//		public function get yField():String { return _yBinding.property; }
-//		public function set yField(f:String):void { _yBinding.property = f; }
-//		
-//		/** The scale binding for the x-axis. */
-//		public function get xScale():ScaleBinding { return _xBinding; }
-//		public function set xScale(b:ScaleBinding):void {
-//			if (_xBinding) {
-//				if (!b.property) b.property = _xBinding.property;
-//				if (!b.group) b.group = _xBinding.group;
-//				if (!b.data) b.data = _xBinding.data;
-//			}
-//			_xBinding = b;
-//		}
-//		/** The scale binding for the y-axis. */
-//		public function get yScale():ScaleBinding { return _yBinding; }
-//		public function set yScale(b:ScaleBinding):void {
-//			if (_yBinding) {
-//				if (!b.property) b.property = _yBinding.property;
-//				if (!b.group) b.group = _yBinding.group;
-//				if (!b.data) b.data = _yBinding.data;
-//			}
-//			_yBinding = b;
-//		}
-//
-//		public override function setup():void{		
-//			if (visualization==null) return;
-//			_xBinding.data = visualization.data;
-//			_yBinding.data = visualization.data;
-//			
-//			var axes:CartesianAxes = super.xyAxes;
-//			axes.xAxis.axisScale = _xBinding;
-//			axes.yAxis.axisScale = _yBinding;
-//			
-//			//lifeline layout variables
-//			_nodeMap 		= new Dictionary();
-//			_displayList	= new Array();
-//			visualization.data.nodes.visit( function (d:DataSprite):void{
-//				_nodeMap[d.data.id] = d;
-//			});
-//			arrangeLifelines();//give y-coord of nodes		
-//			updataMinMax();	
-//		}
-//		protected function axisLayout():void{
-//			_xField = Property.$(_xBinding.property);
-//			_yField = Property.$(_yBinding.property);
-//			
-//			var axes:CartesianAxes = super.xyAxes;
-//			_xBinding.updateBinding(); axes.xAxis.axisScale = _xBinding;
-//			_yBinding.updateBinding(); axes.yAxis.axisScale = _yBinding;
-//						
-//			var x0:Number = axes.originX;
-//			var y0:Number = axes.originY;
-//			
-//			visualization.data.nodes.visit(function(d:DataSprite):void {
-//				var dx:Object, dy:Object, x:Number, y:Number, s:Number, z:Number;
-//				var o:Object = _t.$(d);
-//				dx = _xField.getValue(d); dy = _yField.getValue(d);
-//				
-//				var map:Object;
-//				if (_xField != null) {
-//					x = axes.xAxis.X(dx);
-//					o.x = x;
-//					o.w = x - x0;
-//				}
-//				if (_yField != null) {
-//					y = axes.yAxis.Y(dy);
-//					o.y = y;
-//					o.h = y - y0;
-//				}
-//			});			
-//		}
-//		protected override function layout():void{
-//			axisLayout();//apply axis layout
-//			
-//			//update min and max			
-//			_lifeline.setup(super.xyAxes as CartesianAxes);
-//			specifyShapes();//specify node designs		
-//		}
-//
-//		/**
-//		 * determine y-ordering of nodes
-//		 **/
-//		protected function arrangeLifelines():void{
-//			//sub-class should override this
-//		}
-//		/**
-//		 * specify node shapes
-//		 **/
-//		protected function specifyShapes():void{
-//
-//		}
-//		protected function updataMinMax():void{
-//			visualization.data.nodes.visit( function (d:DataSprite):void{
-//				if (!isNaN(d.data.yorder)) _displayList.push(d.data);
-//				//if (d.data.isVisited) _displayList.push(d.data);
-//			});
-//		    _displayList.sortOn("dateOfBirth", Array.NUMERIC);
-//		    
-//
-//		    // Group years by decade.  Range of years depend on data being displayed.  Scale will change as necessary.    
-//		    var minYear:Number = Math.floor(_displayList[0].dateOfBirth.fullYear/10)*10;
-//		    this.xScale.min = new Date(minYear, 1, 1);
-//		   	
-//			var isAlive:Boolean = false;
-//		 	var min:Number = _displayList[0].yorder;
-//		    var max:Number = _displayList[0].yorder;
-//			for each (var person:Person in _displayList){
-//				if (min>person.yorder) min = person.yorder;
-//		    	if (max<person.yorder) max = person.yorder;	
-//				if (person.dateOfDeath ==null){
-//					isAlive = true;
-//				}				
-//			}
-//			var maxYear:Number;
-//			if (isAlive){
-//				 this.xScale.max = new Date();
-//				 maxYear = this.xScale.max.fullYear;
-//			}else{
-//				_displayList.sortOn("dateOfDeath", Array.NUMERIC);
-//				maxYear = Math.ceil(_displayList[_displayList.length-1].dateOfDeath.fullYear/10)*10;
-//				 this.xScale.max = new Date(maxYear, 11, 31);
-//			}	
-//		   			   
-//			
-//			var axes:CartesianAxes = visualization.axes as CartesianAxes;
-//   			axes.xAxis.numLabels = (maxYear - minYear) / 10;
-// 			
-// 			// Only consider the nodes that we're displaying so maximize the space.
-// 			this.yScale.min = min-1;//_displayList[0].data.order;
-//			this.yScale.max = max+1;//_displayList[_displayList.length-1].data.order;
-//			//vis.update( transition, "axis" ).play();
-//		}
-
+		protected function layoutEvents():void{
+			//Historical Evnets
+			var xAxis:Axis = (visualization.axes as CartesianAxes).xAxis;
+			var visbound:Rectangle = visualization.bounds;
+			visualization.data.visit(function (h:EventSprite):void{
+				var histEvt:Event = h.event;
+				var start:Number = xAxis.X(histEvt.start);				
+				h.x = start;
+				h.y = visbound.y;		
+				
+				h.min = new Point(0, 0);		
+				if (histEvt.end){
+					var end:Number = xAxis.X(histEvt.end);
+					h.max = new Point(end - start, visbound.height);				
+				}else{
+					h.max = new Point(0, visbound.height);
+				}
+				h.dirty();				
+			}, Data.HISTORICAL_EVENTS);
+			visualization.data.visit(function (e:EventSprite):void{
+				e.x = e.y = 0;//set to origin
+				if (e.event.people==null) return;
+				if (e.event.people.length>0) e.points = new Array();
+				for each (var person:Person in e.event.people){
+					var timeline:NodeSprite = person.sprite;
+					if (timeline == null || timeline.simplified) continue;
+					var x:Number = timeline.block.gbLayout.xAxis.X(e.event.start); 
+					var y:Number = timeline.Y(x); 
+					if (isNaN(x) || isNaN(y)) continue;
+					e.points.push(new Point(x, y));					
+				}
+				e.dirty();
+			}, Data.EVENTS);
+		} 
 	}
 }

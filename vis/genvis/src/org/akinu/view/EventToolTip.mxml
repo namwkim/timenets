@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" width="200" height="100">
+	<mx:Script>		
+		<![CDATA[
+			import genvis.data.Event;
+			[Bindable]
+			public var evt:genvis.data.Event;
+	        public var _text:String;
+	
+	        public function get text():String { 
+	            return _text; 
+	        } 
+	        public function set text(value:String):void {
+	        } 
+			
+		]]>
+	</mx:Script>
+	<mx:Label text="{evt.name}"/>
+</mx:Panel>

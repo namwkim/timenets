@@ -301,13 +301,15 @@ fieldset fieldset legend{
 	margin:20px 10px 0px 20px;
 }
 .project_title{
-	padding:10px 500px 10px 20px;
+	margin:0px;
+	padding:10px 0px 10px 20px;
 	background-image:url("/images/project_background.png");
 	background-repeat:no-repeat;
 }
 .project_title_box{
 	width:100%;
-	padding:5px 0px 10px 0px;
+	padding:0px 0px 10px 0px;
+	margin:0px;
 }
 .page_title{
 	height:40px;

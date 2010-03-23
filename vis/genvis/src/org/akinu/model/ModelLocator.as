@@ -44,6 +44,7 @@ package org.akinu.model
 		
 		//vis data variables
 		public var root:Person; //root person for the visualization (in case of hourglass chart, it's the center node)
+		public var events:Array;
 		public var selectedPerson:Person;
 		public var vis:GenVis;
 		

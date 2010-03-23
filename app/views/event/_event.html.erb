@@ -1,9 +1,9 @@
 <table id="<%=dom_id(event)%>" width="100%"><tr>
 	<td width="90px;">
-		<% if event.isRange %>
-			<%= event.from%> - <%=event.to%>
+		<% if event.is_range %>
+			<%= event.start%> - <%=event.end%>
 		<% else %>
-			<%= event.from%>
+			<%= event.start%>
 		<% end %>
 	</td>
 	<td width="250px;"><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>

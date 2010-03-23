@@ -13,6 +13,7 @@
 			import org.akinu.helper.Helper;
 			[Bindable]
 			private var marriage:Marriage;
+			[Bindable]
 			private var model:ModelLocator = ModelLocator.getInstance();
 			private var create:Boolean
 			public function init(mar:Marriage, create:Boolean=false):void{
@@ -94,6 +95,10 @@
 	</mx:Script>
 	<mx:NumberValidator id="marYearValidator" source="{marYear}" property="text" domain="int" required="false"/>
 	<mx:NumberValidator id="divYearValidator" source="{divYear}" property="text" domain="int" required="false"/>    
+	<mx:HBox width="100%" visible="{model.pageState==ModelLocator.EDIT_MARRIAGE}" includeInLayout="{model.pageState==ModelLocator.EDIT_MARRIAGE}">
+		<mx:Text text="{marriage}" styleName="smallTitle" width="100%"/>
+	</mx:HBox>
+	
 	<mx:Form id="marForm" defaultButton="{submit}">
 	    <mx:FormItem direction="vertical" label="Marriage Date">
 	    	<mx:HBox>

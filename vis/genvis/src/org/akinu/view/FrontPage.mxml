@@ -25,15 +25,15 @@
 			<mx:RadioButton groupName="lbStyle" label="Outside" id="outside" value="out"/>
 		</mx:HBox>
 		<mx:HRule strokeColor="0x888a85" shadowColor="0x888a85" strokeWidth="2" width="100%"/>-->
-		<mx:Label text="Help" styleName="mediumTitle" width="100%"/>
+		<mx:Label text="Build Your Genealogy!" styleName="mediumTitle" width="100%"/>
 		<mx:Label text="1. What is this?" color="0xb49159"/>
-		<mx:Text text="The graph you are looking at is an hourglass chart with timelines representing individuals. The hourglass chart is limited in showing only ancestors and descendants of the selected root. Accordingly, it may omit	cousins or siblings depending on your root selection. To explore different parts of your family, please try changing the root person. First, click a person and click 'Use This As The Root'" width="100%"/>
-		<mx:Label text="2. Where are events?" color="0xb49159"/>
-		<mx:Text text="We are currently working on visualizing events. In the next release, you will be able to see event points along each timeline." width="100%"/>
+		<mx:Text text="The graph you are looking at is an hourglass chart with timelines representing individuals. The hourglass chart is limited in showing only ancestors and descendants of the selected root. Accordingly, it may omit	cousins or siblings depending on your root selection. To explore different parts of your family, please try changing the root person with double-click." width="100%"/>
+		<mx:Label text="2. How to add relationships?" color="0xb49159"/>
+		<mx:Text text="Click a person to which you want to add relationships. On the right panel, you will be able to add immediate family members for the selected person. If you are not sure about a specific date, you can leave it blank, or guess it and check 'Approximate'." width="100%"/>
 		<mx:Label text="3. What is the question mark?" color="0xb49159"/>
 		<mx:Text text="It is an indication of uncertainty. In other words, if a date is approximate, a question mark will be displaced at that date." width="100%"/>
-		<mx:Label text="4. Anything else?" color="0xb49159"/>
-		<mx:Text text="More complex relationships such as polygamy or same-sex marriage are not supported yet. Please also note that the system is in early stage and may not work properly sometimes. If you observe any problem, don't be angry, stay calm and please share it with us." width="100%"/>
+		<mx:Label text="4. If anything goes wrong" color="0xb49159"/>
+		<mx:Text text="Please note that the system is in early stage and may not work properly sometimes. If you observe any problem, please share it with us." width="100%"/>
 	</mx:VBox>
 	
 

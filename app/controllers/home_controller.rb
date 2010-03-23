@@ -36,6 +36,9 @@ class HomeController < ApplicationController
             @operator = User.find_by_id user.id
             log "joined", @project, @project
             @invitation.update_attribute(:accepted, true);
+            session[:operator_id] = user.id
+            log "logged in", nil, nil
+            redirect_to(:controller=>"project", :action=>"show_project", :id=>@project.id) and return
           end
         end        
         session[:operator_id] = user.id
@@ -96,7 +99,7 @@ class HomeController < ApplicationController
     end
   end
   def stats
-    @users = User.find(:all, :conditions=>"id>=#{28}")
+    @users = User.find(:all, :conditions=>"id>=#{1}")
     @total = 0
     @max   = 0
     @min   = 2000
@@ -109,6 +112,7 @@ class HomeController < ApplicationController
       @min = @subtotal if @min > @subtotal
       @max = @subtotal if @max < @subtotal
     end
+    @total = Person.count(:id);
     @average = @total/@users.length
   end
 

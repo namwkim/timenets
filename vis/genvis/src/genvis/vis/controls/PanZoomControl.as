@@ -172,10 +172,13 @@ package genvis.vis.controls
 				var dz:Number = 1 + (y-my)/500;
 				var start:Date = _layout.xAxis.value(my, 0, false) as Date;
 				var end:Date = _layout.xAxis.value(y, 0, false) as Date;
+				trace('y:my-'+y+":"+my);
 				xscale.max = new Date(max.fullYear+(start.fullYear-end.fullYear), max.month+(start.month-end.month), max.date+(start.date-end.date));
 				xscale.min = new Date(min.fullYear-(start.fullYear-end.fullYear), min.month-(start.month-end.month), min.date-(start.date-end.date));
+				
 				vis.update(null, GenVis.OPS);
 				Displays.zoomY(vis.marks, dz, dx, dy);
+				
 			}
 			//xscale.flush=false;
 			mx = x;

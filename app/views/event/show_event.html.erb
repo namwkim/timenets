@@ -18,10 +18,10 @@
 		</tr>
 		<tr>
 			<td>				
-				<% if @event.isRange %>
-					<%= @event.from%> - <%=@event.to%>
+				<% if @event.is_range %>
+					<%= @event.start%> - <%=@event.end%>
 				<% else %>
-					<%= @event.from%>
+					<%= @event.start%>
 				<% end %>
 			</td>
 			<td></td><td></td>

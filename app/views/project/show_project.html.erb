@@ -58,7 +58,7 @@ function flip_dob_field(chk_box){
 <% end %>
 <div class="large_title project_title_box">
 	<span class="right"><%=button_to "VISUALIZE", {:controller=>"person", :action=>"visualize", :id=>(@root.id if @root!=nil)}, {:class=>"large_title ui_small_button"} %></span>
-	<span class="project_title"><%= link_to @project.name, :controller=>"project", :action=>"show_project", :id=>@project.id%></span>	
+	<div class="project_title"><%= link_to @project.name, :controller=>"project", :action=>"show_project", :id=>@project.id%></div>	
 </div>
 <!--<div class="project_desc"><%= @project.description%></div>-->
 <div class="container_box">
@@ -91,13 +91,13 @@ function flip_dob_field(chk_box){
 			<div class="underlined">
 				<div id="project_menu">
 					<a id="people_menu" class="small_menu_box small_title selected" onclick="select_menu(this, 'people_box')" href="#">People</a>
-					<!--<a id="events_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'events_box')" href="#">Events</a>
-					<a id="documents_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'documents_box')" href="#">Documents</a>--> 	
+					<a id="events_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'events_box')" href="#">Events</a>
+					<a id="documents_menu" class=" small_menu_box small_title" onclick="select_menu(this, 'documents_box')" href="#">Documents</a> 	
 				</div>
 			</div>
 			<div id="people_box">
 				<div class="submenu_box">
-					<!--<%=button_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person"}, :with=>"'project_id='+#{@project.id}"}, {:class=>"right ui_small_button"}%>-->
+					<%=button_to_remote_lightbox "Create a New Person", {:url=>{:controller=>"person", :action=>"new_person"}, :with=>"'project_id='+#{@project.id}"}, {:class=>"right ui_small_button"}%>
 					<% form_remote_tag :url=>{:controller=>"project", :action=>"people", :id=>@project.id}, :loading=>"$('people').update(new Element('img', { src:'/images/roller.gif'}))", :complete=>"$('search_person').value=''" do %>						
 						<%= text_field_tag :search_person, nil, :size=>25, :class=>"inputtext" %>
 						<%=submit_tag "Search", :class=>"ui_small_button"%>

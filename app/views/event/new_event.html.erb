@@ -2,17 +2,17 @@
 function flip_range(chk_box){
 
 	if (chk_box.checked){
-		$('from_label').innerHTML = "From";
-		$('to_label').setStyle("display:inline");
-		$('to_form').setStyle("display:inline");	
+		$('start_label').innerHTML = "Start";
+		$('end_label').setStyle("display:inline");
+		$('end_form').setStyle("display:inline");	
 	}else{
-		$('from_label').innerHTML = "Date";
-		$('to_label').setStyle("display:none");	
-		$('to_form').setStyle("display:none");	
+		$('start_label').innerHTML = "Date";
+		$('end_label').setStyle("display:none");	
+		$('end_form').setStyle("display:none");	
 		//also clear the form elements
-		$('event_to_1i').selectedIndex = 0;
-		$('event_to_2i').selectedIndex = 0;
-		$('event_to_3i').selectedIndex = 0;
+		$('event_end_1i').selectedIndex = 0;
+		$('event_end_2i').selectedIndex = 0;
+		$('event_end_3i').selectedIndex = 0;
 	}
 }
 function submit_add_form(person_id){
@@ -60,17 +60,22 @@ function submit_add_doc_form(doc_id){
 			<td></td>
 		</tr>
 		<tr>
-			<td><%= f.label :from, "Date", :id=>"from_label"%></td>
-			<td><%= f.date_select :from, :start_year =>Time.now.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
-			<td>Range: <%= f.check_box(:isRange, { :onchange=>"flip_range(this)"},true, false)%></td>
+			<td><%= f.label :historical, "Is this a historical event?"%></td>
+			<td><%= f.check_box :historical, {}, true, false %></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><%= f.label :start, "Date", :id=>"start_label"%></td>
+			<td><%= f.date_select :start, :start_year =>Time.now.year, :end_year=>0, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
+			<td>Range: <%= f.check_box(:is_range, { :onchange=>"flip_range(this)"},true, false)%></td>
 		</tr>
 			
 		<tr>		
 			<td>
-				<span id="to_label" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.label :to %></span>
+				<span id="end_label" style=<%= @event.is_range ? "" : "display:none;"%> ><%= f.label :end %></span>
 			</td>
 			<td>
-				<span id="to_form" style=<%= @event.isRange ? "" : "display:none;"%> ><%= f.date_select :to, { :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }}%></span></td>							
+				<span id="end_form" style=<%= @event.is_range ? "" : "display:none;"%> ><%= f.date_select :end, { :start_year => 0, :end_year=>Time.now.year, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }}%></span></td>							
 			<td></td>
 		</tr>	
 		<tr>		

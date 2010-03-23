@@ -3,10 +3,10 @@
 	<% (person.events.sort!{ |a,b| a.from <=> b.from}).each do |event|%>
 		<tr id="<%="event_"+event.id.to_s%>">
 			<td width="80px">
-				<% if event.isRange %>
-					<%= event.from%> - <%=event.to%>
+				<% if event.is_range %>
+					<%= event.start%> - <%=event.end%>
 				<% else %>
-					<%= event.from%>
+					<%= event.start%>
 				<% end %>
 			</td>
 			<td width="200px"><%= link_to event.name, :controller=>"event", :action=>"show_event", :id=>event.id %></td>

@@ -111,13 +111,16 @@ package genvis.vis.controls
 			var fmt:TextFormat = new TextFormat("Arial", 14);
 			fmt.leftMargin = 2;
 			fmt.rightMargin = 2;
-			
+			fmt.color 		= 0xeeeeec;
+			fmt.size		= 12;			
 			var tip:TextSprite;
 			tip = new TextSprite("", fmt);
 			tip.textField.border = true;
-			tip.textField.borderColor = 0;
+			//tip.textField.borderColor = 0;
 			tip.textField.background = true;
-			tip.textField.backgroundColor = 0xf5f5cc;
+			//tip.textField.backgroundColor = 0xf5f5cc;
+			tip.textField.borderColor = 0x2e3436;
+			tip.textField.backgroundColor = 0x555753;	
 			tip.textField.multiline = true;
 			tip.filters = [new DropShadowFilter(4,45,0,0.5)];
 			return tip;

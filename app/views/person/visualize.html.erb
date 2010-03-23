@@ -2,7 +2,28 @@
 <% javascript_tag do%>
 
 var flex;
-document.observe("dom:loaded", function() {
+document.observe("dom:loaded", function() {	
+	var myWidth = 0, myHeight = 0;
+	if( typeof( window.innerWidth ) == 'number' ) {
+	//Non-IE
+	myWidth = window.innerWidth;
+	myHeight = window.innerHeight;
+	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+	//IE 6+ in 'standards compliant mode'
+	myWidth = document.documentElement.clientWidth;
+	myHeight = document.documentElement.clientHeight;
+	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+	//IE 4 compatible
+	myWidth = document.body.clientWidth;
+	myHeight = document.body.clientHeight;
+	}
+	$('content').setStyle({'width':(myWidth-120)+'px'});
+	$('content').setStyle({'height':(myHeight-120)+'px'});
+	$('visobj').setStyle({'width':(myWidth-120)+'px'});
+	$('visobj').setStyle({'height':(myHeight-120)+'px'});
+	$('embededvis').setStyle({'width':(myWidth-140)+'px'});
+	$('embededvis').setStyle({'height':(myHeight-120)+'px'});
+	//$('visobj').observe('DOMMouseScroll', function (e){Event.stop(e);});
 	FABridge.addInitializationCallback( "flex", initCallback );   
 });
 
@@ -12,11 +33,14 @@ var initCallback = function() {
 }  
 
 <% end %>
-<div class="flexvis" style="z-index: ">
-	<object type="application/x-shockwave-flash" data="/vis/genvis.swf" width="950" height="500">
+
+	<object id='visobj' classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0"/>
+		<param name="movie" value="/vis/genvis.swf" /> 	 
+		<embed id="embededvis" src="/vis/genvis.swf" quality="high" bgcolor="#ffffff" name="timenets" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"/>	
+	</object> 
+
+<!--	<object width="100%" height="500">
   		<param name="vis" value="/vis/genvis.swf" />
   		<param name="wmode" value="transparent">
 		<param name="allowFullScreen" value="true" />
-	</object>			
-</div>
-
+	</object>-->			

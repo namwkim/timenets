@@ -27,6 +27,8 @@ package org.akinu.helper
 			return null;
 		}
 		public static const MonthLabels:Array = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-
+		public static function dateToString(date:Date):String{
+			return Helper.MonthLabels[date.month]+" "+date.date+", "+date.fullYear;
+		}
 	}
 }

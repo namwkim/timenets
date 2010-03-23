@@ -143,8 +143,6 @@ package genvis.scale
 				_smin = Dates.roundTime(_dmin, span, false);
 				_smax = Dates.roundTime(_dmax, span, true);
 			}
-			trace(_smin);
-			trace(_smax);
 			if (_autofmt) {
 				super.labelFormat = formatString(span);
 			}

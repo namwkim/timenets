@@ -48,7 +48,6 @@ class CreatePeople < ActiveRecord::Migration
 
   def self.down
     drop_table :people
-    drop_table :events_people
     drop_table :marriages
   end
 end

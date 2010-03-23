@@ -7,7 +7,7 @@
 	xmlns:genvis="genvis.*" 
 	xmlns:business="org.akinu.business.*"
 	layout="absolute" width="100%" height="100%" 
- 	applicationComplete="init()">
+ 	applicationComplete="init()" keyDown="keyHandler(event)">
    <bridge:FABridge bridgeName="flex" /> 
    	<mx:Style source="./org/akinu/style/style.css"/>
    <mx:Script>
@@ -26,9 +26,42 @@
 			private var model:ModelLocator = ModelLocator.getInstance();
 			
 			private function init():void{
-//				var initializeEvent:InitializeEvent = new  InitializeEvent("383", vis);
+				//Application.application.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+				//Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+				
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
 //				initializeEvent.dispatch();			
 			}
+	         private function fullScreenHandler(evt:FullScreenEvent):void {
+                
+                if (evt.fullScreen) {
+                    /* Do something specific here if we switched to full screen mode. */
+                } else {
+                    /* Do something specific here if we switched to normal mode. */
+                }
+            }
+            private function keyHandler(event:KeyboardEvent):void{
+            	if (event.ctrlKey && event.charCode==102){//control + f
+            		toggleFullScreen();
+            	}
+            }
+            private function toggleFullScreen():void {
+                try {
+                    switch (Application.application.stage.displayState) {
+                        case StageDisplayState.FULL_SCREEN:                           
+                            Application.application.stage.displayState = StageDisplayState.NORMAL;
+                            break;
+                        default:                            
+                            Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+                            break;
+                    }
+                } catch (err:SecurityError) {
+                    // ignore
+                }
+            }
+
+
+
 //			private function resultHandler(e:ResultEvent):void {
 //				var str:String = "asdfawrfh239urF iwiuHF289UJ FU 4f4";				
 //				trace(str.split(" ", 2));		
@@ -80,7 +113,7 @@
 	<mx:VBox width="100%" height="100%">
 		<view:ProjectPage height="20" width="100%"/>
 		<mx:HBox width="100%" height="100%">
-			<genvis:GenVis id="vis" width="100%" height="100%" backgroundColor="#FFFFFF" tabEnabled="false" tabIndex="-1" />
+			<genvis:GenVis id="vis" width="100%" height="100%" backgroundColor="#FFFFFF" tabEnabled="false" tabIndex="-1"/>
 			<mx:ViewStack id="mainStack" maxWidth="350"  minWidth="350" height="100%" selectedIndex="{model.page}" change="changeHandler()" creationPolicy="all">
 				<view:FrontPage/>
 				<view:PersonPage id="personPage"/>				

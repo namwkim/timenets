@@ -26,14 +26,14 @@ package genvis.data
 			root.visitAncestors(firstPass, Infinity, true);
 			root.visitDecendants(firstPass, Infinity, true);
 			//second pass
-			root.apply(secondPass,true);			
-			root.visitAncestors(secondPass, Infinity, true);
-			root.visitDecendants(secondPass, Infinity, true);
+			root.apply(secondPass);			
+			root.visitAncestors(secondPass, Infinity);
+			root.visitDecendants(secondPass, Infinity);
 			
 			//validation
-			root.apply(validation,true);			
-			root.visitAncestors(validation, Infinity, true);
-			root.visitDecendants(validation, Infinity, true);
+			root.apply(validation);		
+			root.visitAncestors(validation, Infinity);
+			root.visitDecendants(validation, Infinity);
 			
 		}		
 		protected static function firstPass(person:Person):void{			
@@ -113,35 +113,36 @@ package genvis.data
 		}
 
 		public static function estimateMarriageDateEnded(person:Person):Boolean{
-			var mar:Marriage, prevMar:Marriage=null;
-			for (var i:int=person.marriages.length-1; i>=0; i--){
-				mar = person.marriages[i];
-				var spouse:Person = mar.spouseOf(person);
-				if (mar.endDate == null){
-					if (mar.spouseOf(person) != person.lastSpouse){
-						if (prevMar.startDate > spouse.dateOfDeath)
-							mar.endDate = spouse.dateOfDeath;
-						else//it should be between birthdate of last child and the start date
-							mar.endDate = prevMar.startDate;
-						mar.estimated = Marriage.ENDDATE;
-					}
-				}else{
-//					if (mar.spouseOf(person) == person.lastSpouse && mar.endDate.fullYear == (person.isDead? person.dateOfDeath.fullYear: (new Date()).fullYear)){
-//						mar.endDate = null;
+//			var mar:Marriage, prevMar:Marriage=null;
+//			for (var i:int=person.marriages.length-1; i>=0; i--){
+//				mar = person.marriages[i];
+//				var spouse:Person = mar.spouseOf(person);
+//				if (mar.endDate == null){
+//					if (mar.spouseOf(person) != person.lastSpouse){
+//						if (prevMar.startDate > spouse.dateOfDeath)
+//							mar.endDate = spouse.dateOfDeath;
+//						else//it should be between birthdate of last child and the start date
+//							mar.endDate = prevMar.startDate;
+//						mar.estimated = Marriage.ENDDATE;
 //					}
-				}
-				prevMar = mar;
-			}			
+//				}else{
+////					if (mar.spouseOf(person) == person.lastSpouse && mar.endDate.fullYear == (person.isDead? person.dateOfDeath.fullYear: (new Date()).fullYear)){
+////						mar.endDate = null;
+////					}
+//				}
+//				prevMar = mar;
+//			}			
 			return true;//(marInfo.endDate==null? false:true); //always succeed for sure
 		}
 		//TODO: ensure that startdate is older than enddate
 		public static function estimateMarriageDateStarted(person:Person, spouse:Person, marriage:Marriage):Boolean{
-			//use oldest child's date of birth
+			//use oldest child's date of birth			
+			
 			var children:Array = person.childrenWith(spouse);
 			if (children.length !=0){
 				var child:Person = children[children.length-1];//
 				marriage.startDate = new Date(child.dateOfBirth);
-			}
+			}			
 			if (person.dateOfBirth < spouse.dateOfBirth){//if spouse is young
 				marriage.startDate = new Date(spouse.dateOfBirth.fullYear + _offset, spouse.dateOfBirth.month, spouse.dateOfBirth.date);
 			}else{//if person is young

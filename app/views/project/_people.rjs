@@ -1,4 +1,4 @@
-page.replace_html "people", :partial=>"person_list", :locals=>{:project=>project, :people=>people}
+page.replace_html "people", :partial=>"person_list", :locals=>{:project=>project, :people=>people, :search_param=>search_param}
 page << "if ($('person_pagination')){ "+
 " links = $('person_pagination').getElementsBySelector('a');" +
 " for (var i=0; i<links.length; i++){"+

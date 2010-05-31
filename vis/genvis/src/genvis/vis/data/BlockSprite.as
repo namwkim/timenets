@@ -262,6 +262,7 @@ package genvis.vis.data
 //		}
 		/**
 		 * bounding box is in local coordinate of box
+		 * This translate nodes so that zero is the minimum-y.
 		 **/
 		public function calcBBox():Box{
 			dirty();
@@ -269,7 +270,8 @@ package genvis.vis.data
 			//calculate bounding box of each node
 			var min:Point = new Point(Number.MAX_VALUE,Number.MAX_VALUE);
 			var max:Point = new Point(-Number.MAX_VALUE,-Number.MAX_VALUE);
-			for each (var node:NodeSprite in nodes){
+			var node:NodeSprite;
+			for each (node in nodes){
 				var box:Box = node.bbox;//bbox should have been calculated beforehand
 				if (box == null) continue;
 				//translate into block space				
@@ -278,6 +280,13 @@ package genvis.vis.data
 				if ((box.min.y + node.y) < min.y ) min.y = (box.min.y + node.y);
 				if ((box.max.y + node.y) > max.y ) max.y = (box.max.y + node.y);	
 			}			
+			if (min.y!=0){//make sure that min-y is coincident with the block starting y-pos
+				for each (node in nodes){
+					node.y -= min.y;
+				}				
+				max.y -= min.y;
+				min.y -= min.y;
+			}
 			return (_bbox = new Box(min.x, min.y, max.x, max.y));
 		}
 		public function visit(func:Function, depth:Number = Infinity):void{

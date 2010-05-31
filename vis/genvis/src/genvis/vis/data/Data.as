@@ -325,13 +325,14 @@ package genvis.vis.data
 
 			for each (var spouse:Person in person.spouses){
 				spouse.sprite		= spouse.sprite==null? this.addNode(spouse) : this.addNode(spouse.sprite);
-				spouse.sprite.type  = NodeSprite.SPOUSE;
+				if (spouse.sprite.type==NodeSprite.UNDETERMINED) spouse.sprite.type  = NodeSprite.SPOUSE;
+				if (_people.indexOf(spouse)<0)	_people.push(spouse);
 			}
 			// add a marriage mapping if necessary
 			for each (var marriage:Marriage in person.marriages){
-				_marriages.push(marriage); 
+				if (_marriages.indexOf(marriage)<0) _marriages.push(marriage); 
 			}	
-			_people.push(person);
+			if (_people.indexOf(person)<0)	_people.push(person);
 			return ns;
 		}
 		/**

@@ -16,6 +16,7 @@ package org.akinu.commands
 			var rootChangeEvent:RootChangeEvent = event as RootChangeEvent;
 			model.root = rootChangeEvent.root;
 			model.vis.visualize(model.root, model.events);
+			model.vis.select(model.root);
 			//model.page = ModelLocator.FRONT_PAGE;			
 		}
 

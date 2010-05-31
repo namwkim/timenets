@@ -3,6 +3,8 @@ package genvis.vis.data
 	import flare.display.TextSprite;
 	import flare.vis.data.DataSprite;
 	
+	import flash.display.Sprite;
+	
 	import genvis.data.Marriage;
 	import genvis.data.Person;
 
@@ -15,6 +17,7 @@ package genvis.vis.data
 		public static const PERSON:uint		= 1;
 		public static const MARRIAGE:uint	= 2;
 		private var _label:TextSprite	= null;
+		private var _marker:Sprite		= null;
 		private var _attrType:uint;
 		private var _objType:uint;
 		/**
@@ -36,7 +39,8 @@ package genvis.vis.data
 		}
 		public function get label():TextSprite { return _label; }
 		public function set label(l:TextSprite):void{ _label	= l;}
-		
+		public function get marker():Sprite { return _marker; }
+		public function set marker(m:Sprite):void { _marker = m; }
 		public function get uncertain():Boolean { 
 			if (objType == PERSON){
 				var person:Person = data as Person;
@@ -57,7 +61,13 @@ package genvis.vis.data
 		}
 		public function get attrType():uint		{ return _attrType;	 }
 		public function get objType():uint		{ return _objType;	 }
-		
+		public function toLocalX(gx:Number):Number{
+			return (gx-(this.x));
+		}
+		public function toLocalY(gy:Number):Number{
+			return (gy-(this.y));
+		}
+	
 
 	}
 }

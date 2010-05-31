@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
   require 'digest/sha1'
+  
+  has_one :study_info
   #one to one
   belongs_to :person
   belongs_to :main_project, :class_name=>"Project", :foreign_key=>"project_id"#will be displayed in the main page

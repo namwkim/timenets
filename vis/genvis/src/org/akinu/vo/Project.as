@@ -8,6 +8,9 @@ package org.akinu.vo
 		public var id:String;
 		public var name:String;
 		public var description:String;
+		public var people:Array;
+		public var events:Array;
+		
 
 	}
 }

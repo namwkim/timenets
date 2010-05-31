@@ -11,12 +11,16 @@ class PersonController < ApplicationController
     else
       @person = nil
     end
-    
+    if @operator and @operator.study_info
+      @rep_type = @operator.study_info.rep_type
+    else
+      @rep_type = 1 # gradient
+    end
     #@session_id = session[:session_id]
   end
   def root #called from flex to get a genealogy root
     @person = Person.find_by_id(params[:id])
-    render :amf=>{:root=>@person, :project=>@person.project, :events=>@person.project.events}
+    render :amf=>{:root=>@person, :project=>@person.project}
   end
   def new_person
     @person = Person.new

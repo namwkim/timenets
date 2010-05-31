@@ -177,7 +177,7 @@ package genvis.vis.controls
 				xscale.min = new Date(min.fullYear-(start.fullYear-end.fullYear), min.month-(start.month-end.month), min.date-(start.date-end.date));
 				
 				vis.update(null, GenVis.OPS);
-				Displays.zoomY(vis.marks, dz, dx, dy);
+				//Displays.zoomY(vis.marks, dz, dx, dy);
 				
 			}
 			//xscale.flush=false;

@@ -40,7 +40,9 @@
 			</td>							
 			<td></td>
 		</tr>	
-		<tr><td colspan="3" align="right" style="border-top:1px dotted #d3d7cf;"><%= link_to_close_lightbox "Create", {:onclick=>"$('prof_new_form').submit()"}%> <%=link_to_close_lightbox "Cancel" %></td></tr>
+		<tr><td colspan="3" align="right" style="border-top:1px dotted #d3d7cf;">			
+			<%= button_to_close_lightbox "Create", {:onclick=>"$('prof_new_form').submit();", :class=>"ui_small_button"} %> <%=button_to_close_lightbox "Cancel", {:class=>"ui_small_button"} %>
+		</td></tr>
 	</table>
 </fieldset>
 <% end %>

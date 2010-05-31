@@ -1,5 +1,6 @@
 package genvis.vis.lifeline
 {
+	import genvis.data.EvtLine;
 	import genvis.data.EvtPt;
 	import genvis.data.Marriage;
 	import genvis.data.Person;
@@ -10,15 +11,17 @@ package genvis.vis.lifeline
 	public class Lifeline
 	{
 		//font size
-		public static const FONTSIZE:int	= 12;
+		public static const FONTSIZE:int	= 14;
 		public static const TOPMARGIN:int	= 2;
 		public static const BOTTOMMARGIN:int= 1;
 		
 		//params for lifeline
 		public static const ALPHA:int		= 5; //in years, time-span between dating & marriage, divorce & resting
 		public static const BETA:int		= 2; //marriage line width
-		public static const GAMMA:int		= FONTSIZE; //y-dist from baseline to marriage line
-		public static const EPSILON:int		= 2; //threshold for ensuring no overlaps between marriage and divorce
+		public static const GAMMA:int		= (TOPMARGIN+FONTSIZE+BOTTOMMARGIN); //y-dist from baseline to marriage line
+		public static const DELTA:int		= 3;// in years, time-span between routing points.
+		
+		//public static const EPSILON:int		= 2; //threshold for ensuring no overlaps between marriage and divorce
 		
 		//lifeline type
 		public static const LINE:uint 		= 0;
@@ -29,7 +32,7 @@ package genvis.vis.lifeline
 		public static const LABELINSIDE:uint	= 0;
 		public static const LABELOUTSIDE:uint 	= 1;
 		//default linewidth
-		private static const LINEWIDTH:int	= 2;
+		private static const LINEWIDTH:Number	= 2.5;
 		
 		protected static const UP:uint	 = 0;
 		protected static const DOWN:uint = 1;
@@ -37,11 +40,13 @@ package genvis.vis.lifeline
 		protected var _lineWidth:int;
 		protected var _style:int;
 		protected var _axes:CartesianAxes;
+		protected var EPSILON:Number;
 		
 		public function Lifeline(s:int = Lifeline.LABELINSIDE)
 		{
 			_style		= s;
 			_lineWidth  = s == Lifeline.LABELOUTSIDE? LINEWIDTH : (TOPMARGIN + FONTSIZE + BOTTOMMARGIN);
+			EPSILON		= s == Lifeline.LABELOUTSIDE? LINEWIDTH : (TOPMARGIN + FONTSIZE + BOTTOMMARGIN);
 		}
 		public function get lineWidth():int { return _lineWidth; }
 		public function get style():int		{ return _style;	 }
@@ -59,10 +64,12 @@ package genvis.vis.lifeline
 		 * Currently layout happens around the local focus
 		 **/
 		public function layout(b:BlockSprite):void{
-			if (b.aggregated){
+			if (b.aggregated){//prevent redering nodes in an aggregated block
 				b.nodes.forEach(function (n:NodeSprite, idx:int, array:Array):void{
 					n.points = new Array();
 				});
+				b.calcBBox();
+				return;
 			}
 			horizontalPositioning(b);
 			verticalPositioning(b);
@@ -81,6 +88,7 @@ package genvis.vis.lifeline
 					simplify(node);
 				}
 			}
+			b.calcBBox();			
 		}
 		/**
 		 * Generate Event Points. Their position are relative to the origin of each Node.
@@ -88,10 +96,12 @@ package genvis.vis.lifeline
 		public function generateLifelines(block:BlockSprite):void{
 			var node:NodeSprite = block.focus;
 			var person:Person   = node.data as Person;
-			node.simplified != true? lifeline(node):simplify(node);
+			//node.simplified != true? lifeline(node):simplify(node);
+			lifeline(node)
 			node.calcBBox();
 			for each (var spouse:Person in person.spouses){
-				spouse.sprite.simplified!=true? lifelineOfSpouse(spouse.sprite, node):simplify(spouse.sprite);
+				//spouse.sprite.simplified!=true? lifelineOfSpouse(spouse.sprite, node):simplify(spouse.sprite);
+				lifelineOfSpouse(spouse.sprite, node);
 				spouse.sprite.calcBBox();
 			}	
 		}
@@ -127,6 +137,7 @@ package genvis.vis.lifeline
 			var noMarEvtPts:Boolean = true;
 			for each (var spouse:Person in block.focus.data.spouses){
 				if (spouse.sprite.simplified!=true) noMarEvtPts = false;
+				else spouse.sprite.y = 0;
 			}
 			var y:Number 	 = 0;
 			var initY:Number = 0;
@@ -137,12 +148,13 @@ package genvis.vis.lifeline
 			}
 			y = initY;
 			if (person.spouses.length !=0 && noMarEvtPts==false){
-				var dist:Number = Lifeline.GAMMA +_lineWidth;
+				var dist:Number = Lifeline.GAMMA +_lineWidth;				
 				for (var i:int = person.spouses.length-1; i>=0; i--){
-					var spouse:Person = person.spouses[i];
-					if (spouse.sprite.simplified) continue;
-					spouse.sprite.y = y;
-					y += dist;
+					var spouse:Person = person.spouses[i];	
+					if (spouse.sprite.simplified) continue;											
+					spouse.sprite.y = y;		
+					y += dist;	
+					 
 				}
 //				//position first half of spouses above focus
 //				for (var i:int = person.spouses.length-1; i>=0; i-=2){
@@ -160,12 +172,40 @@ package genvis.vis.lifeline
 //				}	
 				//2.determine y-position of the focus
 				//2.1. calculate the maximum number of overapping marriages
-				var overlaps:Number = 0; // # of overlap * beta
-				dist += overlaps;
-				if (y!=initY) y += Lifeline.GAMMA + Lifeline.BETA + _lineWidth;			
+				
+				var evt:EvtPt;
+				var points:Array = new Array();	
+				var line:EvtLine;				
+				for each (var marriage:Marriage in person.marriages){
+					line = marriage.marriageLine();
+					if (line){
+						points.push(line.start);
+						if (line.end) points.push(line.end);	
+					}								
+				}
+				
+				points.sortOn("date", Array.NUMERIC);
+				var numMar:int = 0;
+				var maxMar:int = 0; // # of overlap * beta
+				for each (evt in points){
+					switch(evt.type){
+						case EvtPt.MARRIAGE: 
+						numMar++; 
+						if (numMar > maxMar) maxMar = numMar;
+						break;
+						case EvtPt.DIVORCE:	 
+						numMar--; 
+						break;					 
+					}	
+				} 				
+				
+				if (maxMar>1) 	dist = (maxMar-1)*(Lifeline.BETA + _lineWidth);
+				else			dist = 0;
+				if (y!=initY) y += Lifeline.GAMMA + Lifeline.BETA + _lineWidth + dist;			
 				person.sprite.y = y;	
-				y += Lifeline.GAMMA + Lifeline.BETA + _lineWidth + dist;			
+							
 //				//position another half of spouses below the focus
+//				y += Lifeline.GAMMA + Lifeline.BETA + _lineWidth + dist;
 //				for (i=(i==-2?1:0);i<person.spouses.length; i+=2){
 //					var spouse:Person = person.spouses[i];
 //					if (spouse.sprite.simplified) continue;

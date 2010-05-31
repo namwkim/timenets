@@ -7,6 +7,7 @@
       <libraryPathEntry kind="3" linkType="1" path="/flare/bin/flare.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="libs/FlashControls.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="libs/Cairngorm.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="/Users/namwkim/Projects/TimeNets/cs294h social software/code/akinu/vis/ext_libs/Degrafa_Beta3.2_Flex3.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>

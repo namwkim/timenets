@@ -6,6 +6,7 @@ package genvis.vis.data
 	import flash.geom.Point;
 	
 	import genvis.data.EvtPt;
+	import genvis.data.Person;
 	import genvis.geom.Box;
 	import genvis.geom.GeomUtil;
 	import genvis.geom.Line;
@@ -45,7 +46,7 @@ package genvis.vis.data
 		private var _bbox:Box 			= null;// bounding box;
 		private var _lines:Array 		= null;// line segments approximating lifeline
 		private var _label:TextSprite	= null;
-		private var _type:int;
+		private var _type:int			= UNDETERMINED;
 		private var _status:int; 
 		private var _selected:Boolean	= false;		
 		
@@ -144,13 +145,13 @@ package genvis.vis.data
 			return (gx-(this.x + this.block.x));
 		}
 		public function toLocalY(gy:Number):Number{
-			return (gy-(this.y + this.block.y));
+			return (gy-(this.y + this.block.ty));
 		}
-		public function toGlobalX(lx:Number):Number{
+		public function toGlobalX(lx:Number=0):Number{
 			return (lx+(this.x + this.block.x));
 		}
-		public function toGlobalY(ly:Number):Number{
-			return (ly+(this.y + this.block.y));
+		public function toGlobalY(ly:Number=0):Number{
+			return (ly+(this.y + this.block.ty));
 		}
 		public function toLocal(gpt:Point):Point{
 			return new Point(toLocalX(gpt.x), toLocalY(gpt.y));
@@ -171,7 +172,7 @@ package genvis.vis.data
 				if (pt.y < min.y ) min.y = pt.y;
 				if (pt.y > max.y ) max.y = pt.y;				
 			}
-			if (!simplified){
+			//if (!simplified){
 				_lines	= new Array();
 				//1. approximate lifeline using linesegments
 				for (var i:int = 0; i<(points.length-1); i++){
@@ -186,9 +187,9 @@ package genvis.vis.data
 					min.y = min.y - lineWidth/2
 				}
 				max.y = max.y + lineWidth/2;
-			}else{
-				_lines = null;
-			}
+//			}else{
+//				_lines = null;
+//			}
 			return (_bbox = new Box(min.x, min.y, max.x, max.y));			
 		}
 //		public function intersect(obj:Object):Boolean{

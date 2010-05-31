@@ -69,19 +69,26 @@ class HomeController < ApplicationController
       @user.person = @person
       if @user.save and @person.save               
         #create an initial project associated with the new user
-        if params[:signup_invitation_token]==''
-          @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")        
+        if params[:study_participant]=='1'
+          ref_proj = Project.find_by_id 8 #replace with kennedy project's id
+          @project = ref_proj.copy
+          rep_type = @user.id%3
+          @user.study_info = StudyInfo.create(:study_code=>1, :rep_type=>rep_type)
         else
-          @invitation = Invitation.find_by_token(params[:signup_invitation_token])
-          if @invitation.accepted 
-            flash[:notice] = "This invitation was used already."
-            redirect_to(:action => "intro")
+          if params[:signup_invitation_token]==''
+            @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")        
+          else
+            @invitation = Invitation.find_by_token(params[:signup_invitation_token])
+            if @invitation.accepted 
+              flash[:notice] = "This invitation was used already."
+              redirect_to(:action => "intro")
+            end
+            @project    = @invitation.project
+            @invitation.update_attribute(:accepted, true);
           end
-          @project    = @invitation.project
-          @invitation.update_attribute(:accepted, true);
+          @project.people << @person
         end
         @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor") 
-        @project.people << @person
         @user.main_project = @project 
         @user.save
         @operator = User.find_by_id @user.id

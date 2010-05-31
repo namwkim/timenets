@@ -79,8 +79,10 @@ package genvis
 		private var _lifelineLayout:LifelineLayout 	= null;
 		private var _root:Person;	
 		private var _events:Array;
-		private var _focusNodes:Array 			= new Array();
-		private var _selectedNode:NodeSprite		= null;
+		private var _selectedNode:NodeSprite	= null;		
+		private var _focusNodes:Array 			= new Array(); 	//all foci	
+		private var _persistentFoci:Array		= new Array();	//pernanent foci		
+		private var _recentFocus:NodeSprite		= null;			//recent focus
  		private var _range:TextArea				= null;
  		private var _t:Transitioner				= null; 		
 		//child components
@@ -99,6 +101,10 @@ package genvis
 		//****************//
 		//configuration   //
 		//****************//
+		public static const NOMARKER:uint	= 0;
+		public static const GRADIENT:uint	= 1;
+		public static const QSMARK:uint		= 2;
+		
 		public static const AUTOMATIC:int	= 0;
 		public static const MANUAL:int	 	= 1;
 	
@@ -116,23 +122,31 @@ package genvis
 		private var _layoutType:int = LifelineLayout.HOURGLASSCHART;
 		private var _lifelineType:int				= Lifeline.LINESPLINE;
 		private var _doiEnabled:Boolean				= false;
+		private var _doiDist:int					= 2;
 		private var _xrange:Number					= 90;
 		private var _selectedBlock:BlockSprite		= null;
 		//node config
 		private var _nColors:Array 		= [0x3465a4, 0xcc0000, 0x555753];
-		private var _nLineAlpha:Number	= 0.8;
+		private var _nLineAlpha:Number	= 0.7;
 		private var _nFillAlpha:Number	= 0.5;
 		private var _nodeGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.7, 24, 24, 5);
+		private var _focusGlow:GlowFilter 	= new GlowFilter(0x73d216, 0.7, 24, 24, 5);
+		private var _uncGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.8, 24, 24, 7);
 		//block config
 		private var _bLineWidth:Number  = 2;
 		private var _bFillColor:Number 	= 0x888a85;
-		private var _bFillAlpha:Number	= 0.5;
+		private var _bFillAlpha:Number	= 0.6;
 		private var _bLineColor:Number	= 0x2e3436;
-		private var _bLineAlpha:Number	= 0.5;
+		private var _bLineAlpha:Number	= 0.6;
 		//edge config
 		private var _edgeColor:Number  	= 0x4e9a06;//0xbabdb6;
 		private var _edgeWidth:Number	= 2;	
 		private var _edgeAlpha:Number	= 0.6;
+		//attr config (marriage)
+		private var _attrColor:Number = 0x888a85;
+		private var _attrAlpha:Number = 0.8;
+		private var _attrSize:Number  = 2.0;
+		
 		//historical event
 		private var _histColor:Number	= 0xd3d7cf;
 		private var _histAlpha:Number	= 0.8;
@@ -140,17 +154,21 @@ package genvis
 		private var _evtColor:Number	= 0xfcaf3e;
 		private var _evtAlpha:Number	= 0.8;
 		private var _evtGlow:GlowFilter 	= new GlowFilter(0xfcaf3e, 0.8, 16, 16, 7);
-			
+		
+		
 		private var _this:GenVis;
+		
+		//temporary: these variables are used accross the application
+		public static var drawBlock:Boolean = false;//true;
+		public static var uncType:uint		= QSMARK;
+				
 		public function GenVis()
 		{
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 			_this = this;
 			
 		}
-		public function addRelationship(person:Person, role:String, ref_id:String):void{
 
-		}
 		/**
 		 * genealogy: xml-representation of genealogy databases
 		 * it contains four database tables, persons, relationships, relationship_types, person_types
@@ -206,7 +224,10 @@ package genvis
 			deselect();
 			_selectedNode = person.sprite;
 			_selectedNode.selected = true;
-			_selectedNode.filters  = [_nodeGlow];
+			
+			if (_persistentFoci.indexOf(_selectedNode)<0)	{
+				_selectedNode.filters  = [_nodeGlow];
+			}
 			
 
 			//Dispatch Selection Event
@@ -221,7 +242,7 @@ package genvis
 		public function deselect(dispatchEvent:Boolean=false):void{
 			if (_selectedNode){
 				_selectedNode.selected = false;
-				_selectedNode.filters  = null;
+				if (_persistentFoci.indexOf(_selectedNode)<0)	_selectedNode.filters  = null;
 				_selectedNode = null;
 				if (dispatchEvent){
 					var evt:SelectEvent = new SelectEvent(SelectEvent.DESELECT, SelectEvent.PERSON);
@@ -311,7 +332,7 @@ package genvis
 			_vis.data.blocks.setProperties({"renderer":_renderer, lineWidth:_bLineWidth, 
 					lineColor: Colors.setAlpha(_bLineColor, uint(255*_bLineAlpha)%256), 
 					fillColor: Colors.setAlpha(_bFillColor, uint(255*_bFillAlpha)%256)});
-			_vis.data.attributes.setProperty("renderer", _attrRenderer);
+			_vis.data.attributes.setProperties({"renderer": _attrRenderer, fillColor:Colors.setAlpha(_attrColor, uint(255*_attrAlpha)%256), size:_attrSize});
 			_vis.data.histEvents.setProperties({"renderer": _evtRenderer, fillColor:Colors.setAlpha(_histColor, uint(255*_histAlpha)%256)});
 			_vis.data.events.setProperties({"renderer": _evtRenderer, fillColor:Colors.setAlpha(_evtColor, uint(255*_evtAlpha)%256)});
 			//postprocessing after operators added
@@ -355,7 +376,7 @@ package genvis
 // 				_lifelineLayout = new PedigreeChart(_root, "data.dateOfBirth", "data.yorder", _lifelineType);
 // 				break; 				
 // 			} 			
-			_fisheyeFilter = new FisheyeFilter(_focusNodes, 1);
+			_fisheyeFilter = new FisheyeFilter(_focusNodes, _doiDist);
 			_vis.setOperator("fisheyeFilter",_fisheyeFilter);
 			_lifelineLayout = new LifelineLayout(_root.sprite, _doiEnabled, _lifelineType, _labelStyle, _xrange);
 			_vis.setOperator("layout", _lifelineLayout);	
@@ -656,8 +677,6 @@ package genvis
 						//edge highlight
 						edge.props.lineWidth = edge.lineWidth;
 						edge.lineWidth = 4;
-						edge.props.lineColor = edge.lineColor;
-						edge.lineColor = 0xff73d216;
 //						//parents highlight
 //						for each (var p:NodeSprite in edge.parents){
 //							p.props.lineColor = p.lineColor;
@@ -680,15 +699,21 @@ package genvis
 					}else if (e.item is BlockSprite){
 						var b:BlockSprite = e.item as BlockSprite;
 						b.props.lineWidth = b.lineWidth;
-						b.lineWidth = 2;
+						b.lineWidth = 4;
 						b.props.lineColor = b.lineColor;
 						b.lineColor = Colors.setAlpha(0x73d216, uint(255*_bLineAlpha)%256);
 						b.props.fillColor = b.fillColor;
 						b.fillColor = Colors.setAlpha(0x73d216, uint(255*_bFillAlpha)%256);						
 					}else if (e.item is AttributeSprite){
 						var a:AttributeSprite = e.item as AttributeSprite;
-						a.label.bold  = true;
-						a.label.color = 0x73d216;
+						if (GenVis.uncType == GenVis.QSMARK){								
+							a.label.bold  = true;
+							a.label.color = 0x73d216;
+						}else if (GenVis.uncType == GenVis.GRADIENT){
+							//a.props.fillColor = a.fillColor;
+							//a.fillColor = Colors.setAlpha(0x73d216, uint(255*a.fillAlpha)%256);
+							a.filters = [_uncGlow];
+						}
 					}else if (e.item is EventSprite){
 						var evt:EventSprite = e.item as EventSprite;
 						if (evt.event.historical){
@@ -707,14 +732,14 @@ package genvis
 					if (e.item is EdgeSprite) {
 						var edge:EdgeSprite = e.edge;
 						edge.lineWidth = edge.props.lineWidth;
-						edge.lineColor = edge.props.lineColor;
 //						for each (var p:NodeSprite in edge.parents){
 //							p.lineColor = p.props.lineColor;
 //						}
 //						edge.child.lineColor = edge.child.props.lineColor;
 					}else if (e.item is NodeSprite){
 //						e.node.lineColor = e.node.props.lineColor;
-						if (e.node.selected==false) e.node.filters = null;
+						if (e.node.selected==false && _persistentFoci.indexOf(e.node)<0) e.node.filters = null;
+						if (_persistentFoci.indexOf(e.node)>=0) e.node.filters = [_focusGlow];
 						e.node.visitEdges(function (edge:EdgeSprite):void{							
 							edge.lineWidth = edge.props.lineWidth;
 							edge.lineColor = edge.props.lineColor;	
@@ -726,8 +751,14 @@ package genvis
 						b.fillColor = b.props.fillColor;
 					}else if (e.item is AttributeSprite){
 						var a:AttributeSprite = e.item as AttributeSprite;
-						a.label.bold  = false;
-						a.label.color = 0x000000;
+						if (GenVis.uncType == GenVis.QSMARK){								
+							a.label.bold  = false;
+							a.label.color = 0x000000;
+						}else if (GenVis.uncType == GenVis.GRADIENT){
+							//a.fillColor = a.props.fillColor;
+							a.filters = null;
+						}
+						
 					}else if (e.item is EventSprite){
 						var evt:EventSprite = e.item as EventSprite;
 						if (evt.event.historical){
@@ -770,7 +801,7 @@ package genvis
 					text += Helper.dateToString(e.event.start);
 				}
 				text += "<br/>"+e.event.location+"<br/>";
-				var lineLen:Number = 60;
+				var lineLen:Number = 26;
 				var curIdx:Number = 0;
 				while (curIdx < e.event.description.length){
 					text += e.event.description.substr(curIdx, lineLen) + "<br/>";
@@ -785,10 +816,10 @@ package genvis
 
 			_vis.controls.add(new ClickControl(null, 1,
 				// set search query to the occupation name
-				function(e:SelectionEvent):void {
+				function(e:SelectionEvent):void {					
 					var selectPerson:SelectEvent;					
 					if (e.object is NodeSprite){
-						_this.select(e.node.data as Person, false);						
+						_this.select(e.node.data as Person, false);							
 					}else if (e.object is AttributeSprite){
 						_this.deselect();		
 						var attr:AttributeSprite = e.object as AttributeSprite;	
@@ -803,8 +834,48 @@ package genvis
 							selectAttr = new SelectEvent(SelectEvent.SELECT, SelectEvent.ATTRIBUTE, attr, e.cause);
 							selectAttr.dispatch();	
 						}											
+					}else if (e.object is BlockSprite){
+//						var b:BlockSprite = e.object as BlockSprite;
+//						b.selected = b.selected? false:true;
+//						if (e.shiftKey){							
+//							e.ctrlKey? b.desimplify():b.simplify();							
+//							_vis.update(_t, OPS);
+//						}						
 					}else{
-						deselect(true);
+						deselect(true);							
+//						GenVis.drawBlock = !GenVis.drawBlock;
+//						_vis.update(_t, OPS);											
+					}
+				
+					if (_doiEnabled){
+						if (e.object is NodeSprite && e.node.type != NodeSprite.SPOUSE){
+							var pidx:int = _persistentFoci.indexOf(e.node);
+							if ( e.node.type != NodeSprite.ROOT && e.ctrlKey){//set persistent focus	
+								if (pidx<0){//not a persistent focus								
+									_persistentFoci.push(e.node);
+									//_focusNodes.push(e.node);
+									e.node.filters = [_focusGlow];									
+								}else{
+									_persistentFoci.splice(pidx,1);
+									_focusNodes.splice(_focusNodes.indexOf(e.node),1)
+									e.node.filters = null;
+								}																	
+							}
+															
+							if (_recentFocus && _persistentFoci.indexOf(_recentFocus)<0) {
+								_focusNodes.splice(_focusNodes.indexOf(_recentFocus),1);	//remove current focus
+								e.node.status = NodeSprite.NON_FOCUSED;
+							}	
+							if ( e.node.type != NodeSprite.ROOT){								
+								_focusNodes.push(e.node);
+								e.node.status = NodeSprite.FOCUSED;									
+							}
+							_recentFocus = e.node;											
+							
+							_lifelineLayout.buildScale(e.node);
+							_vis.update(null, [ENCODER, FILTER]);
+							_vis.update(1, [LAYOUT, LABLER]).play();						
+						}
 					}
 //					if (_layoutMode == MANUAL || e.node.type == NodeSprite.SPOUSE
 //						|| _doiEnabled==false) return;
@@ -828,12 +899,10 @@ package genvis
 				}
 			));
 			_vis.controls.add( new ClickControl(NodeSprite, 2,
-				function (e:SelectionEvent):void{
-					//chante root
+				function (e:SelectionEvent):void{					
 					var newRoot:Person = e.node.data as Person;
 					var rootChange:RootChangeEvent = new RootChangeEvent(newRoot);
-					rootChange.dispatch();
-					_this.select(newRoot, false);
+					rootChange.dispatch();					
 				}));
 //			_vis.controls.add(new ClickControl(BlockSprite, 1,
 //				// set search query to the occupation name
@@ -846,7 +915,7 @@ package genvis
 //					
 //				}
 //			));
-			_vis.controls.add(new PanZoomControl(this));
+			if (!_doiEnabled) _vis.controls.add(new PanZoomControl(this));
 			
 		}
 	}

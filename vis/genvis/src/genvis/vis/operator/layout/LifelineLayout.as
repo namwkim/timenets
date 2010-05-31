@@ -200,7 +200,7 @@ package genvis.vis.operator.layout
 			_displayNodeList 	= new Array();
 			_displayBlockList	= new Array();
 			if (_doiEnabled){
-				//desimplify all the visible nodes which have been visible by fisheye calcuation
+				//desimplify all the visible nodes which have been set visible by fisheye calcuation
 				visualization.data.nodes.visit(function (n:NodeSprite):void{
 					if (n.visible == true)	{
 						_displayNodeList.push(n);
@@ -225,8 +225,7 @@ package genvis.vis.operator.layout
 							b.aggregated = false;
 						}					
 					}		
-					_t.$(b).alpha = b.visible ? 1 : 0;	
-					
+					_t.$(b).alpha = b.visible ? 1 : 0;								
 				});
 			}else{//all nodes are assumed to be visible
 				visualization.data.attributes.visit(function (a:AttributeSprite):void{
@@ -240,11 +239,11 @@ package genvis.vis.operator.layout
 				visualization.data.nodes.visit(function (n:NodeSprite):void{
 					n.visible = true;
 					n.alpha = 1;
-					n.desimplify();
+					//n.desimplify();
 					_displayNodeList.push(n);
 				});
 				visualization.data.blocks.visit(function (b:BlockSprite):void{						
-					while (b.desimplify());							
+					//while (b.desimplify());							
 					_displayBlockList.push(b);
 				});
 			}
@@ -271,7 +270,6 @@ package genvis.vis.operator.layout
 //					block.setVisibility(false);	continue;
 //				}
 				_lifeline.layout(block);
-				block.calcBBox();
 			}
 		}
 
@@ -350,8 +348,7 @@ package genvis.vis.operator.layout
 					for (var i:int = 0; i<revertedNodeList.length; i++){
 						n = revertedNodeList[i];
 						n.block.simplify();
-						_lifeline.layout(n.block);
-						n.block.calcBBox();
+						_lifeline.layout(n.block);						
 						verticalLayout();
 						top 	= Number.MAX_VALUE;
 						bottom	= -Number.MIN_VALUE;
@@ -364,8 +361,7 @@ package genvis.vis.operator.layout
 						if (newHeight >= prevHeight){
 							newHeight = prevHeight;
 							n.block.desimplify();
-							_lifeline.layout(n.block);//recalculate layout for the block
-							n.block.calcBBox(); //and bounding box
+							_lifeline.layout(n.block);//recalculate layout for the block							
 						}else{
 							prevHeight = newHeight;
 							revertedNodeList.splice(i,1);
@@ -376,8 +372,7 @@ package genvis.vis.operator.layout
 					continue;
 				}
 				n.block.simplify();
-				_lifeline.layout(n.block);
-				n.block.calcBBox();
+				_lifeline.layout(n.block);				
 				//trace("bbox newHeight"+n.block.bbox.height);
 				//efficiently recalculate newHeight...
 				verticalLayout();
@@ -396,8 +391,7 @@ package genvis.vis.operator.layout
 					//trace("reverted: prevH:"+prevHeight+", newH:"+newHeight);					
 					newHeight = prevHeight;
 					n.block.desimplify();
-					_lifeline.layout(n.block);//recalculate layout for the block
-					n.block.calcBBox(); //and bounding box
+					_lifeline.layout(n.block);//recalculate layout for the block				
 					revertedNodeList.push(n); 
 					//the desimplified node should be reconsidered if appropriate....					
 					//cleverly reorder display list so that this node will be reconsidered later..

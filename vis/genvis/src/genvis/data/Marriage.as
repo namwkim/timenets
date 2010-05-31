@@ -95,6 +95,39 @@ package genvis.data
 			_endDate	= endDate;
 			
 		}
+		/**
+		 * marriage line is the period from start date to divorce date or one of couple's death date.
+		 * It does not contain screen coordinates, but start and end dates of the line.
+		 **/
+		public function marriageLine():EvtLine{
+			var e:EvtLine = new EvtLine();
+			var start:Date, end:Date;
+			if (_startDate) {
+				start = _startDate;
+			}else{
+				return null;
+			}
+			
+			if (_endDate){
+				end = _endDate;
+			}else{//not divorced or separated by death 
+				if (person1.dateOfDeath && person2.dateOfDeath){
+					if (person1.dateOfDeath > person2.dateOfDeath)
+						end = person2.dateOfDeath;
+					else
+						end = person1.dateOfDeath;
+				}else if(person1.dateOfDeath){
+					end = person1.dateOfDeath;					
+				}else if (person2.dateOfDeath){
+					end = person2.dateOfDeath;					
+				}else{//all alive
+					end = null;//or use Data.curDate
+				}
+			}			
+			e.start = new EvtPt(0, 0, EvtPt.MARRIAGE, start, e);
+			if (end) e.end	= new EvtPt(0, 0, EvtPt.DIVORCE, end, e);
+			return (e);
+		}
 		public function toString():String{
 			return person1.name + " and "+person2.name+"'s marriage";
 		}

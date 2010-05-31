@@ -4,6 +4,8 @@ package org.akinu.model
 	import com.adobe.cairngorm.CairngormMessageCodes;
 	import com.adobe.cairngorm.model.IModelLocator;
 	
+	import flash.utils.Dictionary;
+	
 	import genvis.GenVis;
 	import genvis.data.Person;
 	
@@ -27,7 +29,7 @@ package org.akinu.model
 			return _instance;
 		}
 		//url
-		public var url:String = "http://akinu.org/";
+		public var url:String = "http://akinu.org/";//"http://localhost:3000/";
 		//context menu variables
 		public static const FRONT_PAGE:uint		= 0;
 		public static const PERSON_PAGE:uint	= 1;
@@ -48,8 +50,8 @@ package org.akinu.model
 		public var selectedPerson:Person;
 		public var vis:GenVis;
 		
-		//project 
-		public var project:Project;
+		//other data 
+		public var project:Project; //it contains events and people		
 		
 		//temp data between views
 		public var data:*;

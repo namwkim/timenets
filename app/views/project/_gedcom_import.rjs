@@ -1,0 +1,3 @@
+page.delay(1) do 
+  page << "new Ajax.Request('/project/people/#{project.id}',{onLoading:function(){$('people').update(new Element('img', { src:'/images/roller.gif'}))}});"
+end

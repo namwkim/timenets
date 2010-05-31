@@ -1,0 +1,14 @@
+<% form_remote_tag :url=>{:action=>"gedcom_import", :id=>@project.id}, :html=>{:multipart => true, :id=>"import_form", :target=>"upload_frame"} do%>
+	<fieldset>
+		<legend>GEDCOM Import</legend>
+	<table>
+		<tr>
+			<td>GEDCOM file</td>
+			<td><%= file_field_tag "gedcom_file"%></td>
+		</tr>
+		<tr><td colspan="2" align="right" style="border-top:1px dotted #d3d7cf;">
+			<%= button_to_close_lightbox "Import", {:onclick=>"$('import_form').submit();", :class=>"ui_small_button"} %> <%=button_to_close_lightbox "Cancel", {:class=>"ui_small_button"} %>
+		</td></tr>
+	</table>
+	</fieldset>	
+<% end %>

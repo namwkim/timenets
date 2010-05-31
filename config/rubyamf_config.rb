@@ -96,6 +96,7 @@ module RubyAMF
       :actionscript => 'Project',
       :ruby         => 'Project',
       :type         => 'active_record',
+      :associations => ["events", "people"],
       :attributes   => ["id", "name", "description"]
     )
     ClassMappings.register(

@@ -34,6 +34,7 @@
 					if (child.parents.length==1) tmp.push(child);
 				}
 				children = tmp.length>0?tmp:null;
+				spouseRepeater.executeBindings(true);
 			}							
 			private function newRelationship(role:String, indices:Array=null, refParent:Person=null):void{	
 //				PopUpManager.addPopUp(relForm, this.parent, true);

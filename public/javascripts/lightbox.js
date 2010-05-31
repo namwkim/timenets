@@ -77,7 +77,10 @@ var Lightbox = {
 function lb_initialize() {
 	if(!$('lb_box')) {
 		var body = document.getElementsByTagName("body").item(0);
-		new Insertion.Bottom(body, '<div id="lb_overlay" style="display:none"></div><div id="lb_box" style="display:none"><div id="lb_box_contents"></div></div>');
+		new Insertion.Bottom(body, '<div id="lb_overlay" style="display:none"></div><div id="lb_box" style="display:none"><div id="lb_box_contents"></div></div>');		
 	}
+
 }
+
 Event.observe(window, "load", lb_initialize, false);
+

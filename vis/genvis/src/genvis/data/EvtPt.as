@@ -9,8 +9,8 @@ package genvis.data
 		private var _pt:Point;
 		private var _date:Date;
 		private var _type:int;
-		private var _data:Object;
-		private var _isEstimated:Boolean;
+		private var _data:*;
+		private var _perturbed:Boolean; // perturbed from original point
 		
 		public static const BORN:int		= 0;
 		public static const	DATING:int		= 1;
@@ -18,16 +18,18 @@ package genvis.data
 		public static const DIVORCE:int 	= 3;
 		public static const RESTING:int		= 4;
 		public static const DEAD:int		= 5;
+		public static const ROUTESTART:int	= 6;
+		public static const ROUTEEND:int	= 7;
 		
 		public function EvtPt(x:Number, y:Number, t:int, d:Date = null, data:Object = null){
 			_pt 	= new Point(x, y);		
 			_date 	= d;
 			_type 	= t;
 			_data	= data;
-			_isEstimated = false;
+			_perturbed = false;
 		}
-		public function get isEstimated():Boolean { return _isEstimated; }
-		public function set isEstimated(e:Boolean):void { _isEstimated = e; }
+		public function get perturbed():Boolean { return _perturbed; }
+		public function set perturbed(e:Boolean):void { _perturbed = e; }
 		
 		public function get pt():Point			{ return _pt;	}
 		public function get x():Number			{ return _pt.x;	}

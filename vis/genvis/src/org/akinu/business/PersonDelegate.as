@@ -7,6 +7,9 @@ package org.akinu.business
 	
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
+	import mx.utils.ObjectUtil;
+	
+	import org.akinu.helper.Helper;
 	
 	public class PersonDelegate
 	{
@@ -26,11 +29,15 @@ package org.akinu.business
 		//// PERSON
 		//
 		public function createPerson(person:Person, project_id:String):void{
-			var call:AsyncToken = AsyncToken(_service.create_person({project_id:project_id, person:person}));
+			var cPerson:Person = ObjectUtil.copy(person) as Person;
+			Helper.personToUTC(cPerson);			
+			var call:AsyncToken = AsyncToken(_service.create_person({project_id:project_id, person:cPerson}));
 			call.addResponder(_responder);
 		}
 		public function updatePerson(person:Person, project_id:String):void{
-			var call:AsyncToken = AsyncToken(_service.update_person({project_id:project_id, person:person}));
+			var cPerson:Person = ObjectUtil.copy(person) as Person;
+			Helper.personToUTC(cPerson);
+			var call:AsyncToken = AsyncToken(_service.update_person({project_id:project_id, person:cPerson}));
 			call.addResponder(_responder);
 		}
 		public function removePerson(id:String):void{
@@ -42,8 +49,12 @@ package org.akinu.business
 		//
 		public function addRelationship(person:Person, marriage:Marriage, ref_id:String, role:String, create:Boolean):void{
 			var call:AsyncToken;
+			var cMarriage:Marriage 	= ObjectUtil.copy(marriage) as Marriage;
+			Helper.marriageToUTC(cMarriage);
 			if (create){
-				call = AsyncToken(_service.create_relationship({person:person, marriage:marriage, ref_id:ref_id, role:role}));
+				var cPerson:Person 		= ObjectUtil.copy(person) as Person;
+				Helper.personToUTC(cPerson);
+				call = AsyncToken(_service.create_relationship({person:cPerson, marriage:cMarriage, ref_id:ref_id, role:role}));
 			}else{
 				call = AsyncToken(_service.create_relationship({person_id:person.id, marriage:marriage, ref_id:ref_id, role:role}));
 			}
@@ -54,7 +65,9 @@ package org.akinu.business
 			call.addResponder(_responder);						
 		}
 		public function updateMarriage(marriage:Marriage):void{
-			var call:AsyncToken = AsyncToken(_service.update_marriage({marriage:marriage}));
+			var cMarriage:Marriage 	= ObjectUtil.copy(marriage) as Marriage;
+			Helper.marriageToUTC(cMarriage);
+			var call:AsyncToken = AsyncToken(_service.update_marriage({marriage:cMarriage}));
 			call.addResponder(_responder);
 		}
 		public function removeMarriage(mar_id:String):void{

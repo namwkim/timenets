@@ -26,11 +26,20 @@
 			private var model:ModelLocator = ModelLocator.getInstance();
 			
 			private function init():void{
-				//Application.application.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
-				//Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
-				
-//				var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);
-//				initializeEvent.dispatch();			
+				Application.application.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+				Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+				//From Hosting Domain
+				//var initializeEvent:InitializeEvent = new  InitializeEvent("1", vis);  //osama
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("667", vis);  //my family
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("711", vis);  //diana
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("704", vis);  //ann dunham
+
+				//From Local Machine
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("6051", vis);  //british royal family		
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("6163", vis);  //kennedy family	
+//				
+//				initializeEvent.dispatch();
+							
 			}
 	         private function fullScreenHandler(evt:FullScreenEvent):void {
                 
@@ -84,11 +93,12 @@
 //			    Alert.show("An error occurred: " + fe.fault.faultString);
 //			}
 //	
-			public function setRoot(rootID:String):void{
+			public function setRoot(rootID:String, repType:uint):void{
 				if (rootID!=""){
 					var initializeEvent:InitializeEvent = new InitializeEvent(rootID, vis);
 					initializeEvent.dispatch();
 				}
+				GenVis.uncType = repType;
 			}
 			private function changeHandler():void{
 				if (model.page == ModelLocator.PERSON_PAGE){

@@ -1,12 +1,19 @@
 package genvis.vis.data.render
 {
-	import flare.util.Shapes;
+	import com.degrafa.geometry.CubicBezier;
+	import com.degrafa.geometry.Line;
+	import com.degrafa.paint.GradientStop;
+	import com.degrafa.paint.LinearGradientStroke;
+	import com.degrafa.paint.SolidStroke;
+	
+	import flare.util.Dates;
 	import flare.vis.data.DataSprite;
 	import flare.vis.data.render.IRenderer;
 	
 	import flash.display.CapsStyle;
 	import flash.display.Graphics;
 	import flash.display.LineScaleMode;
+	import flash.geom.Point;
 	
 	import genvis.GenVis;
 	import genvis.data.EvtPt;
@@ -58,15 +65,36 @@ package genvis.vis.data.render
 //			CubicBezier.curveThroughPoints(g, points);
 //		}
 		public function renderLineSpline(n:NodeSprite):void{
-			//trace("RENDERER:"+n.data.name+", "+n.visible);
+			if (!n.data) return;
 			
 			var g:Graphics = n.graphics;
 			//2.draw lifeline
 			var color:Number = n.lineColor;
 			var width:Number = n.block.gbLayout.lifeline.lineWidth;
+			//Draw Gradient line
+			
+			var p:Person = (n.data as Person);
+			var gs:Number, ge:Number, gy:Number, dy:Number;
+			var uncertain:Line, gradient:LinearGradientStroke;	
+			if (p.isDobUncertain && GenVis.uncType == GenVis.GRADIENT){
+				gs = 0;
+				ge = n.toLocalX(n.block.gbLayout.lifeline.axes.xAxis.X(Dates.addYears(p.dateOfBirth, -3)));
+				gy = 0;				
+				uncertain = new Line(gs, gy, ge, gy);
+				gradient = new LinearGradientStroke();	
+				gradient.caps = CapsStyle.NONE;						
+				gradient.gradientStops.push(new GradientStop(n.lineColor, 0, 0));	
+				gradient.gradientStops.push(new GradientStop(n.lineColor, n.lineAlpha, 1));				
+				gradient.weight = width;				
+				uncertain.stroke = gradient;
+				uncertain.draw(g, null);				
+			}
 			g.lineStyle(width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+			var bezier:CubicBezier, stroke:SolidStroke, evt:EvtPt;
+			stroke = new SolidStroke(color, n.lineAlpha, width);
+			stroke.caps = CapsStyle.NONE;
 			for (var i:int=0; i<n.points.length; i++){		
-				var evt:EvtPt = n.points[i];		
+				evt = n.points[i];		
 				switch (evt.type){
 				case EvtPt.BORN:
 					g.moveTo(evt.x,evt.y);
@@ -76,39 +104,130 @@ package genvis.vis.data.render
 					break;
 				case EvtPt.MARRIAGE:
 					var datEvt:EvtPt = n.points[i-1];
-					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
-					Shapes.drawCubic(g, datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, 
-							(datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
-					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);		
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+//					Shapes.drawCubic(g, datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, 
+//							(datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, (datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);					
+					bezier.stroke = stroke;
+					bezier.draw(g, null);
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);		
 					g.moveTo(evt.x, evt.y);
 					break;
 				case EvtPt.DIVORCE:
 					g.lineTo(evt.x, evt.y);
-					var resEvt:EvtPt = n.points[i+1];
-					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
-					Shapes.drawCubic(g, resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, 
-							(resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					var resEvt:EvtPt = n.points[i+1];					
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+//					Shapes.drawCubic(g, resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, 
+//							(resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, (resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier.stroke = stroke;	
+					bezier.decorators.pus
+					bezier.draw(g, null);				
 					break;					
 				case EvtPt.RESTING:
-					g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 					g.moveTo(evt.x, evt.y);
 				case EvtPt.DEAD:				
 					g.lineTo(evt.x, evt.y);
+					break;				
+				case EvtPt.ROUTESTART:
+					g.lineTo(evt.x, evt.y);
+					break;
+				case EvtPt.ROUTEEND:
+					var routeStart:EvtPt = n.points[i-1];
+//					Shapes.drawCubic(g, routeStart.x, routeStart.y, (routeStart.x+evt.x)/2, routeStart.y, 
+//							(routeStart.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(routeStart.x, routeStart.y, (routeStart.x+evt.x)/2, routeStart.y, (routeStart.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier.stroke = stroke;
+					bezier.draw(g, null);		
+					g.moveTo(evt.x, evt.y);
 					break;
 				}
 			}
+			if (p.isDodUncertain && p.deceased && p.dateOfDeath && GenVis.uncType == GenVis.GRADIENT){						
+				gs = evt.x;
+				ge = n.toLocalX(n.block.gbLayout.lifeline.axes.xAxis.X(Dates.addYears(p.dateOfDeath, 3)));;
+				gy = evt.y;	
+				uncertain = new Line(gs, gy, ge, gy);
+				gradient = new LinearGradientStroke();	
+				gradient.caps = CapsStyle.NONE;							
+				gradient.gradientStops.push(new GradientStop(n.lineColor, n.lineAlpha, 0));
+				gradient.gradientStops.push(new GradientStop(n.lineColor, 0, 1));
+				gradient.weight = width;				
+				uncertain.stroke = gradient;
+				uncertain.draw(g, null);					
+			}			
 		}
 		public function renderSpline(n:NodeSprite):void{
 			var g:Graphics = n.graphics;
 		}
-		public function renderEvtMarkers(n:NodeSprite):void{
+		public function renderSimplifiedLifeline(n:NodeSprite):void{
+			if (!n.data) return;
+			
 			var g:Graphics = n.graphics;
-			g.lineStyle(1, 0xfce94f, 0.8, false, LineScaleMode.NORMAL, CapsStyle.NONE);
-			g.beginFill(0xfce94f, 0.8);	
-			for each(var evt:EvtPt in n.points){	
-				g.drawCircle(evt.x, evt.y, 3);
+			//2.draw lifeline
+			var color:Number = n.lineColor;
+			var width:Number = n.block.gbLayout.lifeline.lineWidth;
+			//Draw Gradient line
+			
+			var p:Person = (n.data as Person);
+			
+			var gs:Number, ge:Number, gy:Number, dy:Number;
+			//var gradientBoxMatrix:Matrix;
+			var marGradient:LinearGradientStroke, divGradient:LinearGradientStroke;
+			marGradient = new LinearGradientStroke();	divGradient = new LinearGradientStroke();
+			marGradient.caps = divGradient.caps = CapsStyle.NONE;						
+			marGradient.gradientStops.push(new GradientStop(color, 0, 0));	
+			marGradient.gradientStops.push(new GradientStop(color,n.lineAlpha, 1));		
+			divGradient.gradientStops.push(new GradientStop(color, n.lineAlpha, 0));	
+			divGradient.gradientStops.push(new GradientStop(color, 0, 1));					
+			marGradient.weight = divGradient.weight = width;
+			g.lineStyle(width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+			var bezier:CubicBezier, stroke:SolidStroke, evt:EvtPt;
+			stroke = new SolidStroke(color, n.lineAlpha, width);
+			stroke.caps = CapsStyle.NONE;
+			for (var i:int=0; i<n.points.length; i++){		
+				evt = n.points[i];		
+				switch (evt.type){
+
+				case EvtPt.MARRIAGE:
+					var datEvt:EvtPt = n.points[i-1];
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+//					Shapes.drawCubic(g, datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, 
+//							(datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(datEvt.x, datEvt.y, (datEvt.x+evt.x)/2, datEvt.y, (datEvt.x+evt.x)/2, evt.y, evt.x, evt.y);					
+					bezier.stroke = marGradient;
+					bezier.draw(g, null);
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);		
+					g.moveTo(evt.x, evt.y);
+					break;
+				case EvtPt.DIVORCE:
+					g.lineTo(evt.x, evt.y);
+					var resEvt:EvtPt = n.points[i+1];					
+					//g.lineStyle( width, color, n.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+//					Shapes.drawCubic(g, resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, 
+//							(resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(resEvt.x, resEvt.y, (resEvt.x+evt.x)/2, resEvt.y, (resEvt.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier.stroke = divGradient;	
+					bezier.draw(g, null);				
+					break;					
+				case EvtPt.DEAD:				
+					g.lineTo(evt.x, evt.y);
+					break;				
+				case EvtPt.ROUTESTART:
+					g.lineTo(evt.x, evt.y);
+					break;
+				case EvtPt.ROUTEEND:
+					var routeStart:EvtPt = n.points[i-1];
+//					Shapes.drawCubic(g, routeStart.x, routeStart.y, (routeStart.x+evt.x)/2, routeStart.y, 
+//							(routeStart.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier = new CubicBezier(routeStart.x, routeStart.y, (routeStart.x+evt.x)/2, routeStart.y, (routeStart.x+evt.x)/2, evt.y, evt.x, evt.y);
+					bezier.stroke = stroke;
+					bezier.draw(g, null);		
+					g.moveTo(evt.x, evt.y);
+					break;
+				}
 			}
-			g.endFill();
 		}
 		public function renderBlock(b:BlockSprite):void {
 			var g:Graphics = b.graphics;
@@ -117,33 +236,46 @@ package genvis.vis.data.render
 			if (b.aggregated && b.focus.parentNode.visible && b.parentBlock.aggregated==false){
 				var pn:NodeSprite = b.focus.parentNode;
 				var upward:Boolean = (b.ty - pn.block.ty)>0? false:true;	
-				var x:Number, y:Number;
-				if (b.focus.type == NodeSprite.ANCESTOR){
-					x = b.toLocalX(b.gbLayout.xAxis.X(pn.data.date_of_birth));
-					y = b.toLocalY(pn.toGlobalY(0));					
+				var fPerson:Person = b.focus.data as Person;				
+				g.lineStyle(b.lineWidth, b.selected? 0x73d216:b.focus.lineColor, b.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
+				g.beginFill(b.selected? 0x73d216:b.focus.lineColor, b.fillAlpha);
+										
+				var start:Point = new Point;
+				var end:Point 	= new Point;
+				var lifeline:Lifeline = b.gbLayout.lifeline;
+				var height:Number = Lifeline.GAMMA+lifeline.lineWidth;				
+				if (b.focus.type == NodeSprite.ANCESTOR){					
+					start.x = b.toLocalX(b.gbLayout.xAxis.X(pn.data.dateOfBirth));
+					start.y = b.toLocalY(pn.toGlobalY(0));	
+					end.x 	= start.x;					
+					end.y	= start.y + (upward? -height:height);				
 				}else if (b.focus.type == NodeSprite.DESCENDANT){
-					var f:NodeSprite = b.focus.data.father.sprite;
-					var m:NodeSprite = b.focus.data.mother.sprite;
-					x = b.gbLayout.xAxis.X(b.focus.data.date_of_birth);
-					var fy:Number = f.Y(x);
-					var my:Number = m.Y(x); 
-					y = (isNaN(fy)? my: (isNaN(my)? fy: (fy+my)/2));
-					x = b.toLocalX(x);
-					y = b.toLocalY(y);
-//					
-//					var pt1:Point = f.evtPt(EvtPt.MARRIAGE, m.data).pt;
-//					pt1 = f.toGlobal(pt1);
-//					var pt2:Point = m.toGlobal(m.evtPt(EvtPt.MARRIAGE, f.data).pt);				
-//					x = b.toLocalX(pt1.x);
-//					y = b.toLocalY((pt1.y + pt2.y)/2);
+					var e:EdgeSprite = b.focus.inEdge;									
+					if (e.outOfWedlock){
+						var startPts:Array = e.startOutOfWedlock;
+						if (startPts.length==2){
+							end.x = b.toLocalX(e.end.x);
+							end.y = b.toLocalY(pn.toGlobalY(0)) + (upward? -height:height);
+							if (e.direction==EdgeSprite.UP){	
+								start = b.toLocal(startPts[1]);									
+								GraphicsUtil.drawTriangleUp(g, b.toLocalX(startPts[0].x), b.toLocalY(startPts[0].y));
+							}else{
+								start = b.toLocal(startPts[0]);
+								GraphicsUtil.drawTriangleUp(g, b.toLocalX(startPts[1].x), b.toLocalY(startPts[1].y));
+							}
+						}
+					}else{
+						start = b.toLocal(e.start);
+						end.x = b.toLocalX(e.end.x);
+						end.y = b.toLocalY(pn.toGlobalY(0)) + (upward? -height:height);
+					}
+	
 				}
-				var size:Number = 10;//TODO: size encoding 
-				g.lineStyle(b.lineWidth, b.selected? 0x73d216:b.lineColor, b.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
-				g.beginFill(b.selected? 0x73d216:b.fillColor, b.fillAlpha);		
-				upward? GraphicsUtil.drawTriangleUp(g, x, y, size):GraphicsUtil.drawTriangleDown(g, x, y, size);
-				g.endFill();						
+				GraphicsUtil.drawDashedArrow(g, start, end, true, {thickness:b.lineWidth, color:(b.selected? 0x73d216:b.focus.lineColor), alpha:b.lineAlpha});
+				g.endFill();					
 			}
-			if (_layoutMode == GenVis.MANUAL && b.aggregated == false) {
+			
+			if (GenVis.drawBlock && b.aggregated == false) {
 				g.lineStyle(b.lineWidth, b.selected? 0x73d216:b.lineColor, b.lineAlpha, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 				g.beginFill(b.selected? 0x73d216:b.fillColor, b.fillAlpha);		
 				g.drawRect(0, 0, b.bbox.width, b.bbox.height);
@@ -174,7 +306,7 @@ package genvis.vis.data.render
 						break;
 				}
 			}else{
-				renderEvtMarkers(n);
+				renderSimplifiedLifeline(n);
 			}
 		}
 		/**
@@ -197,7 +329,21 @@ package genvis.vis.data.render
 				g.lineStyle(e.lineWidth, 0x555753, 0.6, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 				g.beginFill(0x555753, 0.6);				
 			}
-			GraphicsUtil.drawDashedArrow(g, e.start, e.end);
+			if (e.outOfWedlock){
+				var startPts:Array = e.startOutOfWedlock;
+				if (startPts.length==2){
+					if (e.direction==EdgeSprite.UP){
+						GraphicsUtil.drawDashedArrow(g, startPts[1], e.end);
+						GraphicsUtil.drawTriangleUp(g, startPts[0].x, startPts[0].y);
+					}else{
+						GraphicsUtil.drawDashedArrow(g, startPts[0], e.end);
+						GraphicsUtil.drawTriangleUp(g, startPts[1].x, startPts[1].y);
+					}
+				}
+			}else{
+				GraphicsUtil.drawDashedArrow(g, e.start, e.end);
+			}
+			
 			g.endFill();
 		}
 		/** @inheritDoc */

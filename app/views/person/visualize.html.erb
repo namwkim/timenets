@@ -29,7 +29,7 @@ document.observe("dom:loaded", function() {
 
 var initCallback = function() {  
    flex = FABridge.flex.root();  
-   flex.setRoot(<%=@person.id if @person!=nil%>);
+   flex.setRoot(<%=@person.id if @person!=nil%>, <%=@rep_type%>);
 }  
 
 <% end %>

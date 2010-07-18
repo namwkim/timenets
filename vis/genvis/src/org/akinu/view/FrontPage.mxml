@@ -29,7 +29,7 @@
 		<mx:Label text="1. What is this?" color="0xb49159"/>
 		<mx:Text text="The graph you are looking at is an hourglass chart with timelines representing individuals. The hourglass chart is limited in showing only ancestors and descendants of the selected root. Accordingly, it may omit	cousins or siblings depending on your root selection. To explore different parts of your family, please try changing the root person with double-click." width="100%"/>
 		<mx:Label text="2. How to add relationships?" color="0xb49159"/>
-		<mx:Text text="Click a person to which you want to add relationships. On the right panel, you will be able to add immediate family members for the selected person. If you are not sure about a specific date, you can leave it blank, or guess it and check 'Approximate'." width="100%"/>
+		<mx:Text text="Click a person to which you want to add relationships. On the right panel, you will be able to add immediate family members for the selected person. If you are not sure about a specific day or month, you can leave it blank and check 'Approximate'. If you don't specify a year, our system will attempt to estimate it based on local context. However, we encourage you to at least guess it in case the estimation process failed." width="100%"/>
 		<!--<mx:Label text="3. What is the question mark?" color="0xb49159"/>
 		<mx:Text text="It is an indication of uncertainty. In other words, if a date is approximate, a question mark will be displaced at that date." width="100%"/>-->
 		<mx:Label text="3. If anything goes wrong" color="0xb49159"/>

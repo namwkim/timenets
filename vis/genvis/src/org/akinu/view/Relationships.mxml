@@ -295,8 +295,8 @@
 								<mx:VBox width="100%">
 								<mx:Repeater id="marriageRepeater" dataProvider="{model.selectedPerson.marriageWith(spouseRepeater.currentItem as Person)}">
 									<mx:HBox width="100%" rollOver="onRollOver(event, marMenu[event.target.instanceIndices[0]][event.target.instanceIndices[1]])" rollOut="onRollOut(event, marMenu[event.target.instanceIndices[0]][event.target.instanceIndices[1]])">
-										<mx:Label text="{marriageRepeater.currentItem.startDate.fullYear}"/><mx:Label text="-"/>
-										<mx:Label text="{marriageRepeater.currentItem.divorced? marriageRepeater.currentItem.endDate.fullYear:''}"/>
+										<mx:Label text="{marriageRepeater.currentItem.startDate.fullYear+(marriageRepeater.currentItem.isStartUncertain? ' ??':'')}"/><mx:Label text="-"/>
+										<mx:Label text="{marriageRepeater.currentItem.divorced? (marriageRepeater.currentItem.endDate.fullYear + (marriageRepeater.currentItem.isEndUncertain? ' ??':'')):''}"/>
 										<mx:Spacer width="100%"/>
 										<mx:HBox id="marMenu" visible="false" backgroundColor="0x555753">
 											<mx:Button label="Edit" click="editMarriage(event.currentTarget.getRepeaterItem() as Marriage, event.target.instanceIndices)"/>

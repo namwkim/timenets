@@ -19,10 +19,15 @@ document.observe("dom:loaded", function() {
 	}
 	$('content').setStyle({'width':(myWidth-120)+'px'});
 	$('content').setStyle({'height':(myHeight-120)+'px'});
-	$('visobj').setStyle({'width':(myWidth-120)+'px'});
-	$('visobj').setStyle({'height':(myHeight-120)+'px'});
-	$('embededvis').setStyle({'width':(myWidth-140)+'px'});
-	$('embededvis').setStyle({'height':(myHeight-120)+'px'});
+	if ($('visobj')){			
+		$('visobj').setStyle({'width':(myWidth-120)+'px'});
+		$('visobj').setStyle({'height':(myHeight-120)+'px'});
+	}
+	if ($('embededvis')){			
+		$('embededvis').setStyle({'width':(myWidth-140)+'px'});
+		$('embededvis').setStyle({'height':(myHeight-120)+'px'});
+	}
+		
 	//$('visobj').observe('DOMMouseScroll', function (e){Event.stop(e);});
 	FABridge.addInitializationCallback( "flex", initCallback );   
 });
@@ -34,7 +39,7 @@ var initCallback = function() {
 
 <% end %>
 
-	<object id='visobj' classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0"/>
+	<object id='visobj' classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">
 		<param name="movie" value="/vis/genvis.swf" /> 	 
 		<embed id="embededvis" src="/vis/genvis.swf" quality="high" bgcolor="#ffffff" name="timenets" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"/>	
 	</object> 

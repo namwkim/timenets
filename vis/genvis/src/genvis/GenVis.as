@@ -129,9 +129,9 @@ package genvis
 		private var _nColors:Array 		= [0x3465a4, 0xcc0000, 0x555753];
 		private var _nLineAlpha:Number	= 0.7;
 		private var _nFillAlpha:Number	= 0.5;
-		private var _nodeGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.7, 24, 24, 5);
-		private var _focusGlow:GlowFilter 	= new GlowFilter(0x73d216, 0.7, 24, 24, 5);
-		private var _uncGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.8, 24, 24, 7);
+		private var _nodeGlow:GlowFilter 	= new GlowFilter(0x8ae234, 0.7, 24, 24, 5);
+		private var _focusGlow:GlowFilter 	= new GlowFilter(0xe8d138, 0.7, 24, 24, 5);
+		private var _uncGlow:GlowFilter 	= new GlowFilter(0x8ae234, 0.8, 24, 24, 7);
 		//block config
 		private var _bLineWidth:Number  = 2;
 		private var _bFillColor:Number 	= 0x888a85;
@@ -143,9 +143,9 @@ package genvis
 		private var _edgeWidth:Number	= 2;	
 		private var _edgeAlpha:Number	= 0.6;
 		//attr config (marriage)
-		private var _attrColor:Number = 0x888a85;
+		private var _attrColor:Number = 0xedd400;//0x888a85;
 		private var _attrAlpha:Number = 0.8;
-		private var _attrSize:Number  = 2.0;
+		private var _attrSize:Number  = 7.0;
 		
 		//historical event
 		private var _histColor:Number	= 0xd3d7cf;
@@ -160,7 +160,7 @@ package genvis
 		
 		//temporary: these variables are used accross the application
 		public static var drawBlock:Boolean = false;//true;
-		public static var uncType:uint		= QSMARK;
+		public static var uncType:uint		=  GRADIENT;
 				
 		public function GenVis()
 		{

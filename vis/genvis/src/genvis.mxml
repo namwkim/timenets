@@ -33,12 +33,14 @@
 //				var initializeEvent:InitializeEvent = new  InitializeEvent("667", vis);  //my family
 //				var initializeEvent:InitializeEvent = new  InitializeEvent("711", vis);  //diana
 //				var initializeEvent:InitializeEvent = new  InitializeEvent("704", vis);  //ann dunham
-
+				var initializeEvent:InitializeEvent = new  InitializeEvent("1042", vis);  //kennedy family	
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("747", vis);  //test
 				//From Local Machine
 //				var initializeEvent:InitializeEvent = new  InitializeEvent("6051", vis);  //british royal family		
-//				var initializeEvent:InitializeEvent = new  InitializeEvent("6163", vis);  //kennedy family	
+//				var initializeEvent:InitializeEvent = new  InitializeEvent("6117", vis);  //kennedy family	
+				
 //				
-//				initializeEvent.dispatch();
+				initializeEvent.dispatch();
 							
 			}
 	         private function fullScreenHandler(evt:FullScreenEvent):void {

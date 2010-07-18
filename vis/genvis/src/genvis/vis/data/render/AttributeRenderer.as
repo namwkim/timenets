@@ -152,6 +152,7 @@ package genvis.vis.data.render
 						attr.addChild(label);
 					}	
 					label.text 		= "?";
+					label.size		= 24;
 					label.visible	= d.visible;
 					label.textMode	= TextSprite.DEVICE;
 					label.mouseEnabled 		= false;
@@ -163,20 +164,20 @@ package genvis.vis.data.render
 							if (lifeline.style == Lifeline.LABELINSIDE){								
 								label.y = (lifeline.lineWidth-Lifeline.FONTSIZE)/2-Lifeline.BOTTOMMARGIN;
 							}							
-							label.x = -5;
+							label.x = -label.size/2;
 						}else if (attr.attrType == AttributeSprite.DATE_OF_DEATH){
 							if (person.sprite.block.gbLayout.lifeline.style == Lifeline.LABELINSIDE){
 								label.y = (lifeline.lineWidth-Lifeline.FONTSIZE)/2-Lifeline.BOTTOMMARGIN;							
 							}else{
 								//label.y = -Lifeline.FONTSIZE/2-Lifeline.BOTTOMMARGIN;;
 							}
-							label.x = 5;
+							label.x = label.size/2;
 						}
 					}else if (attr.objType == AttributeSprite.MARRIAGE){
 						if (attr.attrType == AttributeSprite.MARRIAGE_DATE){
-							label.x = -20;
+							label.x = -label.size;
 						}else if (attr.attrType == AttributeSprite.DIVORCE_DATE){
-							label.x = 20;
+							label.x = label.size;
 						}							
 					}
 			

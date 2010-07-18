@@ -11,7 +11,7 @@ class HomeController < ApplicationController
         @email            = @invitation.recipient_email
       else
         @invitation_token = @invitation = @email = nil
-      end
+      end        
       render :layout => false
     end
   end
@@ -67,27 +67,19 @@ class HomeController < ApplicationController
       @user    = User.new(params[:user])
       @person = Person.new(params[:person]) 
       @user.person = @person
-      if @user.save and @person.save               
-        #create an initial project associated with the new user
-        if params[:study_participant]=='1'
-          ref_proj = Project.find_by_id 8 #replace with kennedy project's id
-          @project = ref_proj.copy
-          rep_type = @user.id%3
-          @user.study_info = StudyInfo.create(:study_code=>1, :rep_type=>rep_type)
+      if @user.save and @person.save            
+        if params[:signup_invitation_token]==''
+          @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")
         else
-          if params[:signup_invitation_token]==''
-            @project = Project.create(:name=>"The "+@person.last_name+" Family", :description=>"Describe your genealogy project here!")        
-          else
-            @invitation = Invitation.find_by_token(params[:signup_invitation_token])
-            if @invitation.accepted 
-              flash[:notice] = "This invitation was used already."
-              redirect_to(:action => "intro")
-            end
-            @project    = @invitation.project
-            @invitation.update_attribute(:accepted, true);
+          @invitation = Invitation.find_by_token(params[:signup_invitation_token])
+          if @invitation.accepted 
+            flash[:notice] = "This invitation was used already."
+            redirect_to(:action => "intro")
           end
-          @project.people << @person
+          @project    = @invitation.project
+          @invitation.update_attribute(:accepted, true);
         end
+        @project.people << @person
         @user.managed_projects.create( :project_id=>@project.id, :privilege=>"Editor") 
         @user.main_project = @project 
         @user.save
@@ -105,22 +97,4 @@ class HomeController < ApplicationController
       redirect_to(:action => "intro")
     end
   end
-  def stats
-    @users = User.find(:all, :conditions=>"id>=#{1}")
-    @total = 0
-    @max   = 0
-    @min   = 2000
-    @users.each do |user|
-      @subtotal = 0
-      user.projects.each do |proj|
-        @subtotal = @subtotal + proj.people.length
-      end
-      @total = @total + @subtotal
-      @min = @subtotal if @min > @subtotal
-      @max = @subtotal if @max < @subtotal
-    end
-    @total = Person.count(:id);
-    @average = @total/@users.length
-  end
-
 end

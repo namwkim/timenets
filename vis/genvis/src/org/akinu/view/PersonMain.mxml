@@ -31,7 +31,11 @@
 				var person:Person = model.selectedPerson;				
 				photo.source = person.photoUrl? model.url+'images/'+person.photoUrl:model.url+'images/person.png';
 				dob.text = Helper.MonthLabels[person.dateOfBirth.month]+" "+person.dateOfBirth.date+", "+person.dateOfBirth.fullYear;
-				if (person.deceased) dod.text = Helper.MonthLabels[person.dateOfDeath.month]+" "+person.dateOfDeath.date+", "+person.dateOfDeath.fullYear;												
+				if (person.isDobUncertain) 	dob.text += " ??";			
+				if (person.deceased) {
+					dod.text = Helper.MonthLabels[person.dateOfDeath.month]+" "+person.dateOfDeath.date+", "+person.dateOfDeath.fullYear;	
+					if (person.isDodUncertain) dod.text += " ??";
+				}												
 				else dod.text = "Living";
 				//close all open child windows
 				closeEdit();
@@ -151,7 +155,7 @@
 						year 	= parseInt(dobYear.text);
 						month	= parseInt(dobMonth.selectedItem.data);
 						date	= parseInt(dobDay.selectedItem.data);
-						if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDobUncertain == dobApprox.selected && year==person.dateOfBirth.fullYear && (month-1)==person.dateOfBirth.month && 
+						if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDobUncertain == dobApprox.selected && year==person.dateOfBirth.fullYear && month==person.dateOfBirth.month && 
 								date == person.dateOfBirth.date){
 							closeEdit();
 							return;
@@ -178,7 +182,7 @@
 							year	= parseInt(dodYear.text);
 							month	= parseInt(dodMonth.selectedItem.data);
 							date	= parseInt(dodDay.selectedItem.data);
-							if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDodUncertain == dodApprox.selected && year == person.dateOfDeath.fullYear && (month-1)==person.dateOfDeath.month &&
+							if (isNaN(year)==false && isNaN(month)==false && isNaN(date)==false && person.isDodUncertain == dodApprox.selected && person.dateOfDeath && year == person.dateOfDeath.fullYear && month==person.dateOfDeath.month &&
 									date == person.dateOfDeath.date){
 								closeEdit();
 								return;	
@@ -260,7 +264,7 @@
 					<!-- DOB -->
 					<mx:HBox id="showDOBBox" rollOver="onRollOver(event, editDOB)" rollOut="onRollOut(event, editDOB)" width="100%" doubleClickEnabled="true" doubleClick="editProperty(Person.DOB, showDOBBox, editDOBBox)">
 						<mx:Label styleName="mute"  text="Date of Birth:" width="85"/>
-						<mx:Label id="dob"  width="100%"/>
+						<mx:Label id="dob" width="100%"/>
 						<mx:Button id="editDOB" label="Edit" visible="false" click="editProperty(Person.DOB, showDOBBox, editDOBBox)"/>
 					</mx:HBox>
 					<mx:VBox id="editDOBBox" visible="false" includeInLayout="false" styleName="solidBorder" width="100%">		

@@ -57,7 +57,7 @@ package genvis.vis.operator.layout
 		protected var _yMin:Number;
 		protected var _yMax:Number;
 		
-		protected var _fitHorzBound:Boolean = false;	
+		protected var _fitHorzBound:Boolean = true;	
 		
 		public function get curDate():Date			{ return _curDate; 	}
 		public function set curDate(d:Date):void	{ _curDate = d;		}
@@ -140,27 +140,27 @@ package genvis.vis.operator.layout
 //				}
 			}else{
 				//find xmin and xmax from the whole data
-//				var people:Array  = new Array();
-//				var isAlive:Boolean = false;
-//				visualization.data.nodes.visit(function (n:NodeSprite):void{
-//					var person:Person = n.data as Person;
-//					people.push(person);
-//					if (!person.isDead && isAlive == false){
-//						isAlive = true;
-//					}					
-//				});
-//				people.sortOn("dateOfBirth", Array.NUMERIC);
-//				_xscale.min = people[0].dateOfBirth;
-//				if (isAlive) {
-//					_xscale.max = _curDate;
-//				}else{
-//					people.sortOn("dateOfDeath", Array.NUMERIC);
-//					_xscale.max = people[people.length-1].dateOfDeath;
-//					
-//				}
-				//temp for study data
-				_xscale.min = new Date(1900,1,1);				
-				_xscale.max = _curDate;
+				var people:Array  = new Array();
+				var isAlive:Boolean = false;
+				visualization.data.nodes.visit(function (n:NodeSprite):void{
+					var person:Person = n.data as Person;
+					people.push(person);
+					if (!person.deceased && isAlive == false){
+						isAlive = true;
+					}					
+				});
+				people.sortOn("dateOfBirth", Array.NUMERIC);
+				_xscale.min = people[0].dateOfBirth;
+				if (isAlive) {
+					_xscale.max = _curDate;
+				}else{
+					people.sortOn("dateOfDeath", Array.NUMERIC);
+					_xscale.max = people[people.length-1].dateOfDeath;
+					
+				}
+//				//temp for study data
+//				_xscale.min = new Date(1900,1,1);				
+//				_xscale.max = _curDate;
 			}
 //			trace("XRANGE-"+_xscale.min.fullYear+","+_xscale.max.fullYear);
 //			var people:Array  = new Array();

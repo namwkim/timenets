@@ -62,7 +62,7 @@ function submit_signup_form(){
 	<div class="signup">
    	  <strong style="font-size:16px">Sign Up:</strong>
 	  <% form_tag({:controller=>"home", :action=>"signup"}, :id=> "signup_form") do -%>
-	  	<%= hidden_field_tag :signup_invitation_token, @invitation_token%>	  	
+	  	<%= hidden_field_tag :signup_invitation_token, @invitation_token%>		
         <table> 
         <tr>
             <td>First Name:</td><td><%= text_field 'person', 'first_name', :size=>"30" , :class=>"inputtext"%></td>
@@ -71,7 +71,7 @@ function submit_signup_form(){
             <td>Last Name:</td><td><%= text_field 'person', 'last_name', :size=>"30" , :class=>"inputtext"%></td>
         </tr>
         <tr>
-            <td>Your Email:</td><td><%= text_field 'user', 'email', :size=>"30" , :class=>"inputtext" %></td>
+            <td>Your Email</td><td><%= text_field 'user', 'email', :size=>"30" , :class=>"inputtext" %></td>
         </tr>
         <tr>
             <td>Password:</td><td><%= password_field 'user', 'password', :size=>"30" , :class=>"inputtext"%></td>
@@ -83,10 +83,6 @@ function submit_signup_form(){
             <td>Birth Date:</td>
             <td><%=date_select 'person', 'date_of_birth', :start_year =>Time.now.year, :end_year=>1900, :order=>[:month, :day, :year],  :prompt => { :day => 'Day', :month => 'Month', :year => 'Year' }%></td>
         </tr>    
-		<tr>
-			<td><span style='color:#ffcc99;font-weight:bold;'>Study<br/> Participant?</span></td>
-			<td><%= check_box_tag 'study_participant'%></td>
-		</tr>
 		<tr><td colspan="2" align="center"><span id="signup_error" class="flash"><%= error_messages_for 'user', 'person', :header_message=>nil, :message=>nil %></span></td></tr>
         <tr><td></td><td><%= submit_tag "SignUp", :class=>"ui_small_button"%></td></tr>            
         </table>        

@@ -49,10 +49,18 @@ package org.akinu.business
 		//
 		public function addRelationship(person:Person, marriage:Marriage, ref_id:String, role:String, create:Boolean):void{
 			var call:AsyncToken;
-			var cMarriage:Marriage 	= ObjectUtil.copy(marriage) as Marriage;
-			Helper.marriageToUTC(cMarriage);
+			var cMarriage:Marriage;
+			if (marriage){
+				cMarriage = ObjectUtil.copy(marriage) as Marriage;
+				Helper.marriageToUTC(cMarriage);
+			}
 			if (create){
-				var cPerson:Person 		= ObjectUtil.copy(person) as Person;
+				var cPerson:Person;
+				if (marriage){
+					cPerson = marriage.person1.id == ref_id? marriage.person1 : marriage.person2;
+				}else{
+					cPerson = ObjectUtil.copy(person) as Person;
+				}				 		
 				Helper.personToUTC(cPerson);
 				call = AsyncToken(_service.create_relationship({person:cPerson, marriage:cMarriage, ref_id:ref_id, role:role}));
 			}else{
